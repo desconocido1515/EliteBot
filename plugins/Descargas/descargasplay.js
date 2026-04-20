@@ -67,26 +67,35 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    // ✅ Enviar SOLO la barra de progreso (sin miniatura)
+    // ✅ Barra de progreso (solo texto, sin canal)
     await conn.reply(m.chat, `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`, m);
 
-    // ✅ Enviar la miniatura del video con el canal PEGADO (usando externalAdReply)
-    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal\nWhatsApp');
+    // ✅ MINIATURA CON CANAL PEGADO (usando reply como en frases)
+    // Extraer el texto del canal
+    let canalMsg = '';
+    if (typeof rcanal === 'string') {
+      canalMsg = rcanal;
+    } else if (rcanal && rcanal.text) {
+      canalMsg = rcanal.text;
+    } else if (rcanal) {
+      canalMsg = JSON.stringify(rcanal);
+    } else {
+      canalMsg = 'Ver canal\nWhatsApp';
+    }
     
-    await conn.sendMessage(m.chat, {
-      text: canalText,  // ← El texto del canal va AQUÍ, dentro de la miniatura
+    // Enviar miniatura con el canal como texto principal
+    await conn.reply(m.chat, canalMsg, m, {
       contextInfo: {
         externalAdReply: {
-          title: video.title.slice(0, 60),
-          body: "🎵 Descargado por Elite Bot",
+          title: video.title,
+          body: '🎵 ELITE BOT MUSIC',
           thumbnailUrl: video.thumbnail,
           mediaType: 1,
           renderLargerThumbnail: true,
-          showAdAttribution: true,
           sourceUrl: video.url
         }
       }
-    }, { quoted: m });
+    });
 
     const formato = '128k';
     const data = await yt.convert(video.url, formato);
