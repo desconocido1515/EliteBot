@@ -29,6 +29,7 @@ global.kanekiAIJadibts = true
 global.botname = "𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇"
 global.textbot = "𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇\nSince - 2023®"
 global.dev = "Elite Bot Global - Since 2023®"
+global.music = "01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹"
 global.author = "© mᥲძᥱ ᥕі𝗍һ ᑲᥡ ƈαɾʅσʂ.ɾʋ"
 global.etiqueta = "✫ᴄᴀʀʟᴏs ʀᴀᴍɪʀᴇᴢ❄️ ⊹꙰ "
 global.currency = "g᥆𝗍іᥴᥲs"
@@ -80,7 +81,7 @@ global.rcanal = {
     },
     externalAdReply: {
       title: global.botname || 'Elite Bot',
-      body: global.dev || 'Elite Bot Global',
+      body: global.music || 'Elite Bot Global',
       mediaUrl: null,
       description: null,
       previewType: "PHOTO",
