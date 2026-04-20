@@ -79,7 +79,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ URL DIRECTA DE TU IMAGEN (desde GitHub)
+    // ✅ URL DIRECTA DE TU IMAGEN
     const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg";
     
     await conn.sendMessage(m.chat, {
@@ -95,7 +95,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
           body: '🎵 YouTube Music',
           mediaType: 1,
           previewType: "PHOTO",
-          thumbnail: { url: tuImagen },
+          thumbnailUrl: tuImagen,  // ← CAMBIADO: thumbnailUrl en lugar de thumbnail
           sourceUrl: video.url,
           mediaUrl: null,
           renderLargerThumbnail: true
