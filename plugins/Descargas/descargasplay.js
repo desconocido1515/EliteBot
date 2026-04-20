@@ -66,9 +66,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    if (video.seconds > 600) {
-      throw "❌ El audio es muy largo (máximo 10 minutos)";
-    }
+    // ❌ RESTRICCIÓN ELIMINADA - ya no hay límite de tiempo
 
     await conn.sendMessage(m.chat, {
       text: `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`,
@@ -100,17 +98,13 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ AUDIO CON rcanal (como en los stickers)
-    await conn.sendMessage(
-      m.chat,
-      {
-        audio: buffer,
-        mimetype: 'audio/mpeg',
-        fileName: `${fileName}.mp3`,
-        ptt: false
-      },
-      { quoted: m, rcanal }  // ← AGREGADO rcanal AQUÍ
-    );
+    // ✅ ENVÍA EL AUDIO usando conn.reply (para poder usar , rcanal)
+    await conn.reply(m.chat, { 
+      audio: buffer, 
+      mimetype: 'audio/mpeg', 
+      fileName: `${fileName}.mp3`, 
+      ptt: false 
+    }, m, rcanal);
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
@@ -127,7 +121,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         `• Intenta con otro tema\n` +
         `• Prueba más tarde`;
 
-    await conn.sendMessage(m.chat, { text: errorMsg }, { quoted: m, rcanal });  // ← También en errores
+    await conn.reply(m.chat, errorMsg, m, rcanal);
   }
 };
 
