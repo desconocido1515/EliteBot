@@ -1,4 +1,6 @@
 import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
 
 export async function before(m, { conn }) {
   if (global._cmdHandled) return;
@@ -9,49 +11,96 @@ export async function before(m, { conn }) {
 
   if (!command || command === 'bot') return;
 
-  const isValidCommand = (command, plugins) => {
-    for (let plugin of Object.values(plugins)) {
-      const cmd = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
-      if (cmd.includes(command)) return true;
+  // ✅ FUNCIÓN QUE REVISA TODAS LAS SUBCARPETAS
+  const isValidCommand = (command) => {
+    // Primero revisa plugins cargados en memoria (global.plugins)
+    if (global.plugins) {
+      for (let plugin of Object.values(global.plugins)) {
+        if (!plugin) continue;
+        const cmd = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
+        if (cmd && cmd.includes(command)) return true;
+      }
     }
-    return false;
+    
+    // Si no lo encuentra, escanea las carpetas físicas
+    const pluginsPath = './plugins';
+    const searchInDir = (dir) => {
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        const fullPath = path.join(dir, file);
+        const stat = fs.statSync(fullPath);
+        
+        if (stat.isDirectory()) {
+          // Buscar en subcarpetas
+          const found = searchInDir(fullPath);
+          if (found) return true;
+        } else if (file.endsWith('.js')) {
+          try {
+            const content = fs.readFileSync(fullPath, 'utf8');
+            // Buscar handler.command o handler.command = ['comando']
+            const match = content.match(/handler\.command\s*=\s*\[(.*?)\]/s);
+            if (match) {
+              const commands = match[1].match(/['"](.*?)['"]/g);
+              if (commands) {
+                for (const cmd of commands) {
+                  const cleanCmd = cmd.replace(/['"]/g, '');
+                  if (cleanCmd === command) return true;
+                }
+              }
+            }
+          } catch (e) {
+            console.log('Error leyendo', fullPath, e.message);
+          }
+        }
+      }
+      return false;
+    };
+    
+    try {
+      return searchInDir(pluginsPath);
+    } catch (e) {
+      console.log('Error escaneando plugins:', e);
+      return false;
+    }
   };
 
-  if (isValidCommand(command, global.plugins)) {
+  if (isValidCommand(command)) {
     let user = global.db.data.users[m.sender];
-    user.commands = (user.commands || 0) + 1;
+    if (user) {
+      user.commands = (user.commands || 0) + 1;
+    }
     return;
   }
 
   global._cmdHandled = true;
 
   const mensajes = [
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Deja de inventar comandos raros.
 No dispongo de ese comando.
 Usa \`.menu\` para ver opciones.`,
 
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Pero… ¿qué estás escribiendo?
 Creo que buscas \`.menu\`
 Ahí está todo.`,
 
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Ni yo conozco ese comando.
 Mejor usa \`.menu\`
 y revisa mi catálogo.`,
 
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Ese comando no existe.
 Pero puedes usar \`.menu\`
 para ver todos los disponibles.`,
 
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Comando inválido.
 No está en mi sistema.
 Prueba con \`.menu\`.`,
 
-`✦ ¡Hey!
+    `✦ ¡Hey!
 Ese comando no está disponible.
 Revisa \`.menu\`
 para encontrar lo que buscas.`
@@ -70,5 +119,3 @@ para encontrar lo que buscas.`
     global._cmdHandled = false;
   }, 1000);
 }
-
-
