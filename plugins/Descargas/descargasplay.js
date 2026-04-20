@@ -18,7 +18,7 @@ const yt = {
     return {
       link,
       format: tipo,
-      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '128',
+      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '64',  // ← BAJADO A 64k
       videoQuality: tipo === 'mp4' ? f.replace('p', '') : '480',
       filenameStyle: 'pretty',
       vCodec: 'h264'
@@ -33,7 +33,6 @@ const yt = {
     const r = await fetch(this.static.baseUrl + '/v2/sanity/key', {
       headers: this.static.headers
     });
-
     const j = await r.json();
     if (!j?.key) throw new Error('Key inválida');
     return j.key;
@@ -42,13 +41,11 @@ const yt = {
   async convert(url, f) {
     const key = await this.getKey();
     const payload = this.resolvePayload(url, f);
-
     const r = await fetch(this.static.baseUrl + '/v2/converter', {
       method: 'POST',
       headers: { ...this.static.headers, key },
       body: new URLSearchParams(payload)
     });
-
     const j = await r.json();
     if (!j?.url) throw new Error('No se pudo convertir');
     return j;
@@ -68,7 +65,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    const formato = '128k';
+    const formato = '64k';  // ← CALIDAD BAJA PARA MÁS VELOCIDAD
     const data = await yt.convert(video.url, formato);
 
     const fileName = yt.sanitize(data.filename || video.title);
@@ -83,10 +80,10 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ AUDIO CON TU ICONO DE YOUTUBE
+    // AUDIO CON CALIDAD BAJA
     let tuImagen;
     try {
-      tuImagen = fs.readFileSync('./media/youtube.jpg');  // ← TU IMAGEN YOUTUBE
+      tuImagen = fs.readFileSync('./media/youtube.jpg');
     } catch {
       tuImagen = null;
     }
@@ -101,11 +98,11 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         forwardingScore: 999,
         externalAdReply: {
           title: video.title,
-          body: 'EliteBotGlobal',
+          body: '🎵 YouTube Music',
           mediaType: 1,
           previewType: "PHOTO",
-          thumbnail: tuImagen,  // Tu imagen de YouTube
-          sourceUrl: video.url,  // ← Enlace a YouTube (opcional)
+          thumbnail: tuImagen,
+          sourceUrl: video.url,
           mediaUrl: null,
           renderLargerThumbnail: true
         },
@@ -120,9 +117,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
   } catch (error) {
     console.error("Error:", error);
-
     await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
-
     const errorMsg = typeof error === 'string'
       ? error
       : `❌ *Error:* ${error.message || 'Ocurrió un problema'}\n\n` +
@@ -130,7 +125,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         `• Verifica el nombre de la canción\n` +
         `• Intenta con otro tema\n` +
         `• Prueba más tarde`;
-
     await conn.reply(m.chat, errorMsg, m, rcanal);
   }
 };
