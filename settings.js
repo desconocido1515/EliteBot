@@ -85,7 +85,7 @@ global.rcanal = {
       mediaUrl: null,
       description: null,
       previewType: "PHOTO",
-      thumbnail: "https://raw.githubusercontent.com/desconocido1515/desco/main/media/youtube.jpg", 
+      thumbnail: null, 
       sourceUrl: "https://whatsapp.com/channel/0029VbCUT9R7YScuSbDdT51u",
       mediaType: 1,
       renderLargerThumbnail: false
