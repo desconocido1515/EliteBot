@@ -1,4 +1,4 @@
-/*import { spawn } from 'child_process'
+import { spawn } from 'child_process'
 import fs from 'fs'
 
 const handler = async (m, { conn, usedPrefix, command }) => {
@@ -59,4 +59,4 @@ handler.command = ["hdvideo", "hd2", "hdvideos"]
 handler.group = true
 
 export default handler
-*/
+
