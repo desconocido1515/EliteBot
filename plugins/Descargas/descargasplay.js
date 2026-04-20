@@ -67,18 +67,18 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    // ✅ TEXTO con rcanal PEGADO (igual que en frases)
-    const textoBase = `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`;
-    
-    await conn.reply(m.chat, textoBase, m, rcanal);  // ← rcanal pegado al texto
+    // ✅ Enviar SOLO la barra de progreso (sin miniatura)
+    await conn.reply(m.chat, `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`, m);
 
-    // Enviar también la vista previa del video
+    // ✅ Enviar la miniatura del video con el canal PEGADO (usando externalAdReply)
+    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal\nWhatsApp');
+    
     await conn.sendMessage(m.chat, {
-      text: ' ',
+      text: canalText,  // ← El texto del canal va AQUÍ, dentro de la miniatura
       contextInfo: {
         externalAdReply: {
           title: video.title.slice(0, 60),
-          body: "",
+          body: "🎵 Descargado por Elite Bot",
           thumbnailUrl: video.thumbnail,
           mediaType: 1,
           renderLargerThumbnail: true,
