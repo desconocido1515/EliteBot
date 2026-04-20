@@ -17,7 +17,7 @@ const yt = {
     return {
       link,
       format: tipo,
-      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '128',
+      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '64',
       videoQuality: tipo === 'mp4' ? f.replace('p', '') : '480',
       filenameStyle: 'pretty',
       vCodec: 'h264'
@@ -80,7 +80,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const buffer = Buffer.from(await r.arrayBuffer());
 
     // ✅ URL DIRECTA DE TU IMAGEN
-    const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/youtube.jpg";
+    const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/youtube2.jpg";
     
     await conn.sendMessage(m.chat, {
       audio: buffer,
