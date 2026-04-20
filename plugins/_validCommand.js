@@ -1,120 +1,174 @@
 import fetch from 'node-fetch';
+import { readdirSync, statSync } from 'fs';
+import { join } from 'path';
 
 export async function before(m, { conn }) {
-  // Si ya se procesó un comando en este ciclo, salir
   if (global._cmdHandled) return;
-  
-  // Verificar si hay texto y prefijo
   if (!m.text || !global.prefix.test(m.text)) return;
 
   const usedPrefix = global.prefix.exec(m.text)[0];
   const fullCommand = m.text.slice(usedPrefix.length).trim();
   const command = fullCommand.split(' ')[0].toLowerCase();
-  const args = fullCommand.slice(command.length).trim();
 
-  // Ignorar comando 'bot'
   if (!command || command === 'bot') return;
 
-  // ========== SISTEMA DE DETECCIÓN MEJORADO ==========
+  // ========== SISTEMA DE DETECCIÓN RECURSIVA ==========
   let isValid = false;
-  let foundPlugin = null;
+  let foundPath = null;
   let foundCommand = null;
 
-  // Método 1: Recorrer todos los plugins registrados
+  // Función recursiva para escanear TODAS las subcarpetas
+  function scanPluginsRecursive(pluginsObj, currentPath = 'root') {
+    if (!pluginsObj || typeof pluginsObj !== 'object') return false;
+    
+    for (let [key, value] of Object.entries(pluginsObj)) {
+      // Si es un plugin válido (tiene command)
+      if (value && typeof value === 'object') {
+        // Verificar si tiene propiedad 'command'
+        if (value.command) {
+          let pluginCommands = [];
+          
+          // Normalizar comandos (string o array)
+          if (Array.isArray(value.command)) {
+            pluginCommands = value.command;
+          } else if (typeof value.command === 'string') {
+            pluginCommands = [value.command];
+          }
+          
+          // Verificar alias
+          let aliases = [];
+          if (value.alias) {
+            if (Array.isArray(value.alias)) aliases = value.alias;
+            else if (typeof value.alias === 'string') aliases = [value.alias];
+          }
+          
+          const allCommands = [...pluginCommands, ...aliases];
+          
+          if (allCommands.includes(command)) {
+            return { found: true, path: `${currentPath}/${key}`, cmd: command };
+          }
+        }
+        
+        // Si tiene subplugins (subcarpetas), escanear recursivamente
+        if (value && typeof value === 'object' && !value.command) {
+          const subResult = scanPluginsRecursive(value, `${currentPath}/${key}`);
+          if (subResult.found) return subResult;
+        }
+      }
+    }
+    return { found: false };
+  }
+
+  // Método 1: Escanear global.plugins recursivamente
   if (global.plugins && typeof global.plugins === 'object') {
-    for (let [pluginName, plugin] of Object.entries(global.plugins)) {
-      if (!plugin) continue;
-      
-      // Obtener comandos del plugin (puede ser string, array, o función)
-      let pluginCommands = [];
-      
-      if (Array.isArray(plugin.command)) {
-        pluginCommands = plugin.command;
-      } else if (typeof plugin.command === 'string') {
-        pluginCommands = [plugin.command];
-      } else if (typeof plugin.command === 'function') {
-        // Algunos plugins tienen command como función que retorna el comando
-        try {
-          const result = plugin.command();
-          if (typeof result === 'string') pluginCommands = [result];
-          else if (Array.isArray(result)) pluginCommands = result;
-        } catch(e) {}
+    const result = scanPluginsRecursive(global.plugins);
+    if (result.found) {
+      isValid = true;
+      foundPath = result.path;
+      foundCommand = result.cmd;
+    }
+  }
+
+  // Método 2: Escanear sistema de archivos directamente (respaldo)
+  if (!isValid && global.__dirname) {
+    const pluginsPath = join(global.__dirname, 'plugins');
+    try {
+      function scanFilesystem(dir, relativePath = '') {
+        const files = readdirSync(dir);
+        
+        for (const file of files) {
+          const fullPath = join(dir, file);
+          const stat = statSync(fullPath);
+          
+          if (stat.isDirectory()) {
+            // Escanear subcarpeta
+            const subResult = scanFilesystem(fullPath, `${relativePath}/${file}`);
+            if (subResult) return subResult;
+          } else if (file.endsWith('.js')) {
+            // Intentar importar el plugin temporalmente para leer su command
+            try {
+              // Limpiar cache para evitar conflictos
+              const modulePath = fullPath;
+              delete require.cache[require.resolve(modulePath)];
+              const plugin = await import(`file://${modulePath}`);
+              
+              if (plugin.default && plugin.default.command) {
+                let cmds = [];
+                if (Array.isArray(plugin.default.command)) cmds = plugin.default.command;
+                else if (typeof plugin.default.command === 'string') cmds = [plugin.default.command];
+                
+                if (cmds.includes(command)) {
+                  return { found: true, path: `${relativePath}/${file}`, cmd: command };
+                }
+              }
+            } catch(e) {}
+          }
+        }
+        return null;
       }
       
-      // Verificar alias también
-      let aliases = [];
-      if (plugin.alias && Array.isArray(plugin.alias)) {
-        aliases = plugin.alias;
-      } else if (plugin.alias && typeof plugin.alias === 'string') {
-        aliases = [plugin.alias];
-      }
-      
-      const allCommands = [...pluginCommands, ...aliases];
-      
-      if (allCommands.includes(command)) {
+      const fsResult = scanFilesystem(pluginsPath);
+      if (fsResult) {
         isValid = true;
-        foundPlugin = pluginName;
-        foundCommand = command;
-        break;
+        foundPath = fsResult.path;
+        foundCommand = fsResult.cmd;
       }
+    } catch(e) {
+      console.log('Error escaneando filesystem:', e.message);
     }
   }
 
-  // Método 2: Verificar en global.commands (si existe)
-  if (!isValid && global.commands && global.commands instanceof Map) {
-    if (global.commands.has(command)) {
-      isValid = true;
-      foundCommand = command;
-      foundPlugin = 'global.commands';
-    }
-  }
-
-  // Método 3: Verificar en handler.js o comandos cargados dinámicamente
-  if (!isValid && global.handler && global.handler.commands) {
-    if (global.handler.commands.includes && global.handler.commands.includes(command)) {
-      isValid = true;
-      foundCommand = command;
-      foundPlugin = 'handler.commands';
-    }
-  }
-
-  // ========== LOG EN CONSOLA (DURO) ==========
-  console.log('\x1b[36m════════════════════════════════════════════\x1b[0m');
-  console.log('\x1b[33m[ELITEBOT - DETECCIÓN DE COMANDO]\x1b[0m');
+  // ========== LOG EXTREMO EN CONSOLA ==========
+  console.log('\x1b[36m═══════════════════════════════════════════════════\x1b[0m');
+  console.log('\x1b[33m[ELITEBOT - DETECCIÓN RECURSIVA]\x1b[0m');
   console.log(`\x1b[35m📨 Usuario:\x1b[0m ${m.sender.split('@')[0]}`);
-  console.log(`\x1b[35m💬 Comando ingresado:\x1b[0m ${usedPrefix}${command}`);
-  console.log(`\x1b[35m📝 Args:\x1b[0m ${args || '(sin argumentos)'}`);
-  console.log(`\x1b[35m🔍 ¿Comando válido?:\x1b[0m ${isValid ? '\x1b[32m✓ SÍ\x1b[0m' : '\x1b[31m✗ NO\x1b[0m'}`);
+  console.log(`\x1b[35m💬 Comando:\x1b[0m .${command}`);
+  console.log(`\x1b[35m📊 Plugins totales:\x1b[0m ${Object.keys(global.plugins || {}).length}`);
+  console.log(`\x1b[35m🔍 ¿Válido?:\x1b[0m ${isValid ? '\x1b[32m✓ SÍ\x1b[0m' : '\x1b[31m✗ NO\x1b[0m'}`);
   
   if (isValid) {
-    console.log(`\x1b[32m📦 Plugin encontrado:\x1b[0m ${foundPlugin}`);
-    console.log(`\x1b[32m⚡ Comando detectado:\x1b[0m ${foundCommand}`);
+    console.log(`\x1b[32m📂 Ruta encontrada:\x1b[0m ${foundPath}`);
+    console.log(`\x1b[32m⚡ Comando:\x1b[0m ${foundCommand}`);
   } else {
-    console.log(`\x1b[31m⚠️  No se encontró el comando en ningún plugin registrado\x1b[0m`);
-    console.log(`\x1b[31m📋 Total plugins cargados:\x1b[0m ${global.plugins ? Object.keys(global.plugins).length : 0}`);
+    console.log(`\x1b[31m⚠️  No encontrado en ninguna subcarpeta\x1b[0m`);
+    
+    // Mostrar estructura de carpetas para depuración
+    if (global.__dirname) {
+      const pluginsPath = join(global.__dirname, 'plugins');
+      console.log('\x1b[33m📁 Estructura de plugins:\x1b[0m');
+      function listDirs(path, indent = '') {
+        try {
+          const items = readdirSync(path);
+          items.forEach(item => {
+            const fullPath = join(path, item);
+            if (statSync(fullPath).isDirectory()) {
+              console.log(`${indent}📂 ${item}/`);
+              listDirs(fullPath, indent + '  ');
+            }
+          });
+        } catch(e) {}
+      }
+      listDirs(pluginsPath);
+    }
   }
-  console.log('\x1b[36m════════════════════════════════════════════\x1b[0m');
+  console.log('\x1b[36m═══════════════════════════════════════════════════\x1b[0m');
 
-  // ========== PROCESAR COMANDO VÁLIDO ==========
+  // ========== PROCESAR COMANDO ==========
   if (isValid) {
-    // Contar comando usado
     let user = global.db.data.users[m.sender];
     if (user) {
       user.commands = (user.commands || 0) + 1;
-      console.log(`\x1b[32m📊 Comandos totales de usuario: ${user.commands}\x1b[0m`);
     }
     
-    // IMPORTANTE: No bloquear la ejecución del comando
-    // Devolvemos true para que el sistema sepa que hay un comando válido
     global._cmdHandled = true;
     setTimeout(() => {
       global._cmdHandled = false;
     }, 500);
     
-    return true; // Permite que el handler principal ejecute el comando
+    return true; // Dejar que el handler ejecute el comando
   }
 
-  // ========== COMANDO INVÁLIDO - ENVIAR MENSAJE ==========
+  // ========== COMANDO INVÁLIDO ==========
   global._cmdHandled = true;
 
   const mensajes = [
@@ -145,16 +199,11 @@ para encontrar lo que buscas.`
 
   let texto = mensajes[Math.floor(Math.random() * mensajes.length)];
   
-  // Añadir información de depuración (solo para admins/owner)
-  if (global.owner && global.owner.includes(m.sender.split('@')[0])) {
-    texto += `\n\n\`\`\`[DEBUG] Comando "${command}" no encontrado en plugins\`\`\``;
-  }
-
   await conn.reply(m.chat, texto, m, { quoted: m });
 
   setTimeout(() => {
     global._cmdHandled = false;
   }, 1000);
   
-  return false; // Comando inválido, no continuar
+  return false;
 }
