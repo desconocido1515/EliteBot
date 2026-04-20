@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import yts from "yt-search";
+import fs from 'fs';
 
 const yt = {
   static: Object.freeze({
@@ -82,13 +83,37 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ SOLO EL AUDIO CON EL CANAL (sin textos extras)
+    // ✅ AUDIO CON TU ICONO DE YOUTUBE
+    let tuImagen;
+    try {
+      tuImagen = fs.readFileSync('./media/youtube.jpg');  // ← TU IMAGEN YOUTUBE
+    } catch {
+      tuImagen = null;
+    }
+    
     await conn.sendMessage(m.chat, {
       audio: buffer,
       mimetype: 'audio/mpeg',
       fileName: `${fileName}.mp3`,
       ptt: false,
-      contextInfo: rcanal.contextInfo  // El canal pegado al audio
+      contextInfo: {
+        isForwarded: true,
+        forwardingScore: 999,
+        externalAdReply: {
+          title: video.title,
+          body: '🎵 YouTube Music',
+          mediaType: 1,
+          previewType: "PHOTO",
+          thumbnail: tuImagen,  // Tu imagen de YouTube
+          sourceUrl: video.url,  // ← Enlace a YouTube (opcional)
+          mediaUrl: null,
+          renderLargerThumbnail: true
+        },
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: "120363407475582973@newsletter",
+          newsletterName: "YouTube"
+        }
+      }
     }, { quoted: m });
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
