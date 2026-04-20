@@ -92,7 +92,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         forwardingScore: 999,
         externalAdReply: {
           title: video.title,
-          body: '🎵 YouTube Music',
+          body: 'EliteBotGlobal ',
           mediaType: 1,
           previewType: "PHOTO",
           thumbnailUrl: tuImagen,  // ← CAMBIADO: thumbnailUrl en lugar de thumbnail
