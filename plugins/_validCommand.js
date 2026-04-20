@@ -11,60 +11,64 @@ export async function before(m, { conn }) {
 
   if (!command || command === 'bot') return;
 
-  // ✅ FUNCIÓN QUE REVISA TODAS LAS SUBCARPETAS
-  const isValidCommand = (command) => {
-    // Primero revisa plugins cargados en memoria (global.plugins)
+  // ✅ FUNCIÓN QUE ESCANEA TODAS LAS SUBCARPETAS
+  const commandExists = (cmd) => {
+    // Primero revisar plugins ya cargados en memoria
     if (global.plugins) {
-      for (let plugin of Object.values(global.plugins)) {
+      for (const plugin of Object.values(global.plugins)) {
         if (!plugin) continue;
-        const cmd = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
-        if (cmd && cmd.includes(command)) return true;
+        const pluginCommands = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
+        if (pluginCommands && pluginCommands.includes(cmd)) return true;
       }
     }
     
-    // Si no lo encuentra, escanea las carpetas físicas
-    const pluginsPath = './plugins';
-    const searchInDir = (dir) => {
-      const files = fs.readdirSync(dir);
-      for (const file of files) {
-        const fullPath = path.join(dir, file);
-        const stat = fs.statSync(fullPath);
-        
-        if (stat.isDirectory()) {
-          // Buscar en subcarpetas
-          const found = searchInDir(fullPath);
-          if (found) return true;
-        } else if (file.endsWith('.js')) {
-          try {
-            const content = fs.readFileSync(fullPath, 'utf8');
-            // Buscar handler.command o handler.command = ['comando']
-            const match = content.match(/handler\.command\s*=\s*\[(.*?)\]/s);
-            if (match) {
-              const commands = match[1].match(/['"](.*?)['"]/g);
-              if (commands) {
-                for (const cmd of commands) {
-                  const cleanCmd = cmd.replace(/['"]/g, '');
-                  if (cleanCmd === command) return true;
+    // Si no está en memoria, escanear archivos físicos (solo una vez)
+    if (!global._scannedCommands) {
+      global._scannedCommands = new Set();
+      const scanDir = (dir) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const fullPath = path.join(dir, file);
+          const stat = fs.statSync(fullPath);
+          
+          if (stat.isDirectory()) {
+            scanDir(fullPath); // ← CLAVE: entra a subcarpetas
+          } else if (file.endsWith('.js')) {
+            try {
+              const content = fs.readFileSync(fullPath, 'utf8');
+              // Buscar handler.command = ['comando1', 'comando2']
+              const match = content.match(/handler\.command\s*=\s*\[(.*?)\]/s);
+              if (match) {
+                const commands = match[1].match(/['"](.*?)['"]/g);
+                if (commands) {
+                  for (const c of commands) {
+                    global._scannedCommands.add(c.replace(/['"]/g, ''));
+                  }
                 }
               }
+              // Buscar handler.command = 'comando'
+              const singleMatch = content.match(/handler\.command\s*=\s*['"](.*?)['"]/);
+              if (singleMatch) {
+                global._scannedCommands.add(singleMatch[1]);
+              }
+            } catch (e) {
+              // Ignorar errores de lectura
             }
-          } catch (e) {
-            console.log('Error leyendo', fullPath, e.message);
           }
         }
+      };
+      
+      try {
+        scanDir('./plugins');
+      } catch (e) {
+        console.log('Error escaneando plugins:', e);
       }
-      return false;
-    };
-    
-    try {
-      return searchInDir(pluginsPath);
-    } catch (e) {
-      console.log('Error escaneando plugins:', e);
-      return false;
     }
+    
+    return global._scannedCommands && global._scannedCommands.has(cmd);
   };
 
-  if (isValidCommand(command)) {
+  if (commandExists(command)) {
     let user = global.db.data.users[m.sender];
     if (user) {
       user.commands = (user.commands || 0) + 1;
@@ -108,12 +112,7 @@ para encontrar lo que buscas.`
 
   let texto = mensajes[Math.floor(Math.random() * mensajes.length)];
 
-  await conn.reply(
-    m.chat,
-    texto,
-    m,
-    rcanal
-  );
+  await conn.reply(m.chat, texto, m, rcanal);
 
   setTimeout(() => {
     global._cmdHandled = false;
