@@ -1,34 +1,31 @@
-import { mediafiredl } from '@bochilteam/scraper'
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-if (!args[0]) throw `*[❗INFO❗] INGRESE UN ENLACE VALIDO DE MEDIAFIRE, EJEMPLO: ${usedPrefix + command} https://www.mediafire.com/file/pbabuzyc7i8ord5/TheMystic-Bot-MD-master_%25285%2529.zip/file*`
+import fetch from 'node-fetch'
+import { lookup } from 'mime-types'
+
+let handler = async (m, { conn, text, usedPrefix }) => {
+if (!text) return conn.reply(m.chat, '❀ Te faltó el enlace de Mediafire.', m)
+if (!/^https:\/\/www\.mediafire\.com\//i.test(text)) return conn.reply(m.chat, 'ꕥ Enlace inválido.', m)
 try {
-let res = await mediafiredl(args[0])
-let { url, url2, filename, ext, aploud, filesize, filesizeH } = await res
-let caption = `
-🌀𝘿𝙀𝙎𝘾𝘼𝙍𝙂𝘼𝙎 𝙈𝙀𝘿𝙄𝘼𝙁𝙄𝙍𝙀 🌀
-
-🎁 𝙉𝙊𝙈𝘽𝙍𝙀: ${filename}
-🇦🇶 𝙏𝘼𝙈𝘼𝙉̃𝙊: ${filesizeH}
-💻𝙏𝙄𝙋𝙊: ${ext}
-
-𝙀𝙎𝙋𝙀𝙍𝘼 𝙐𝙉 𝙈𝙊𝙈𝙀𝙉𝙏𝙊 𝙎𝙀 𝙀𝙎𝙏𝘼 𝙀𝙉𝙑𝙄𝘼𝙉𝘿𝙊 𝙏𝙐 𝘼𝙍𝘾𝙃𝙄𝙑𝙊  .✅
-`.trim()
-m.reply(caption)
-await conn.sendFile(m.chat, url, filename, '', m, null, { mimetype: ext, asDocument: true })
-} catch {
-await m.reply('*[❗INFO❗] ERROR, POR FAVOR VUELVA A INTENTARLO*\n\n*- CORROBORE QUE EL ENLACE SEA SIMILAR A:*\n*◉ https://www.mediafire.com/file/pbabuzyc7i8ord5/TheMystic-Bot-MD-master_%25285%2529.zip/file*')
-/*conn.reply(m.chat, caption, m, {
-contextInfo: { externalAdReply :{ mediaUrl: null, mediaType: 1, description: null, 
-title: 'DESCARGAR DE MEDIAFIRE',
-body: wm,         
-previewType: 0, thumbnail: fs.readFileSync("./Menu2.jpg"),
-sourceUrl: hp_otkstogthr}}})
-conn.sendFile(m.chat, url, filename, '', m, null, { mimetype: ext, asDocument: true })
+await m.react('🕒')
+const res = await fetch(`${global.APIs.delirius.url}/download/mediafire?url=${encodeURIComponent(text)}`)
+const json = await res.json()
+const data = json.data
+if (!json.status || !data?.filename || !data?.link) { throw 'ꕥ No se pudo obtener el archivo desde Delirius.' }
+const filename = data.filename
+const filesize = data.size || 'desconocido'
+const mimetype = data.mime || lookup(data.extension?.toLowerCase()) || 'application/octet-stream'
+const dl_url = data.link.includes('u=') ? decodeURIComponent(data.link.split('u=')[1]) : data.link
+const caption = `乂 MEDIAFIRE - DESCARGA 乂\n\n✩ Nombre » ${filename}\n✩ Peso » ${filesize}\n✩ MimeType » ${mimetype}\n✩ Enlace » ${text}`
+await conn.sendMessage(m.chat, { document: { url: dl_url }, fileName: filename, mimetype, caption }, { quoted: m })
+await m.react('✔️')
 } catch (e) {
-m.reply('*[❗INFO❗] ERROR, POR FAVOR VUELVA A INTENTARLO*\n\n*- CORROBORE QUE EL ENLACE SEA SIMILAR A:*\n*◉ https://www.mediafire.com/file/pbabuzyc7i8ord5/TheMystic-Bot-MD-master_%25285%2529.zip/file*')
-console.log(e)*/
+await m.react('✖️')
+return conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${e.message}`, m)
 }}
-handler.help = ['mediafire'].map(v => v + ' <url>')
-handler.tags = ['downloader']
-handler.command = /^(mediafire|mediafiredl|dlmediafire)$/i
+
+handler.command = ['mf', 'mediafire']
+handler.help = ['mediafire']
+handler.tags = ['download']
+handler.group = true
+handler.premium = true
+
 export default handler
