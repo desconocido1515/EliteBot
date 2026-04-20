@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
 import yts from "yt-search";
-import fs from 'fs';
 
 const yt = {
   static: Object.freeze({
@@ -80,19 +79,8 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ LEER LA IMAGEN CADA VEZ (sin caché)
-    let tuImagen;
-    try {
-      const imagePath = './media/youtube1.jpg';
-      if (fs.existsSync(imagePath)) {
-        tuImagen = fs.readFileSync(imagePath);
-      } else {
-        tuImagen = null;
-      }
-    } catch (e) {
-      console.log('Error al leer imagen:', e);
-      tuImagen = null;
-    }
+    // ✅ URL DIRECTA DE TU IMAGEN (desde GitHub)
+    const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg";
     
     await conn.sendMessage(m.chat, {
       audio: buffer,
@@ -107,7 +95,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
           body: '🎵 YouTube Music',
           mediaType: 1,
           previewType: "PHOTO",
-          thumbnail: tuImagen,
+          thumbnail: { url: tuImagen },
           sourceUrl: video.url,
           mediaUrl: null,
           renderLargerThumbnail: true
