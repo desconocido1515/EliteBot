@@ -67,25 +67,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    // Barra de progreso
-    await conn.reply(m.chat, `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`, m);
-
-    // Miniatura del video
-    await conn.sendMessage(m.chat, {
-      text: ' ',
-      contextInfo: {
-        externalAdReply: {
-          title: video.title.slice(0, 60),
-          body: "🎵 Descargado por Elite Bot",
-          thumbnailUrl: video.thumbnail,
-          mediaType: 1,
-          renderLargerThumbnail: true,
-          showAdAttribution: true,
-          sourceUrl: video.url
-        }
-      }
-    }, { quoted: m });
-
     const formato = '128k';
     const data = await yt.convert(video.url, formato);
 
@@ -101,13 +82,13 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ AUDIO CON EL CANAL (usando rcanal.contextInfo)
+    // ✅ SOLO EL AUDIO CON EL CANAL (sin textos extras)
     await conn.sendMessage(m.chat, {
       audio: buffer,
       mimetype: 'audio/mpeg',
       fileName: `${fileName}.mp3`,
       ptt: false,
-      contextInfo: rcanal.contextInfo  // ← Aquí se aplica el canal al audio
+      contextInfo: rcanal.contextInfo  // El canal pegado al audio
     }, { quoted: m });
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
