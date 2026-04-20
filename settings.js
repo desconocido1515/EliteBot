@@ -69,3 +69,28 @@ unwatchFile(file)
 console.log(chalk.redBright("Update 'configXD.js'"))
 import(`${file}?update=${Date.now()}`)
 })
+// ========== CONFIGURACIÓN DE CANAL (rcanal) ==========
+global.rcanal = {
+  contextInfo: {
+    isForwarded: true,
+    forwardedNewsletterMessageInfo: {
+      newsletterJid: "120363407475582973@newsletter",
+      serverMessageId: '',
+      newsletterName: "𝘌𝘓𝘐𝘛𝘌 𝘉𝘖𝘛 𝘎𝘓𝘖𝘉𝘈𝘓 - 𝘚𝘐𝘕𝘊𝘌 2023®"
+    },
+    externalAdReply: {
+      title: global.botname || 'Elite Bot',
+      body: global.dev || 'Elite Bot Global',
+      mediaUrl: null,
+      description: null,
+      previewType: "PHOTO",
+      thumbnail: null,
+      sourceUrl: "https://whatsapp.com/channel/0029VbCUT9R7YScuSbDdT51u",
+      mediaType: 1,
+      renderLargerThumbnail: false
+    }
+  }
+};
+
+// También puedes agregar una versión simple como texto (para comandos como frases)
+global.rcanalText = 'Ver canal\nWhatsApp';
