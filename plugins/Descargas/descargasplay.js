@@ -80,11 +80,17 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ AUDIO CON ICONO youtube1.jpg
+    // ✅ LEER LA IMAGEN CADA VEZ (sin caché)
     let tuImagen;
     try {
-      tuImagen = fs.readFileSync('./media/youtube1.jpg');  // ← NUEVO NOMBRE
-    } catch {
+      const imagePath = './media/youtube1.jpg';
+      if (fs.existsSync(imagePath)) {
+        tuImagen = fs.readFileSync(imagePath);
+      } else {
+        tuImagen = null;
+      }
+    } catch (e) {
+      console.log('Error al leer imagen:', e);
       tuImagen = null;
     }
     
