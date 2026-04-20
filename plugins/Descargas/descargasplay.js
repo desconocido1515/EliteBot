@@ -56,7 +56,9 @@ const yt = {
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text || !text.trim()) {
-    await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, rcanal);
+    // ✅ Extraer el texto del objeto rcanal
+    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal');
+    await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, canalText);
     return;
   }
 
@@ -97,31 +99,17 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ AUDIO CON "Ver canal" DENTRO (usando contextInfo)
-    let canalText = '';
-    if (rcanal && rcanal.text) {
-      canalText = rcanal.text;
-    } else if (rcanal) {
-      canalText = rcanal;
-    } else {
-      canalText = 'Ver canal\nWhatsApp';
-    }
-
+    // ✅ Enviar audio normalmente
     await conn.sendMessage(m.chat, {
       audio: buffer,
       mimetype: 'audio/mpeg',
       fileName: `${fileName}.mp3`,
-      ptt: false,
-      contextInfo: {
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363292358451293@newsletter',
-          newsletterName: canalText,
-          serverMessageId: 1
-        }
-      }
+      ptt: false
     }, { quoted: m });
+
+    // ✅ Enviar mensaje de canal como texto APARTE (pero justo después)
+    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal\nWhatsApp');
+    await conn.reply(m.chat, canalText, m);
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
@@ -138,7 +126,8 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         `• Intenta con otro tema\n` +
         `• Prueba más tarde`;
 
-    await conn.reply(m.chat, errorMsg, m, rcanal);
+    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal');
+    await conn.reply(m.chat, errorMsg, m, canalText);
   }
 };
 
