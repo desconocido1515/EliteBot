@@ -86,7 +86,7 @@ global.rcanal = {
       description: null,
       previewType: "PHOTO",
       thumbnail: "https://qu.ax/0JKxL", 
-      sourceUrl: "https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg",
+      sourceUrl: "https://raw.githubusercontent.com/desconocido1515/desco/main/media/youtube.jpg",
       mediaType: 1,
       renderLargerThumbnail: false
     }
