@@ -86,7 +86,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     // ✅ AUDIO CON TU ICONO DE YOUTUBE
     let tuImagen;
     try {
-      tuImagen = fs.readFileSync('./media/youtube.jpg');  // ← TU IMAGEN YOUTUBE
+      tuImagen = fs.readFileSync('./media/youtube1.jpg');  // ← TU IMAGEN YOUTUBE
     } catch {
       tuImagen = null;
     }
