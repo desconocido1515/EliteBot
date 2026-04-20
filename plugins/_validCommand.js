@@ -72,7 +72,3 @@ para encontrar lo que buscas.`
 }
 
 
-
-
-
-Corrige, hay comandos que si existen y manda el mensaje que no existen. Ponle un sistema duro qué detecte desde consola que es un comando válido. 
