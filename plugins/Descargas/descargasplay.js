@@ -80,7 +80,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const buffer = Buffer.from(await r.arrayBuffer());
 
     // ✅ URL DIRECTA DE TU IMAGEN
-    const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg";
+    const tuImagen = "https://raw.githubusercontent.com/desconocido1515/desco/main/media/youtube.jpg";
     
     await conn.sendMessage(m.chat, {
       audio: buffer,
