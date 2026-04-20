@@ -55,7 +55,6 @@ const yt = {
 };
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
-  // ✅ CAMBIADO: ahora usa conn.reply en lugar de throw
   if (!text || !text.trim()) {
     await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, rcanal);
     return;
@@ -68,7 +67,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    // Enviar mensaje con info del video
     await conn.sendMessage(m.chat, {
       text: `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`,
       contextInfo: {
@@ -99,18 +97,31 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // Enviar audio
+    // ✅ AUDIO CON "Ver canal" DENTRO (usando contextInfo)
+    let canalText = '';
+    if (rcanal && rcanal.text) {
+      canalText = rcanal.text;
+    } else if (rcanal) {
+      canalText = rcanal;
+    } else {
+      canalText = 'Ver canal\nWhatsApp';
+    }
+
     await conn.sendMessage(m.chat, {
       audio: buffer,
       mimetype: 'audio/mpeg',
       fileName: `${fileName}.mp3`,
-      ptt: false
+      ptt: false,
+      contextInfo: {
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: '120363292358451293@newsletter',
+          newsletterName: canalText,
+          serverMessageId: 1
+        }
+      }
     }, { quoted: m });
-
-    // Enviar mensaje de canal
-    if (rcanal) {
-      await conn.reply(m.chat, ' ', m, rcanal);
-    }
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
