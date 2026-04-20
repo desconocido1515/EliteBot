@@ -55,8 +55,10 @@ const yt = {
 };
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
+  // ✅ CAMBIADO: ahora usa conn.reply en lugar de throw
   if (!text || !text.trim()) {
-    throw `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`;
+    await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, rcanal);
+    return;
   }
 
   try {
@@ -66,8 +68,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
-    // ❌ RESTRICCIÓN ELIMINADA - ya no hay límite de tiempo
-
+    // Enviar mensaje con info del video
     await conn.sendMessage(m.chat, {
       text: `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`,
       contextInfo: {
@@ -98,18 +99,23 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ ENVÍA EL AUDIO usando conn.reply (para poder usar , rcanal)
-    await conn.reply(m.chat, { 
-      audio: buffer, 
-      mimetype: 'audio/mpeg', 
-      fileName: `${fileName}.mp3`, 
-      ptt: false 
-    }, m, rcanal);
+    // Enviar audio
+    await conn.sendMessage(m.chat, {
+      audio: buffer,
+      mimetype: 'audio/mpeg',
+      fileName: `${fileName}.mp3`,
+      ptt: false
+    }, { quoted: m });
+
+    // Enviar mensaje de canal
+    if (rcanal) {
+      await conn.reply(m.chat, ' ', m, rcanal);
+    }
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
   } catch (error) {
-    console.error("Error real en play:", error);
+    console.error("Error:", error);
 
     await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key } });
 
