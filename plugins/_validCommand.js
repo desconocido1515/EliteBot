@@ -2,11 +2,10 @@ import fs from 'fs';
 import path from 'path';
 
 export async function before(m, { conn }) {
-  // Evitar doble ejecución
-  if (global._cmdHandled) return;
+  // Solo procesar mensajes de texto con prefijo
   if (!m.text) return;
   
-  // Detectar prefijo
+  // Detectar prefijo (., !, #, etc.)
   const prefixRegex = /^[°•π÷×¶∆£¢€¥®™✓_=|~!?#$%^&.\\/\\-@©:;¿¡+*]+/;
   const match = m.text.match(prefixRegex);
   if (!match) return;
@@ -16,32 +15,46 @@ export async function before(m, { conn }) {
   
   if (!command) return;
 
-  // ✅ FUNCIÓN PARA VERIFICAR SI EL COMANDO EXISTE
-  const commandExists = (cmd) => {
-    // Revisar plugins cargados en memoria
-    if (global.plugins) {
-      for (const plugin of Object.values(global.plugins)) {
-        if (!plugin) continue;
-        
-        // Array de comandos
-        if (Array.isArray(plugin.command) && plugin.command.includes(cmd)) return true;
-        // String simple
-        if (typeof plugin.command === 'string' && plugin.command === cmd) return true;
-        // Expresión regular
-        if (plugin.command instanceof RegExp && plugin.command.test(cmd)) return true;
-        // handler.help
-        if (Array.isArray(plugin.help) && plugin.help.includes(cmd)) return true;
-        if (typeof plugin.help === 'string' && plugin.help === cmd) return true;
-        if (plugin.help instanceof RegExp && plugin.help.test(cmd)) return true;
+  // ✅ Verificar si el comando existe en los plugins cargados
+  let commandExists = false;
+  
+  if (global.plugins) {
+    for (const plugin of Object.values(global.plugins)) {
+      if (!plugin) continue;
+      
+      // Array de comandos
+      if (Array.isArray(plugin.command) && plugin.command.includes(command)) {
+        commandExists = true;
+        break;
+      }
+      // String simple
+      if (typeof plugin.command === 'string' && plugin.command === command) {
+        commandExists = true;
+        break;
+      }
+      // Expresión regular
+      if (plugin.command instanceof RegExp && plugin.command.test(command)) {
+        commandExists = true;
+        break;
+      }
+      // handler.help
+      if (Array.isArray(plugin.help) && plugin.help.includes(command)) {
+        commandExists = true;
+        break;
+      }
+      if (typeof plugin.help === 'string' && plugin.help === command) {
+        commandExists = true;
+        break;
+      }
+      if (plugin.help instanceof RegExp && plugin.help.test(command)) {
+        commandExists = true;
+        break;
       }
     }
-    return false;
-  };
+  }
 
   // Si el comando NO existe, mostrar mensaje de error
-  if (!commandExists(command)) {
-    global._cmdHandled = true;
-    
+  if (!commandExists) {
     const mensajes = [
       `✦ ¡Hey!\nDeja de inventar comandos raros.\nNo dispongo de ese comando.\nUsa \`.menu\` para ver opciones.`,
       `✦ ¡Hey!\nPero… ¿qué estás escribiendo?\nCreo que buscas \`.menu\`\nAhí está todo.`,
@@ -53,16 +66,17 @@ export async function before(m, { conn }) {
     
     const texto = mensajes[Math.floor(Math.random() * mensajes.length)];
     
+    // Enviar mensaje de error
     await conn.reply(m.chat, texto, m, rcanal);
     
-    setTimeout(() => {
-      global._cmdHandled = false;
-    }, 1000);
-    
-    return; // Detener ejecución
+    // Detener la ejecución para que no procese otros handlers
+    return true;
   }
   
   // Si el comando existe, contar y continuar
   let user = global.db.data.users[m.sender];
   if (user) user.commands = (user.commands || 0) + 1;
 }
+
+// Para depuración
+console.log('✅ Validador de comandos cargado correctamente');
