@@ -86,7 +86,7 @@ global.rcanal = {
       description: null,
       previewType: "PHOTO",
       thumbnail: null, 
-      thumbnail: fs.readFileSync('./media/youtube.jpg'),  // Cambia "tu_imagen.jpg" por el nombre de tu archivo
+      thumbnail: fs.readFileSync('./media/youtube1.jpg'),  // Cambia "tu_imagen.jpg" por el nombre de tu archivo
       sourceUrl: "https://whatsapp.com/channel/0029VbCUT9R7YScuSbDdT51u",
       mediaType: 1,
       renderLargerThumbnail: false
