@@ -29,7 +29,7 @@ global.kanekiAIJadibts = true
 global.botname = "𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇"
 global.textbot = "𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇\nSince - 2023®"
 global.dev = "Elite Bot Global - Since 2023®"
-global.music = "01:27 ━━━━⬤───── 05:48"
+global.music = "Elite Bot Global - Since 2023®"
 global.author = "© mᥲძᥱ ᥕі𝗍һ ᑲᥡ ƈαɾʅσʂ.ɾʋ"
 global.etiqueta = "✫ᴄᴀʀʟᴏs ʀᴀᴍɪʀᴇᴢ❄️ ⊹꙰ "
 global.currency = "g᥆𝗍іᥴᥲs"
@@ -85,8 +85,8 @@ global.rcanal = {
       mediaUrl: null,
       description: null,
       previewType: "PHOTO",
-      thumbnail: null, 
-      thumbnail: fs.readFileSync('./media/youtube1.jpg'),  // Cambia "tu_imagen.jpg" por el nombre de tu archivo
+      thumbnail: null,
+      thumbnail: null,  // Cambia "tu_imagen.jpg" por el nombre de tu archivo
       sourceUrl: "https://whatsapp.com/channel/0029VbCUT9R7YScuSbDdT51u",
       mediaType: 1,
       renderLargerThumbnail: false
