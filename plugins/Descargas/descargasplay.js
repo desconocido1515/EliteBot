@@ -18,7 +18,7 @@ const yt = {
     return {
       link,
       format: tipo,
-      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '64',
+      audioBitrate: tipo === 'mp3' ? f.replace('k', '') : '128',
       videoQuality: tipo === 'mp4' ? f.replace('p', '') : '480',
       filenameStyle: 'pretty',
       vCodec: 'h264'
