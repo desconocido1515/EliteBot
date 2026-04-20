@@ -56,9 +56,7 @@ const yt = {
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text || !text.trim()) {
-    // ✅ Extraer el texto del objeto rcanal
-    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal');
-    await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, canalText);
+    await conn.reply(m.chat, `⭐ 𝘌𝘯𝘷𝘪𝘢 𝘦𝘭 𝘯𝘰𝘮𝘣𝘳𝘦 𝘥𝘦 𝘭𝘢 𝘤𝘢𝘯𝘤𝘪ó𝘯\n\n» 𝘌𝘫𝘦𝘮𝘱𝘭𝘰: ${usedPrefix + command} Bad Bunny - Monaco`, m, rcanal);
     return;
   }
 
@@ -69,8 +67,14 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const video = searchResults.videos[0];
     if (!video) throw new Error("No se encontró el video");
 
+    // ✅ TEXTO con rcanal PEGADO (igual que en frases)
+    const textoBase = `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`;
+    
+    await conn.reply(m.chat, textoBase, m, rcanal);  // ← rcanal pegado al texto
+
+    // Enviar también la vista previa del video
     await conn.sendMessage(m.chat, {
-      text: `01:27 ━━━━━⬤────── 05:48\n*⇄ㅤ      ◁        ❚❚        ▷        ↻*\n╴𝗘𝗹𝗶𝘁𝗲 𝗕𝗼𝘁 𝗚𝗹𝗼𝗯𝗮𝗹`,
+      text: ' ',
       contextInfo: {
         externalAdReply: {
           title: video.title.slice(0, 60),
@@ -99,17 +103,13 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const buffer = Buffer.from(await r.arrayBuffer());
 
-    // ✅ Enviar audio normalmente
+    // Enviar audio
     await conn.sendMessage(m.chat, {
       audio: buffer,
       mimetype: 'audio/mpeg',
       fileName: `${fileName}.mp3`,
       ptt: false
     }, { quoted: m });
-
-    // ✅ Enviar mensaje de canal como texto APARTE (pero justo después)
-    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal\nWhatsApp');
-    await conn.reply(m.chat, canalText, m);
 
     await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
 
@@ -126,8 +126,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         `• Intenta con otro tema\n` +
         `• Prueba más tarde`;
 
-    const canalText = (rcanal && rcanal.text) ? rcanal.text : (rcanal || 'Ver canal');
-    await conn.reply(m.chat, errorMsg, m, canalText);
+    await conn.reply(m.chat, errorMsg, m, rcanal);
   }
 };
 
