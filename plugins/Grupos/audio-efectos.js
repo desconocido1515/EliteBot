@@ -1,4 +1,4 @@
-import { unlinkSync, readFileSync } from 'fs'
+import { unlinkSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { exec } from 'child_process'
 import { tmpdir } from 'os'
@@ -28,18 +28,17 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     let set = effects[command]
     if (!set) throw `Efecto "${command}" no soportado.`
 
-    // ✅ VALIDACIÓN REAL
     if (!/audio/.test(mime)) {
       return conn.reply(m.chat, `⚠️ Responde a un audio.\nEjemplo: *${usedPrefix + command}*`, m)
     }
 
     await m.react('🕓')
 
-    let media = await q.download() // ✅ ESTE ES EL BUENO
+    let media = await q.download()
     let input = join(tmpdir(), `${Date.now()}.mp3`)
     let output = join(tmpdir(), `${Date.now()}_out.mp3`)
 
-    require('fs').writeFileSync(input, media)
+    writeFileSync(input, media)
 
     exec(`ffmpeg -i "${input}" ${set} "${output}"`, async (err) => {
       try { unlinkSync(input) } catch {}
