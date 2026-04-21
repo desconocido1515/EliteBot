@@ -1,6 +1,15 @@
 import fetch from 'node-fetch';
 
 const handler = async (m, { conn, command, usedPrefix }) => {
+  
+  // Reacción inicial 🔮
+  await conn.sendMessage(m.chat, {
+    react: {
+      text: '🔮',
+      key: m.key
+    }
+  });
+  
   switch (command) {
 		  
     case 'goku':
@@ -18,6 +27,14 @@ const handler = async (m, { conn, command, usedPrefix }) => {
       await conn.sendMessage(m.chat, { image: { url: url3 }, caption: `» 𝙑𝙀𝙂𝙐𝙀𝙏𝘼 ☢️` }, { quoted: m });
       break;
   }
+  
+  // Reacción final 🐉
+  await conn.sendMessage(m.chat, {
+    react: {
+      text: '🐉',
+      key: m.key
+    }
+  });
 };
 
 handler.command = /^(goku|dragonbz|vegueta)$/i;
