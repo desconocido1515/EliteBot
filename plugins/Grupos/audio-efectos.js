@@ -6,9 +6,9 @@ import { tmpdir } from 'os'
 let handler = async (m, { conn, args, __dirname, usedPrefix, command }) => {
   try {
     let q = m.quoted ? m.quoted : m
-    let mime = ((m.quoted ? m.quoted : m).mimetype || '')
-    
-    // Mapa de efectos
+    let mime = (q.msg || q).mimetype || ''
+
+    // 🎧 Mapa de efectos
     const effects = {
       bass: '-af equalizer=f=94:width_type=o:width=2:g=30',
       blown: '-af acrusher=.1:1:64:0:log',
@@ -25,43 +25,74 @@ let handler = async (m, { conn, args, __dirname, usedPrefix, command }) => {
       squirrel: '-filter:a "atempo=0.5,asetrate=65100"',
       chipmunk: '-filter:a "atempo=0.5,asetrate=65100"'
     }
-    
+
     let set = effects[command]
-    if (!set) throw `Efecto "${command}" no soportado.`
-    
-    if (/audio/.test(mime)) {
-      let ran = getRandom('.mp3')
-      let filename = join(tmpdir(), ran) // Usa tmp del sistema
-      let media = await q.download(true)
-      
-      exec(`ffmpeg -i ${media} ${set} ${filename}`, async (err, stderr, stdout) => {
-        // Limpia archivo original
-        try { unlinkSync(media) } catch(e) {}
-        
-        if (err) {
-          console.error(err)
-          throw `_*Error al procesar el audio!*_`
-        }
-        
-        let buff = await readFileSync(filename)
-        await conn.sendFile(m.chat, buff, ran, null, m, true, {
-          type: 'audioMessage', 
-          ptt: true 
-        })
-        
-        // Limpia archivo de salida
-        try { unlinkSync(filename) } catch(e) {}
-      })
-    } else {
-      throw `RESPONDE A UN AUDIO O NOTA DE VOZ. Usa *${usedPrefix + command}*`
+    if (!set) {
+      return conn.reply(m.chat, `⚠️ Efecto *${command}* no soportado.`, m)
     }
+
+    // ❌ NO ES AUDIO
+    if (!/audio/.test(mime)) {
+      return conn.reply(
+        m.chat,
+        `🎧 *Responde a un audio o nota de voz.*\nUsa *${usedPrefix + command}*`,
+        m
+      )
+    }
+
+    // ✅ PROCESO
+    await m.react('🕓')
+
+    let ran = getRandom('.mp3')
+    let filename = join(tmpdir(), ran)
+    let media = await q.download(true)
+
+    exec(`ffmpeg -i "${media}" ${set} "${filename}"`, async (err) => {
+      // limpiar original
+      try { unlinkSync(media) } catch {}
+
+      if (err) {
+        console.error(err)
+        await m.react('✖️')
+        return conn.reply(m.chat, '❌ Error al procesar el audio.', m)
+      }
+
+      let buff = readFileSync(filename)
+
+      await conn.sendFile(
+        m.chat,
+        buff,
+        ran,
+        null,
+        m,
+        true,
+        {
+          type: 'audioMessage',
+          ptt: true
+        }
+      )
+
+      await m.react('✅')
+
+      // limpiar salida
+      try { unlinkSync(filename) } catch {}
+    })
+
   } catch (e) {
-    throw e
+    console.error(e)
+    await m.react('✖️')
+    conn.reply(m.chat, '⚠️ Ocurrió un error inesperado.', m)
   }
 }
 
-handler.help = ['bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'tupai', 'squirrel', 'chipmunk'].map(v => v + ' [vn]')
+handler.help = [
+  'bass', 'blown', 'deep', 'earrape', 'fast', 'fat',
+  'nightcore', 'reverse', 'robot', 'slow',
+  'smooth', 'tupai', 'squirrel', 'chipmunk'
+].map(v => v + ' (responde a audio)')
+
 handler.tags = ['audio']
+
 handler.command = /^(bass|blown|deep|earrape|fas?t|nightcore|reverse|robot|slow|smooth|tupai|squirrel|chipmunk)$/i
 
 export default handler
