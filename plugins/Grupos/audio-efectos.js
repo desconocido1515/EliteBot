@@ -2,6 +2,7 @@ import { unlinkSync, writeFileSync, readFileSync } from 'fs'
 import { join } from 'path'
 import { exec } from 'child_process'
 import { tmpdir } from 'os'
+import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 
 let handler = async (m, { conn, usedPrefix, command }) => {
   try {
@@ -29,10 +30,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     await m.react('🕓')
 
-    // 🔥 DESCARGA REAL (GATA STYLE)
-    let buffer = await conn.downloadMediaMessage(q)
+    // 🔥 DESCARGA UNIVERSAL
+    let stream = await downloadContentFromMessage(q.msg || q, 'audio')
+    let buffer = Buffer.from([])
 
-    if (!buffer) throw 'No se pudo descargar el audio'
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk])
+    }
+
+    if (!buffer.length) throw 'No se pudo descargar el audio'
 
     let input = join(tmpdir(), `${Date.now()}.opus`)
     let output = join(tmpdir(), `${Date.now()}.mp3`)
