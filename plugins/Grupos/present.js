@@ -1,19 +1,12 @@
-let handler = async (m) => {}
-export default handler
-
-handler.groupUpdate = async function (update) {
+let handler = async (m, { conn }) => {
   try {
-    const { id, participants, action } = update
-    const botJid = this.user.jid || this.decodeJid(this.user.id)
+    // Detectar creación / entrada a grupo
+    if (m.messageStubType === 20) {
 
-    console.log('Evento detectado:', update)
-
-    // Cuando el bot es añadido
-    if (action === 'add' && participants.includes(botJid)) {
-
+      let botJid = conn.user.jid
       let botNumber = botJid.split('@')[0]
 
-      let text = `Hola grupo 👋
+      let texto = `Hola grupo 👋
 
 Soy el bot activo.
 
@@ -21,10 +14,13 @@ Número: ${botNumber}
 
 Escribe .menu para ver comandos.`
 
-      await this.sendMessage(id, { text })
+      await conn.sendMessage(m.chat, { text: texto })
     }
 
   } catch (e) {
-    console.error('❌ Error en groupUpdate:', e)
+    console.error('Error detectando entrada:', e)
   }
 }
+
+handler.all = true
+export default handler
