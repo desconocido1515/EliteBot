@@ -66,7 +66,14 @@ async function generarBienvenida({ conn, userId, groupMetadata, chat }) {
     if (!userId) return null
 
     const username = `@${userId.split('@')[0]}`
-    const textoAleatorio = TEXTOS_BIENVENIDA[Math.floor(Math.random() * TEXTOS_BIENVENIDA.length)]
+    
+    // Usar texto personalizado si existe, si no usar texto aleatorio
+    let textoAleatorio
+    if (chat.sWelcome && chat.sWelcome !== false) {
+        textoAleatorio = chat.sWelcome
+    } else {
+        textoAleatorio = TEXTOS_BIENVENIDA[Math.floor(Math.random() * TEXTOS_BIENVENIDA.length)]
+    }
 
     let imageUrl = await tieneFotoPublica(conn, userId)
     if (!imageUrl) {
@@ -99,7 +106,14 @@ async function generarDespedida({ conn, userId, groupMetadata, chat }) {
     if (!userId) return null
 
     const username = `@${userId.split('@')[0]}`
-    const textoAleatorio = TEXTOS_DESPEDIDA[Math.floor(Math.random() * TEXTOS_DESPEDIDA.length)]
+    
+    // Usar texto personalizado si existe, si no usar texto aleatorio
+    let textoAleatorio
+    if (chat.sBye && chat.sBye !== false) {
+        textoAleatorio = chat.sBye
+    } else {
+        textoAleatorio = TEXTOS_DESPEDIDA[Math.floor(Math.random() * TEXTOS_DESPEDIDA.length)]
+    }
 
     let imageUrl = await tieneFotoPublica(conn, userId)
     if (!imageUrl) {
@@ -137,11 +151,117 @@ const AUDIO_SALIDA_URLS = [
 ]
 const AUDIO_BIENVENIDA_URL = 'https://files.catbox.moe/kgykxt.ogg'
 
-// ─────────────────────────────
-// 🔥 HANDLER PRINCIPAL
-// ─────────────────────────────
-let handler = m => m
+// ================= COMANDOS SETWELCOME =================
+let handler = async (m, { conn, command, text }) => {
 
+let fkontak = { 
+  "key": { 
+    "participants": "0@s.whatsapp.net", 
+    "remoteJid": "status@broadcast", 
+    "fromMe": false, 
+    "id": "Halo" 
+  }, 
+  "message": { 
+    "contactMessage": { 
+      "vcard": `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` 
+    }
+  }, 
+  "participant": "0@s.whatsapp.net" 
+}
+
+// Inicializar datos del chat
+if (!global.db.data.chats[m.chat]) {
+  global.db.data.chats[m.chat] = {}
+}
+if (global.db.data.chats[m.chat].sWelcome === undefined) {
+  global.db.data.chats[m.chat].sWelcome = false
+}
+if (global.db.data.chats[m.chat].sBye === undefined) {
+  global.db.data.chats[m.chat].sBye = false
+}
+if (global.db.data.chats[m.chat].welcome === undefined) {
+  global.db.data.chats[m.chat].welcome = true
+}
+
+// ================= ACTIVAR/DESACTIVAR BIENVENIDA =================
+if (/^(welcome|bienvenida)$/i.test(command)) {
+  if (text === 'on' || text === '1' || text === 'activar') {
+    global.db.data.chats[m.chat].welcome = true
+    return conn.reply(m.chat, '✅ Bienvenida y despedida ACTIVADAS correctamente.', fkontak, m)
+  } else if (text === 'off' || text === '0' || text === 'desactivar') {
+    global.db.data.chats[m.chat].welcome = false
+    return conn.reply(m.chat, '❌ Bienvenida y despedida DESACTIVADAS correctamente.', fkontak, m)
+  } else {
+    const estado = global.db.data.chats[m.chat].welcome ? 'ACTIVADAS' : 'DESACTIVADAS'
+    return conn.reply(m.chat, `⚙️ Bienvenida y despedida están *${estado}*\n\n📝 Usa:\n.welcome on - Activar\n.welcome off - Desactivar`, fkontak, m)
+  }
+}
+
+// ================= RESET WELCOME =================
+if (/^resetwelcome$/i.test(command)) {
+  global.db.data.chats[m.chat].sWelcome = false
+  return conn.reply(m.chat, '✅ Bienvenida restablecida al texto por defecto.', fkontak, m)
+}
+
+// ================= RESET BYE =================
+if (/^resetbye$/i.test(command)) {
+  global.db.data.chats[m.chat].sBye = false
+  return conn.reply(m.chat, '✅ Despedida restablecida al texto por defecto.', fkontak, m)
+}
+
+// ================= SET WELCOME =================
+if (/^(setwelcome)$/i.test(command)) {
+  let txt = text
+  if (!txt || txt.length === 0) {
+    const ayuda = `✦ ¡Hola!
+Te ayudaré a configurar la bienvenida personalizada.
+
+📌 *Variables disponibles:*
+» @user - Para etiquetar a la persona
+» @subject - Para mencionar el nombre del grupo
+
+💫 *Ejemplo:*
+.setwelcome Bienvenido @user al grupo @subject, siéntete en casa.
+
+🌟 *Para restablecer:*
+.resetwelcome`
+    return conn.reply(m.chat, ayuda, fkontak, m)
+  }
+
+  global.db.data.chats[m.chat].sWelcome = txt
+  return conn.reply(m.chat, '✅ Bienvenida configurada correctamente.\n\n📝 Texto guardado:\n' + txt, fkontak, m)
+}
+
+// ================= SET BYE =================
+if (/^(setbye)$/i.test(command)) {
+  let txt = text
+  if (!txt || txt.length === 0) {
+    const ayuda = `✦ ¡Hola!
+Te ayudaré a configurar la despedida personalizada.
+
+📌 *Variables disponibles:*
+» @user - Para etiquetar a la persona
+
+💫 *Ejemplo:*
+.setbye Adiós @user, te extrañaremos.
+
+🌟 *Para restablecer:*
+.resetbye`
+    return conn.reply(m.chat, ayuda, fkontak, m)
+  }
+
+  global.db.data.chats[m.chat].sBye = txt
+  return conn.reply(m.chat, '✅ Despedida configurada correctamente.\n\n📝 Texto guardado:\n' + txt, fkontak, m)
+}
+
+}
+
+handler.command = ['setwelcome', 'resetwelcome', 'setbye', 'resetbye', 'welcome', 'bienvenida']
+handler.botAdmin = true
+handler.admin = true
+handler.group = true
+
+// ================= EVENTOS DE BIENVENIDA/DESPEDIDA =================
 handler.before = async function (m, { conn, groupMetadata }) {
     // Manejar respuestas de botones
     if (m.message?.buttonsResponseMessage) {
@@ -149,7 +269,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
         const sender = m.sender
         const senderName = sender.split('@')[0]
         
-        // BIENVENIDA - Dar bienvenida
         if (buttonId.startsWith('welcome_')) {
             const targetUserId = buttonId.replace('welcome_', '')
             const targetName = targetUserId.split('@')[0]
@@ -165,7 +284,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
             return
         }
         
-        // DESPEDIDA - Escupir
         if (buttonId.startsWith('spit_')) {
             const targetUserId = buttonId.replace('spit_', '')
             const targetName = targetUserId.split('@')[0]
@@ -183,14 +301,11 @@ handler.before = async function (m, { conn, groupMetadata }) {
         return
     }
     
-    // ──────────────────────────────────────────
-    // 🚨 VERIFICAR EVENTOS DE ENTRADA/SALIDA
-    // ──────────────────────────────────────────
+    // VERIFICAR EVENTOS DE ENTRADA/SALIDA
     if (!m.messageStubType || !m.isGroup) return true
     
     let userId = m.messageStubParameters?.[0]
     
-    // Ignorar eventos del propio bot
     if (userId === conn.user.jid) {
         console.log(`⏭️ Ignorando evento del propio bot`)
         return true
@@ -199,23 +314,18 @@ handler.before = async function (m, { conn, groupMetadata }) {
     const chat = global.db.data.chats[m.chat]
     if (!chat || !chat.welcome) return true
     
-    // Detectar si es entrada o salida
     const isAdd = m.messageStubType === 27
     const isRemove = m.messageStubType === 28 || m.messageStubType === 29 || m.messageStubType === 32
     
     if (!isAdd && !isRemove) return true
     if (!safeUser(userId)) return true
     
-    // 🔥 VERIFICACIÓN CRÍTICA: Si es una salida, comprobar que realmente ya no está en el grupo
     if (isRemove) {
         try {
-            // Obtener metadata actualizada del grupo
             const metadata = await conn.groupMetadata(m.chat)
             const participantExists = metadata.participants.some(p => p.id === userId)
-            
-            // Si el usuario SÍ sigue en el grupo, es un falso positivo (cambio de admin)
             if (participantExists) {
-                console.log(`⏭️ Falso positivo: ${userId} sigue en el grupo (probablemente cambio de admin)`)
+                console.log(`⏭️ Falso positivo: ${userId} sigue en el grupo`)
                 return true
             }
         } catch (error) {
@@ -227,7 +337,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
     
     const freshGroupMetadata = await conn.groupMetadata(m.chat).catch(() => groupMetadata)
     
-    // ───── ENVIAR IMAGEN + TEXTO + BOTÓN ─────
     let data
     if (isAdd) {
         data = await generarBienvenida({ conn, userId, groupMetadata: freshGroupMetadata, chat })
@@ -252,7 +361,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
         }
     }
     
-    // ───── ENVIAR AUDIO O STICKER ─────
     if (isRemove) {
         setTimeout(async () => {
             try {
