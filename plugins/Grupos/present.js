@@ -1,9 +1,13 @@
-let handler = async (m, { conn }) => {
-  try {
-    // Detectar creación / entrada a grupo
-    if (m.messageStubType === 20) {
+let handler = async (m) => {}
+export default handler
 
-      let botJid = conn.user.jid
+handler.participantsUpdate = async function ({ id, participants, action }) {
+  try {
+    let botJid = this.user.jid
+
+    // Detectar cuando el bot entra
+    if (action === 'add' && participants.includes(botJid)) {
+
       let botNumber = botJid.split('@')[0]
 
       let texto = `Hola grupo 👋
@@ -14,13 +18,10 @@ Número: ${botNumber}
 
 Escribe .menu para ver comandos.`
 
-      await conn.sendMessage(m.chat, { text: texto })
+      await this.sendMessage(id, { text: texto })
     }
 
   } catch (e) {
-    console.error('Error detectando entrada:', e)
+    console.error('Error bienvenida bot:', e)
   }
 }
-
-handler.all = true
-export default handler
