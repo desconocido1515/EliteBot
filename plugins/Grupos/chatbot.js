@@ -1,35 +1,20 @@
-import fetch from 'node-fetch';
+let handler = async (m, { conn }) => {
 
-let handler = async (m, { text, conn }) => {
-  // Detectar si el mensaje menciona al bot o usa comandos
-  const isTagged = m.mentionedJid?.includes(conn.user.jid) || false;
-  const isCommand = /^[\.]?(bot|gemini)/i.test(m.text);
-  
-  if (!isTagged && !isCommand) return;
+  let user = '@' + m.sender.split('@')[0]
 
-  // Extraer la consulta (elimina menciones/comandos)
-  let query = m.text
-    .replace(new RegExp(`@${conn.user.jid.split('@')[0]}`, 'i'), '') // Elimina @EliteBot
-    .replace(/^[\.]?(bot|gemini)\s*/i, '') // Elimina comandos
-    .trim();
+  await conn.reply(
+    m.chat,
+    `👋 Hola ${user} ¿en qué te puedo ayudar?`,
+    m,
+    {
+      mentions: [m.sender],
+      ...rcanal
+    }
+  )
+}
 
-  if (!query) throw `¡Hola!\nMi nombre es Elite Bot\n¿En qué te puedo ayudar? ♥️`;
+handler.command = /^bot$/i
+handler.help = ['bot']
+handler.tags = ['main']
 
-  try {
-    await conn.sendPresenceUpdate('composing', m.chat);
-    const apiUrl = `https://apis-starlights-team.koyeb.app/starlight/gemini?text=${encodeURIComponent(query)}`;
-    const res = await fetch(apiUrl);
-    const data = await res.json();
-    
-    await m.reply(data.result || '🔴 Error en la API');
-  } catch (e) {
-    console.error(e);
-    await m.reply('❌ Error al procesar');
-  }
-};
-
-// Configuración universal
-handler.customPrefix = /^(\.?bot|\.?gemini|@\d+)/i;
-handler.command = new RegExp;
-handler.tags = ['ai'];
-export default handler;
+export default handler
