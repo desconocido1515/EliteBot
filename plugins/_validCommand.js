@@ -14,7 +14,7 @@ export async function before(m, { conn }) {
   const ignoreCommands = [
     // Comandos básicos
     'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'tienda', 'comprar', 
-    'nightcore', 'reverse', 'robot', 'slow', 'smooth', 
+    'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'desblock',
     'tupai', 'squirrel', 'chipmunk'
   ];
   // ==================================================
