@@ -3,36 +3,37 @@ let handler = async (m, { conn, participants, usedPrefix, command }) => {
     throw '*[ ⚠️ ] MI CREADOR TIENE DESACTIVADO ESTA FUNCIÓN.*\n💻 593993370003';
 
   let kicktext = `⚠️ *ETIQUETA A LA PERSONA O RESPONDE SU MENSAJE PARA ELIMINARLO DE ESTE GRUPO.*`;
+
   if (!m.mentionedJid[0] && !m.quoted) 
-    return m.reply(kicktext, m.chat, { mentions: conn.parseMention(kicktext) });
+    return conn.reply(m.chat, kicktext, m, rcanal);
 
   let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted.sender;
-  let owr = m.chat.split`-`[0];
 
-  // Mensaje de cuenta regresiva
-  await conn.sendMessage(
-    m.chat,
-    { 
-      text: `*ADIOS BASURA🤮*\n@${user.split('@')[0]}\n\n *¡Tienes 15 segundos para decir tus últimas palabras!* ⏳`,
-      mentions: [user]
-    }
-  );
+  // ⏳ Cuenta regresiva
+  let texto1 = `*ADIOS BASURA🤮*\n@${user.split('@')[0]}\n\n *¡Tienes 15 segundos para decir tus últimas palabras!* ⏳`;
 
-  // Espera 15 segundos antes de kickear
+  await conn.reply(m.chat, texto1, m, {
+    mentions: [user],
+    ...rcanal
+  });
+
+  // ⏱️ Espera y elimina
   setTimeout(async () => {
     try {
       await conn.groupParticipantsUpdate(m.chat, [user], 'remove');
-      await conn.sendMessage(
-        m.chat,
-        { 
-          text: `Le mandamos botando a esta basura\n@${user.split('@')[0]}\n\nOjalá no vuelva.`,
-          mentions: [user]
-        }
-      );
+
+      let texto2 = `Le mandamos botando a esta basura\n@${user.split('@')[0]}\n\nOjalá no vuelva.`;
+
+      await conn.reply(m.chat, texto2, m, {
+        mentions: [user],
+        ...rcanal
+      });
+
     } catch (error) {
       console.error("Error al kickear:", error);
     }
-  }, 15000); // 15 segundos
+  }, 15000);
+
 };
 
 handler.command = /^(kick|echar|hechar|ban|rip|basura)$/i;
@@ -40,4 +41,5 @@ handler.admin = true;
 handler.group = true;
 handler.botAdmin = true;
 handler.register = false;
+
 export default handler;
