@@ -1,4 +1,3 @@
-
 import fetch from 'node-fetch';
 
 export async function before(m, { conn }) {
@@ -9,6 +8,9 @@ export async function before(m, { conn }) {
   const command = m.text.slice(usedPrefix.length).trim().split(' ')[0].toLowerCase();
 
   if (!command || command === 'bot') return;
+  
+  // Ignorar el comando .menu
+  if (command === 'menu') return;
 
   const isValidCommand = (command, plugins) => {
     for (let plugin of Object.values(plugins)) {
@@ -40,7 +42,7 @@ Ahí está todo.`,
 `✦ ¡Hey!
 Ni yo conozco ese comando.
 Mejor usa \`.menu\`
-y revisa mi catálogo.`,
+y reviso mi catálogo.`,
 
 `✦ ¡Hey!
 Ese comando no existe.
