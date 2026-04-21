@@ -1,24 +1,30 @@
-let handler = async (m, { conn }) => {
+let handler = async (m) => {}
+export default handler
 
-  if (!m.messageStubType) return
+handler.groupUpdate = async function (update) {
+  try {
+    const { id, participants, action } = update
+    const botJid = this.user.jid || this.decodeJid(this.user.id)
 
-  // 🔥 CUANDO AGREGAN AL BOT
-  if (m.messageStubType == 27) {
+    console.log('Evento detectado:', update)
 
-    let botJid = conn.user.jid || conn.user.id
+    // Cuando el bot es añadido
+    if (action === 'add' && participants.includes(botJid)) {
 
-    // Verifica que el agregado sea el bot
-    if (m.messageStubParameters.includes(botJid)) {
+      let botNumber = botJid.split('@')[0]
 
-      let texto = `Hola grupo, estoy activo.`
+      let text = `Hola grupo 👋
 
-      console.log('🤖 BOT AGREGADO AL GRUPO')
-      console.log('📦 Grupo:', m.chat)
+Soy el bot activo.
 
-      await conn.sendMessage(m.chat, { text: texto })
+Número: ${botNumber}
+
+Escribe .menu para ver comandos.`
+
+      await this.sendMessage(id, { text })
     }
+
+  } catch (e) {
+    console.error('❌ Error en groupUpdate:', e)
   }
 }
-
-handler.all = true
-export default handler
