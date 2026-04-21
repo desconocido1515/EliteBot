@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+/*import fetch from 'node-fetch'
 import fs from 'fs'
 import { generarBienvenida, generarDespedida } from './_welcome.js'
 
@@ -46,3 +46,4 @@ handler.admin = true
 handler.group = true
 
 export default handler
+*/
