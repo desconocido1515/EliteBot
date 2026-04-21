@@ -1,4 +1,4 @@
-let handler = async (m, { conn, usedPrefix }) => {
+/*let handler = async (m, { conn, usedPrefix }) => {
   if (!global.db.data.settings[conn.user.jid].restrict) 
     throw '*[ ⚠️ ] MI CREADOR TIENE DESACTIVADO ESTA FUNCIÓN.*';
 
@@ -66,3 +66,4 @@ handler.group = true
 handler.botAdmin = true
 
 export default handler
+*/
