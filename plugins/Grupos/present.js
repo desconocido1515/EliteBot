@@ -35,13 +35,26 @@ export async function before(m, { conn }) {
     // CASO 1: Grupo recién creado (GROUP_CREATE)
     if (m.messageStubType === 20) {
       setTimeout(async () => {
-        await conn.reply(
-          m.chat,
-          mensaje,
-          m,
-          rcanal
-        );
-        console.log(`✅ Grupo creado - Presentación enviada a: ${m.chat}`);
+        try {
+          const groupMetadata = await conn.groupMetadata(m.chat);
+          const participants = groupMetadata.participants;
+          
+          const users = [];
+          for (let p of participants) {
+            let jid = p.id.includes(':') ? p.id.split(':')[0] + '@s.whatsapp.net' : p.id;
+            users.push(jid);
+          }
+          
+          await conn.sendMessage(m.chat, {
+            text: mensaje,
+            mentions: users
+          });
+          
+          console.log(`✅ Grupo creado - Notify enviado a: ${m.chat}`);
+        } catch (error) {
+          console.error('Error al enviar notify:', error);
+          await conn.reply(m.chat, mensaje, m, rcanal);
+        }
       }, 2000);
       return;
     }
@@ -53,13 +66,26 @@ export async function before(m, { conn }) {
       const botAgregado = addedUsers.some(user => user.includes(botId));
       
       if (botAgregado) {
-        await conn.reply(
-          m.chat,
-          mensaje,
-          m,
-          rcanal
-        );
-        console.log(`✅ Bot agregado al grupo: ${m.chat}`);
+        try {
+          const groupMetadata = await conn.groupMetadata(m.chat);
+          const participants = groupMetadata.participants;
+          
+          const users = [];
+          for (let p of participants) {
+            let jid = p.id.includes(':') ? p.id.split(':')[0] + '@s.whatsapp.net' : p.id;
+            users.push(jid);
+          }
+          
+          await conn.sendMessage(m.chat, {
+            text: mensaje,
+            mentions: users
+          });
+          
+          console.log(`✅ Bot agregado - Notify enviado a: ${m.chat}`);
+        } catch (error) {
+          console.error('Error al enviar notify:', error);
+          await conn.reply(m.chat, mensaje, m, rcanal);
+        }
       }
     }
   }
