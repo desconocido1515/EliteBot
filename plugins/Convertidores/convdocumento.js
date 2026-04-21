@@ -3,28 +3,35 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     let mime = (q.msg || q).mimetype || ''
 
-    if (!m.quoted)
-        throw `Responda a el Video o Audio que desea convertir a documento.`
+    if (!m.quoted) {
+        return conn.reply(m.chat, `☑️ 𝚁𝙴𝚂𝙿𝙾𝙽𝙳𝙴 𝙰𝙻 𝚅𝙸𝙳𝙴𝙾 𝙾 𝙰𝚄𝙳𝙸𝙾 𝙌𝚄𝙴 𝙳𝙴𝚂𝙴𝙰 𝙲𝙾𝙽𝚅𝙴𝚁𝚃𝙸𝚁 𝙰 𝙳𝙾𝙲𝚄𝙼𝙴𝙽𝚃𝙾`, m, rcanal)
+    }
 
-    if (!text) throw `Ingrese el nombre que desea colocar al documento`
-    if (!/audio|video/.test(mime)) throw `Responda al video o audio que desea convertir a documento`
+    if (!text) {
+        return conn.reply(m.chat, `☑️ 𝙸𝙽𝙶𝚁𝙴𝚂𝙴 𝙴𝙻 𝙽𝙾𝙼𝙱𝚁𝙴 𝙳𝙴𝙻 𝙳𝙾𝙲𝚄𝙼𝙴𝙽𝚃𝙾`, m, rcanal)
+    }
+
+    if (!/audio|video/.test(mime)) {
+        return conn.reply(m.chat, `☑️ 𝚁𝙴𝚂𝙿𝙾𝙽𝙳𝙰 𝙰𝙻 𝚅𝙸𝙳𝙴𝙾 𝙾 𝙰𝚄𝙳𝙸𝙾 𝙿𝙰𝚁𝙰 𝙲𝙾𝙽𝚅𝙴𝚁𝚃𝙸𝚁 𝙰 𝙳𝙾𝙲𝚄𝙼𝙴𝙽𝚃𝙾`, m, rcanal)
+    }
 
     let media = await q.download?.()
 
-    if (!media) throw 'Error al descargar medio'
+    if (!media) {
+        return conn.reply(m.chat, `☑️ 𝙴𝚁𝚁𝙾𝚁 𝙰𝙻 𝙳𝙴𝚂𝙲𝙰𝚁𝙶𝙰𝚁 𝙴𝙻 𝙼𝙴𝙳𝙸𝙾`, m, rcanal)
+    }
 
-    m.reply(`${wait}`)
+    await conn.reply(m.chat, `☑️ 𝙲𝙾𝙽𝚅𝙴𝚁𝚃𝙸𝙴𝙽𝙳𝙾 𝙰 𝙳𝙾𝙲𝚄𝙼𝙴𝙽𝚃𝙾...`, m, rcanal)
 
     if (/video/.test(mime)) {
-
         return conn.sendMessage(m.chat, { document: media, mimetype: 'video/mp4', fileName: `${text}.mp4` }, { quoted: m })
     } else if (/audio/.test(mime)) {
         return conn.sendMessage(m.chat, { document: media, mimetype: 'audio/mpeg', fileName: `${text}.mp3` }, { quoted: m })
     }
 }
 
-handler.help = ['convdocumento <audio/video>']
+handler.help = ['documento *<nombre>*']
 handler.tags = ['tools']
-handler.command = ['documento']
+handler.command = ['documento', 'convdocumento']
 
 export default handler
