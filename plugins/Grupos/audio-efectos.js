@@ -23,12 +23,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     if (/tupai|squirrel|chipmunk/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
 
     if (!/audio/.test(mime)) {
-      throw `⚠️ Responde a un audio\nEjemplo: ${usedPrefix + command}`
+      return conn.reply(
+        m.chat,
+        `⚠️ Responde a un audio\nEjemplo: *${usedPrefix + command}*`,
+        m,
+        rcanal
+      )
     }
 
     let media = await q.download(true)
-
-    // 🔥 CLAVE: usar opus
     let out = join(tmpdir(), `${Date.now()}.opus`)
 
     exec(`ffmpeg -i "${media}" ${set} -vn -c:a libopus -b:a 128k "${out}"`, async (err) => {
@@ -36,23 +39,35 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
       if (err) {
         console.error(err)
-        return m.reply('❌ Error al procesar el audio')
+        return conn.reply(
+          m.chat,
+          '❌ Error al procesar el audio',
+          m,
+          rcanal
+        )
       }
 
       let buff = readFileSync(out)
 
-      await conn.sendMessage(m.chat, {
-        audio: buff,
-        mimetype: 'audio/ogg; codecs=opus',
-        ptt: true
-      }, { quoted: m })
+      await conn.sendFile(
+        m.chat,
+        buff,
+        'audio.opus',
+        null,
+        m,
+        rcanal,
+        {
+          mimetype: 'audio/ogg; codecs=opus',
+          ptt: true
+        }
+      )
 
       try { unlinkSync(out) } catch {}
     })
 
   } catch (e) {
     console.error(e)
-    m.reply(String(e))
+    conn.reply(m.chat, String(e), m, rcanal)
   }
 }
 
