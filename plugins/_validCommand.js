@@ -13,7 +13,7 @@ export async function before(m, { conn }) {
   // Agrega aquí todos los comandos que NO deben mostrar el mensaje de error
   const ignoreCommands = [
     // Comandos básicos
-    'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 
+    'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'tienda', 'comprar', 
     'nightcore', 'reverse', 'robot', 'slow', 'smooth', 
     'tupai', 'squirrel', 'chipmunk'
   ];
