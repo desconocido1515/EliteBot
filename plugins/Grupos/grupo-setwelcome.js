@@ -17,6 +17,17 @@ let fkontak = {
   "participant": "0@s.whatsapp.net" 
 }
 
+// Inicializar datos del chat si no existen
+if (!global.db.data.chats[m.chat]) {
+  global.db.data.chats[m.chat] = {}
+}
+if (global.db.data.chats[m.chat].sWelcome === undefined) {
+  global.db.data.chats[m.chat].sWelcome = false
+}
+if (global.db.data.chats[m.chat].sBye === undefined) {
+  global.db.data.chats[m.chat].sBye = false
+}
+
 // ================= RESET WELCOME =================
 if (/^resetwelcome$/i.test(command)) {
   global.db.data.chats[m.chat].sWelcome = false
@@ -39,7 +50,6 @@ if (/^(setwelcome|bienvenida)$/i.test(command)) {
     global.db.data.chats[m.chat].sWelcome = txt
     return conn.reply(m.chat, '✅ Bienvenida configurada correctamente.\n\n📝 Texto guardado:\n' + txt, fkontak, m)
   } else {
-    // Mostrar ayuda en el chat, NO en consola
     const ayuda = `✦ ¡Hola!
 Te ayudaré a configurar la bienvenida y despedida. 
 
@@ -80,7 +90,6 @@ if (/^(setbye|despedida)$/i.test(command)) {
     global.db.data.chats[m.chat].sBye = txt
     return conn.reply(m.chat, '✅ Despedida configurada correctamente.\n\n📝 Texto guardado:\n' + txt, fkontak, m)
   } else {
-    // Mostrar ayuda en el chat, NO en consola
     const ayuda = `✦ ¡Hola!
 Te ayudaré a configurar la bienvenida y despedida. 
 
@@ -119,3 +128,63 @@ handler.admin = true
 handler.group = true
 
 export default handler
+
+// ================= ENVÍO DE BIENVENIDA Y DESPEDIDA =================
+export async function before(m, { conn, isGroup }) {
+  if (!isGroup) return
+  
+  // Verificar que exista la base de datos
+  if (!global.db.data.chats[m.chat]) {
+    global.db.data.chats[m.chat] = {}
+  }
+  
+  // Detectar cuando alguien se une al grupo (ADD)
+  if (m.messageStubType === 21) {
+    const addedUsers = m.messageStubParameters
+    
+    // Obtener datos del grupo
+    const groupMetadata = await conn.groupMetadata(m.chat)
+    const groupName = groupMetadata.subject || 'Grupo'
+    const groupDesc = groupMetadata.desc || 'Sin descripción'
+    
+    // Obtener el texto de bienvenida configurado
+    let welcomeText = global.db.data.chats[m.chat]?.sWelcome || false
+    
+    // Si hay texto de bienvenida configurado
+    if (welcomeText && welcomeText !== false) {
+      for (let user of addedUsers) {
+        // Reemplazar variables
+        let processedText = welcomeText
+          .replace(/@user/g, `@${user.split('@')[0]}`)
+          .replace(/@subject/g, groupName)
+          .replace(/@desc/g, groupDesc)
+        
+        // Enviar bienvenida mencionando al nuevo usuario
+        await conn.sendMessage(m.chat, {
+          text: processedText,
+          mentions: [user]
+        })
+      }
+    }
+  }
+  
+  // Detectar cuando alguien se va del grupo (REMOVE)
+  if (m.messageStubType === 22) {
+    const removedUsers = m.messageStubParameters
+    
+    // Obtener el texto de despedida configurado
+    let byeText = global.db.data.chats[m.chat]?.sBye || false
+    
+    // Si hay texto de despedida configurado
+    if (byeText && byeText !== false) {
+      for (let user of removedUsers) {
+        let processedText = byeText.replace(/@user/g, `@${user.split('@')[0]}`)
+        
+        await conn.sendMessage(m.chat, {
+          text: processedText,
+          mentions: [user]
+        })
+      }
+    }
+  }
+}
