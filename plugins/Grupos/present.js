@@ -1,16 +1,25 @@
-let handler = async (m) => {}
-export default handler
-
-handler.participantsUpdate = async function ({ id, participants, action }) {
+let handler = async (m, { conn }) => {
   try {
-    let botJid = this.user.jid
+    // Solo en grupos
+    if (!m.isGroup) return
 
-    // Detectar cuando el bot entra
-    if (action === 'add' && participants.includes(botJid)) {
+    // Detectar si el mensaje es del bot
+    if (!m.fromMe) return
 
-      let botNumber = botJid.split('@')[0]
+    // Base de datos simple en memoria
+    if (!global.db.data.chats[m.chat]) {
+      global.db.data.chats[m.chat] = {}
+    }
 
-      let texto = `Hola grupo 👋
+    // Si ya se presentó, no repetir
+    if (global.db.data.chats[m.chat].presentado) return
+
+    // Marcar como presentado
+    global.db.data.chats[m.chat].presentado = true
+
+    let botNumber = conn.user.jid.split('@')[0]
+
+    let texto = `Hola grupo 👋
 
 Soy el bot activo.
 
@@ -18,10 +27,12 @@ Número: ${botNumber}
 
 Escribe .menu para ver comandos.`
 
-      await this.sendMessage(id, { text: texto })
-    }
+    await conn.sendMessage(m.chat, { text: texto })
 
   } catch (e) {
-    console.error('Error bienvenida bot:', e)
+    console.error('Error presentación:', e)
   }
 }
+
+handler.all = true
+export default handler
