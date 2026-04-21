@@ -1,9 +1,7 @@
 let handler = async (m, { conn, text, participants, command, usedPrefix }) => {
   // Verificar que el bot sea admin
   if (!handler.botAdmin) {
-    return conn.sendMessage(m.chat, { 
-      text: 'ⓘ 𝘕𝘦𝘤𝘦𝘴𝘪𝘵𝘰 𝘴𝘦𝘳 𝘢𝘥𝘮𝘪𝘯𝘪𝘴𝘵𝘳𝘢𝘥𝘰𝘳 𝘱𝘢𝘳𝘢 𝘲𝘶𝘦 𝘱𝘶𝘦𝘥𝘢𝘴 𝘶𝘴𝘢𝘳 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰.' 
-    }, { quoted: m });
+    return conn.reply(m.chat, 'ⓘ 𝘕𝘦𝘤𝘦𝘴𝘪𝘵𝘰 𝘴𝘦𝘳 𝘢𝘥𝘮𝘪𝘯𝘪𝘴𝘵𝘳𝘢𝘥𝘰𝘳 𝘱𝘢𝘳𝘢 𝘲𝘶𝘦 𝘱𝘶𝘦𝘥𝘢𝘴 𝘶𝘴𝘢𝘳 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰.', m, rcanal);
   }
 
   try {
@@ -22,7 +20,7 @@ let handler = async (m, { conn, text, participants, command, usedPrefix }) => {
     const groupMetadata = await conn.groupMetadata(m.chat);
     const groupName = groupMetadata.subject || 'Grupo';
     
-    // ✅ RESPETAR EXACTAMENTE el texto original
+    // RESPETAR EXACTAMENTE el texto original
     let finalText = "";
     
     if (text) {
@@ -75,7 +73,7 @@ let handler = async (m, { conn, text, participants, command, usedPrefix }) => {
 
   } catch (e) {
     console.error('Error en el comando hidetag:', e);
-    await m.reply('❌ Ocurrió un error al ejecutar el comando.');
+    await conn.reply(m.chat, '❌ Ocurrió un error al ejecutar el comando.', m, rcanal);
   }
 };
 
