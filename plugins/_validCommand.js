@@ -14,9 +14,9 @@ export async function before(m, { conn }) {
   const ignoreCommands = [
     // Comandos básicos
     'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'tienda', 'comprar', 
-    'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'desblock','ayuda', 
-    'tupai', 'squirrel', 'chipmunk'
-  ];
+    'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'desblock','ayuda', 'tupai', 'squirrel', 'kick', 'basura', ' echar', 'echar', 'ban', 'ripbasura', 
+    
+    'chipmunk'];
   // ==================================================
   
   if (ignoreCommands.includes(command)) return;
