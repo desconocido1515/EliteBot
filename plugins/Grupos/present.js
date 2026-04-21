@@ -50,7 +50,7 @@ export async function before(m, { conn }) {
           rcanal
         );
         
-        console.log(`✅ Bot agregado al grupo: ${m.chat}`);
+        console.log(`✅ Bot agregado al grupo: ${m.chat} - Presentación enviada`);
       }
     }
   }
