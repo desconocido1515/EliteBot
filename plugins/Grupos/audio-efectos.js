@@ -1,4 +1,4 @@
-import { unlinkSync, writeFileSync, readFileSync, existsSync } from 'fs'
+import { unlinkSync, writeFileSync, readFileSync } from 'fs'
 import { join } from 'path'
 import { exec } from 'child_process'
 import { tmpdir } from 'os'
@@ -29,16 +29,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     await m.react('🕓')
 
-    // 🔥 DESCARGA SEGURA
-    let buffer = await q.download()
+    // 🔥 DESCARGA REAL (GATA STYLE)
+    let buffer = await conn.downloadMediaMessage(q)
+
     if (!buffer) throw 'No se pudo descargar el audio'
 
     let input = join(tmpdir(), `${Date.now()}.opus`)
     let output = join(tmpdir(), `${Date.now()}.mp3`)
 
     writeFileSync(input, buffer)
-
-    if (!existsSync(input)) throw 'El archivo no se creó'
 
     exec(`ffmpeg -y -i "${input}" ${set} "${output}"`, async (err) => {
 
@@ -47,10 +46,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
       if (err) {
         console.error(err)
         return conn.reply(m.chat, '❌ Error en ffmpeg', m)
-      }
-
-      if (!existsSync(output)) {
-        return conn.reply(m.chat, '❌ No se generó el audio', m)
       }
 
       let buff = readFileSync(output)
