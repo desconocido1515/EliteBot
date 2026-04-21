@@ -17,7 +17,7 @@ export async function before(m, { conn }) {
     'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'desblock','ayuda', 'tupai', 'squirrel', 'kick', 'basura', ' echar', 'echar', 'ban', 'rip', 'basura', 
     'setname', 'newnombre','nuevonombre',
 'setpp', 'group', 'grup', 'gc','todos', 
-
+'hidetag', 'notify', 'notificar', 'noti', 'n', 'avisos', 'aviso', 
 
 
     
