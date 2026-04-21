@@ -5,9 +5,14 @@ export async function before(m, { conn }) {
   // Detectar eventos de participantes en grupos
   if (m.chat.endsWith('@g.us') && m.isGroup) {
     
-    // Para grupos recién creados (GROUP_CREATE)
-    if (m.messageStubType === 20 && m.messageStubParameters[0] === '') {
-      // El bot acaba de crear el grupo
+    // Mostrar en consola para depuración (puedes eliminar esta línea después)
+    if (m.messageStubType) {
+      console.log(`Evento detectado - Type: ${m.messageStubType}, Params:`, m.messageStubParameters);
+    }
+    
+    // CASO 1: Grupo recién creado (GROUP_CREATE)
+    if (m.messageStubType === 20) {
+      // El bot acaba de crear el grupo (con o sin nombre)
       setTimeout(async () => {
         await conn.reply(
           m.chat,
@@ -15,11 +20,12 @@ export async function before(m, { conn }) {
           m,
           rcanal
         );
+        console.log(`✅ Grupo creado - Presentación enviada a: ${m.chat}`);
       }, 2000);
       return;
     }
     
-    // Para cuando alguien es agregado al grupo (ADD)
+    // CASO 2: Cuando alguien es agregado al grupo (GROUP_PARTICIPANT_ADD)
     if (m.messageStubType === 21) {
       const botId = conn.user.jid.split('@')[0];
       const addedUsers = m.messageStubParameters;
