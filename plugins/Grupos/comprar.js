@@ -39,7 +39,7 @@ https://sites.google.com/view/elitebotglobal?usp=sharing
 `.trim()
 
     // ✅ FIX AQUÍ
-    const vi = ['https://qu.ax/kLbxI']
+    const vi = ['https://files.catbox.moe/tpmd88.mp4']
     let video = vi[Math.floor(Math.random() * vi.length)]
 
     await conn.sendMessage(m.chat, {
