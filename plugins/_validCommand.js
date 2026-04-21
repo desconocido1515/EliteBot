@@ -1,37 +1,33 @@
 export async function before(m, { conn }) {
+  if (global._cmdHandled) return;
   if (!m.text || !global.prefix.test(m.text)) return;
 
   const usedPrefix = global.prefix.exec(m.text)[0];
   const command = m.text.slice(usedPrefix.length).trim().split(' ')[0].toLowerCase();
 
-  if (!command) return;
+  if (!command || command === 'bot') return;
 
-  // 🔍 Obtener todos los comandos
-  const getAllCommands = (plugins) => {
-    let cmds = [];
+  const allCommands = [];
 
-    for (let plugin of Object.values(plugins)) {
-      let cmd = plugin.command;
-      if (!cmd) continue;
+  for (let plugin of Object.values(global.plugins)) {
+    let cmds = Array.isArray(plugin.command)
+      ? plugin.command
+      : [plugin.command];
 
-      if (Array.isArray(cmd)) {
-        cmds.push(...cmd.filter(c => typeof c === 'string'));
-      } else if (typeof cmd === 'string') {
-        cmds.push(cmd);
-      }
-      // ignoramos regex porque no sirven para sugerencias
+    for (let cmd of cmds) {
+      if (cmd) allCommands.push(cmd);
     }
+  }
 
-    return cmds;
-  };
+  // ✅ comando válido
+  if (allCommands.includes(command)) {
+    let user = global.db.data.users[m.sender];
+    user.commands = (user.commands || 0) + 1;
+    return;
+  }
 
-  const commandsList = getAllCommands(global.plugins);
-
-  // ✅ Si el comando existe → salir
-  if (commandsList.includes(command)) return;
-
-  // 🧠 Distancia de Levenshtein (magia)
-  const levenshtein = (a, b) => {
+  // 🔥 función de distancia
+  function levenshtein(a, b) {
     const matrix = [];
 
     for (let i = 0; i <= b.length; i++) matrix[i] = [i];
@@ -52,28 +48,34 @@ export async function before(m, { conn }) {
     }
 
     return matrix[b.length][a.length];
-  };
+  }
 
-  // 🔍 Buscar el comando más parecido
-  let sugerido = null;
-  let minDist = 3; // tolerancia
+  // 🔍 buscar el más cercano
+  let closest = null;
+  let minDist = Infinity;
 
-  for (let cmd of commandsList) {
+  for (let cmd of allCommands) {
     let dist = levenshtein(command, cmd);
+
     if (dist < minDist) {
       minDist = dist;
-      sugerido = cmd;
+      closest = cmd;
     }
   }
 
-  // 🧠 RESPUESTA INTELIGENTE
-  let texto;
+  let texto = `✦ Comando inválido: ${command}\n`;
 
-  if (sugerido) {
-    texto = `✦ Comando inválido: *${command}*\n\n¿Quisiste decir *${usedPrefix}${sugerido}*? 🤔`;
+  // 🔥 SOLO sugiere si realmente es parecido
+  if (minDist <= 2) {
+    texto += `\n¿Quisiste decir .${closest}? 🤔`;
   } else {
-    texto = `✦ No reconozco ese comando.\nUsa *${usedPrefix}menu* para ver opciones.`;
+    texto += `\nUsa .menu para ver los comandos disponibles.`;
   }
 
-  await conn.reply(m.chat, texto, m);
+  await conn.reply(m.chat, texto, m, rcanal);
+
+  global._cmdHandled = true;
+  setTimeout(() => {
+    global._cmdHandled = false;
+  }, 800);
 }
