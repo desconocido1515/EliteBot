@@ -1,20 +1,22 @@
-let handler = async (m, { conn }) => {
+export async function before(m, { conn }) {
 
-  let user = '@' + m.sender.split('@')[0]
+  if (!m.text) return
+  if (m.isBaileys) return
 
-  await conn.reply(
-    m.chat,
-    `👋 Hola ${user} ¿en qué te puedo ayudar?`,
-    m,
-    {
-      mentions: [m.sender],
-      ...rcanal
-    }
-  )
+  // Detecta exactamente "bot" sin prefijo
+  if (m.text.trim().toLowerCase() === 'bot') {
+
+    let user = '@' + m.sender.split('@')[0]
+
+    await conn.reply(
+      m.chat,
+      `👋 Hola ${user} ¿en qué te puedo ayudar?`,
+      m,
+      {
+        mentions: [m.sender],
+        ...rcanal
+      }
+    )
+
+  }
 }
-
-handler.command = /^bot$/i
-handler.help = ['bot']
-handler.tags = ['main']
-
-export default handler
