@@ -1,4 +1,4 @@
-import { unlinkSync, readFileSync, writeFileSync } from 'fs'
+import { unlinkSync, existsSync, statSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { exec } from 'child_process'
 import { tmpdir } from 'os'
@@ -26,10 +26,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 
     let set = effects[command]
-    if (!set) throw `Efecto "${command}" no soportado.`
+    if (!set) return
 
+    // ⚠️ Validar audio
     if (!/audio/.test(mime)) {
-      return conn.reply(m.chat, `⚠️ Responde a un audio.\nEjemplo: *${usedPrefix + command}*`, m)
+      return conn.reply(
+        m.chat,
+        `⚠️ Responde a un audio o nota de voz.\nEjemplo: *${usedPrefix + command}*`,
+        m
+      )
     }
 
     await m.react('🕓')
@@ -40,7 +45,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     writeFileSync(input, media)
 
-    exec(`ffmpeg -i "${input}" ${set} "${output}"`, async (err) => {
+    exec(`ffmpeg -y -i "${input}" ${set} "${output}"`, async (err) => {
       try { unlinkSync(input) } catch {}
 
       if (err) {
@@ -48,12 +53,17 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         return conn.reply(m.chat, '❌ Error al procesar el audio', m)
       }
 
-      let buff = readFileSync(output)
+      // ✅ Verificar archivo generado
+      if (!existsSync(output) || statSync(output).size < 1000) {
+        return conn.reply(m.chat, '❌ El audio no se generó correctamente', m)
+      }
 
-      await conn.sendFile(m.chat, buff, 'audio.mp3', null, m, true, {
-        type: 'audioMessage',
+      // 🚀 Envío PRO (como GataBot)
+      await conn.sendMessage(m.chat, {
+        audio: { url: output },
+        mimetype: 'audio/mpeg',
         ptt: true
-      })
+      }, { quoted: m })
 
       try { unlinkSync(output) } catch {}
 
@@ -66,8 +76,14 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   }
 }
 
-handler.help = ['bass','blown','deep','earrape','fast','fat','nightcore','reverse','robot','slow','smooth','tupai','squirrel','chipmunk']
+handler.help = [
+  'bass','blown','deep','earrape','fast','fat',
+  'nightcore','reverse','robot','slow','smooth',
+  'tupai','squirrel','chipmunk'
+]
+
 handler.tags = ['audio']
+
 handler.command = /^(bass|blown|deep|earrape|fast|fat|nightcore|reverse|robot|slow|smooth|tupai|squirrel|chipmunk)$/i
 
 export default handler
