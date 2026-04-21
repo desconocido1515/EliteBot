@@ -1,9 +1,4 @@
-
-
-import fetch from 'node-fetch';
-
 export async function before(m, { conn }) {
-  if (global._cmdHandled) return;
   if (!m.text || !global.prefix.test(m.text)) return;
 
   const usedPrefix = global.prefix.exec(m.text)[0];
@@ -13,8 +8,15 @@ export async function before(m, { conn }) {
 
   const isValidCommand = (command, plugins) => {
     for (let plugin of Object.values(plugins)) {
-      const cmd = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
-      if (cmd.includes(command)) return true;
+      let cmd = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
+
+      if (cmd.some(c =>
+        typeof c === 'string'
+          ? c === command
+          : c instanceof RegExp
+          ? c.test(command)
+          : false
+      )) return true;
     }
     return false;
   };
@@ -25,50 +27,13 @@ export async function before(m, { conn }) {
     return;
   }
 
-  global._cmdHandled = true;
-
   const mensajes = [
-`✦ ¡Hey!
-Deja de inventar comandos raros.
-No dispongo de ese comando.
-Usa \`.menu\` para ver opciones.`,
-
-`✦ ¡Hey!
-Pero… ¿qué estás escribiendo?
-Creo que buscas \`.menu\`
-Ahí está todo.`,
-
-`✦ ¡Hey!
-Ni yo conozco ese comando.
-Mejor usa \`.menu\`
-y revisa mi catálogo.`,
-
-`✦ ¡Hey!
-Ese comando no existe.
-Pero puedes usar \`.menu\`
-para ver todos los disponibles.`,
-
-`✦ ¡Hey!
-Comando inválido.
-No está en mi sistema.
-Prueba con \`.menu\`.`,
-
-`✦ ¡Hey!
-Ese comando no está disponible.
-Revisa \`.menu\`
-para encontrar lo que buscas.`
+    '✦ Comando inválido. Usa `.menu`',
+    '✦ No reconozco ese comando. Prueba `.menu`',
+    '✦ Ese comando no existe. Usa `.menu`'
   ];
 
   let texto = mensajes[Math.floor(Math.random() * mensajes.length)];
 
-  await conn.reply(
-    m.chat,
-    texto,
-    m,
-    rcanal
-  );
-
-  setTimeout(() => {
-    global._cmdHandled = false;
-  }, 1000);
+  await conn.reply(m.chat, texto, m);
 }
