@@ -9,8 +9,17 @@ export async function before(m, { conn }) {
 
   if (!command || command === 'bot') return;
   
-  // Ignorar el comando .menu
-  if (command === 'menu') return;
+  // ========== LISTA DE COMANDOS A IGNORAR ==========
+  // Agrega aquí todos los comandos que NO deben mostrar el mensaje de error
+  const ignoreCommands = [
+    // Comandos básicos
+    'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 
+    'nightcore', 'reverse', 'robot', 'slow', 'smooth', 
+    'tupai', 'squirrel', 'chipmunk'
+  ];
+  // ==================================================
+  
+  if (ignoreCommands.includes(command)) return;
 
   const isValidCommand = (command, plugins) => {
     for (let plugin of Object.values(plugins)) {
@@ -42,7 +51,7 @@ Ahí está todo.`,
 `✦ ¡Hey!
 Ni yo conozco ese comando.
 Mejor usa \`.menu\`
-y reviso mi catálogo.`,
+y revisa mi catálogo.`,
 
 `✦ ¡Hey!
 Ese comando no existe.
