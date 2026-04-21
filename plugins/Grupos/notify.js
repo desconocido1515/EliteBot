@@ -38,29 +38,24 @@ let handler = async (m, { conn, text, participants, command, usedPrefix }) => {
     // Solo agregar el nombre del grupo al final con un salto de línea
     const fullMessage = finalText + '\nㅤㅤㅤㅤㅤㅤㅤㅤ' + groupName;
 
-    const options = {
-      mentions: users,
-      quoted: m
-    };
-
     if (isMedia) {
       const media = await quoted.download?.();
       const caption = fullMessage;
 
       if (quoted.mtype === 'imageMessage') {
-        await conn.sendMessage(m.chat, { image: media, caption, ...options });
+        await conn.sendMessage(m.chat, { image: media, caption, mentions: users });
       } else if (quoted.mtype === 'videoMessage') {
-        await conn.sendMessage(m.chat, { video: media, caption, mimetype: 'video/mp4', ...options });
+        await conn.sendMessage(m.chat, { video: media, caption, mimetype: 'video/mp4', mentions: users });
       } else if (quoted.mtype === 'audioMessage') {
-        await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/mpeg', ptt: true, ...options });
+        await conn.sendMessage(m.chat, { audio: media, mimetype: 'audio/mpeg', ptt: true, mentions: users });
       } else if (quoted.mtype === 'stickerMessage') {
-        await conn.sendMessage(m.chat, { sticker: media, ...options });
+        await conn.sendMessage(m.chat, { sticker: media, mentions: users });
       }
     } else {
       await conn.sendMessage(m.chat, {
         text: fullMessage,
         mentions: users
-      }, { quoted: m });
+      });
     }
 
     // Reacción al mensaje original
