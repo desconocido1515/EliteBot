@@ -15,7 +15,7 @@ export async function before(m, { conn }) {
     // Comandos básicos
     'menu', 'bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'tienda', 'comprar', 
     'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'desblock','ayuda', 'tupai', 'squirrel', 'kick', 'basura', ' echar', 'echar', 'ban', 'rip', 'basura', 
-    
+    'setname', 'newnombre','nuevonombre',
     'chipmunk'];
   // ==================================================
   
