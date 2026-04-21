@@ -1,45 +1,68 @@
-let handler = async (m, { conn, participants, usedPrefix, command }) => {
+let handler = async (m, { conn, usedPrefix }) => {
   if (!global.db.data.settings[conn.user.jid].restrict) 
-    throw '*[ ⚠️ ] MI CREADOR TIENE DESACTIVADO ESTA FUNCIÓN.*\n💻 593993370003';
+    throw '*[ ⚠️ ] MI CREADOR TIENE DESACTIVADO ESTA FUNCIÓN.*';
 
-  let kicktext = `⚠️ *ETIQUETA A LA PERSONA O RESPONDE SU MENSAJE PARA ELIMINARLO DE ESTE GRUPO.*`;
+  let mentionedJid = m.mentionedJid
+  let user = mentionedJid && mentionedJid.length 
+    ? mentionedJid[0] 
+    : m.quoted 
+    ? m.quoted.sender 
+    : null
 
-  if (!m.mentionedJid[0] && !m.quoted) 
-    return conn.reply(m.chat, kicktext, m, rcanal);
+  if (!user) {
+    return conn.reply(
+      m.chat, 
+      `⚠️ *ETIQUETA A LA PERSONA O RESPONDE SU MENSAJE PARA ELIMINARLO.*`, 
+      m, 
+      rcanal
+    )
+  }
 
-  let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted.sender;
+  try {
+    const groupInfo = await conn.groupMetadata(m.chat)
+    const ownerGroup = groupInfo.owner || m.chat.split`-`[0] + '@s.whatsapp.net'
+    const ownerBot = global.owner[0][0] + '@s.whatsapp.net'
 
-  // ⏳ Cuenta regresiva
-  let texto1 = `*ADIOS BASURA🤮*\n@${user.split('@')[0]}\n\n *¡Tienes 15 segundos para decir tus últimas palabras!* ⏳`;
+    if (user === conn.user.jid) 
+      return conn.reply(m.chat, `No puedo eliminar el bot.`, m, rcanal)
 
-  await conn.reply(m.chat, texto1, m, {
-    mentions: [user],
-    ...rcanal
-  });
+    if (user === ownerGroup) 
+      return conn.reply(m.chat, `No puedo eliminar al dueño del grupo.`, m, rcanal)
 
-  // ⏱️ Espera y elimina
-  setTimeout(async () => {
-    try {
-      await conn.groupParticipantsUpdate(m.chat, [user], 'remove');
+    if (user === ownerBot) 
+      return conn.reply(m.chat, `No puedo eliminar al creador del bot.`, m, rcanal)
 
-      let texto2 = `Le mandamos botando a esta basura\n@${user.split('@')[0]}\n\nOjalá no vuelva.`;
+    // ⏳ MENSAJE ANTES DEL KICK
+    await conn.reply(m.chat, 
+      `*ADIOS BASURA🤮*\n@${user.split('@')[0]}\n\n*Tienes 15 segundos...*`, 
+      m, 
+      { mentions: [user], ...rcanal }
+    )
 
-      await conn.reply(m.chat, texto2, m, {
-        mentions: [user],
-        ...rcanal
-      });
+    setTimeout(async () => {
+      await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
 
-    } catch (error) {
-      console.error("Error al kickear:", error);
-    }
-  }, 15000);
+      await conn.reply(m.chat, 
+        `Fue eliminado:\n@${user.split('@')[0]}`, 
+        m, 
+        { mentions: [user], ...rcanal }
+      )
 
-};
+    }, 15000)
 
-handler.command = /^(kick|echar|hechar|ban|rip|basura)$/i;
-handler.admin = true;
-handler.group = true;
-handler.botAdmin = true;
-handler.register = false;
+  } catch (e) {
+    conn.reply(
+      m.chat, 
+      `⚠️ Error:\n${e.message}`, 
+      m, 
+      rcanal
+    )
+  }
+}
 
-export default handler;
+handler.command = /^(kick|echar|hechar|ban|rip|basura)$/i
+handler.admin = true
+handler.group = true
+handler.botAdmin = true
+
+export default handler
