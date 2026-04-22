@@ -17,10 +17,13 @@ await m.react('🕒')
 const media = await q.download()
 const isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime)
 const link = await uploadImage(media)
-// Convertir link a .jpg si es posible
-const linkJpg = link.split('?')[0] + '.jpg'
-const txt = `☑️ *𝙻𝙸𝙽𝙺 - 𝙴𝙽𝙻𝙰𝙲𝙴*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎:* ${linkJpg}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
-await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m)
+// Limpiar el enlace y asegurar formato .jpg directo
+let linkDirecto = link.split('?')[0]
+if (!linkDirecto.match(/\.(jpg|jpeg|png|gif|mp4)$/i)) {
+linkDirecto = linkDirecto + '.jpg'
+}
+const txt = `☑️ *𝙻𝙸𝙽𝙺 - 𝙴𝙽𝙻𝙰𝙲𝙴*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎 𝚍𝚒𝚛𝚎𝚌𝚝𝚘:* ${linkDirecto}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
+await conn.sendMessage(m.chat, { image: { url: linkDirecto }, caption: txt })
 await m.react('✔️')
 break
 }
@@ -30,10 +33,12 @@ await m.react('🕒')
 const media = await q.download()
 const isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime)
 const link = await catbox(media)
-// Convertir link a .jpg
-const linkJpg = link.split('?')[0] + '.jpg'
-const txt = `☑️ *𝙲𝙰𝚃𝙱𝙾𝚇 - 𝚄𝙿𝙻𝙾𝙰𝙳𝙴𝚁*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎:* ${linkJpg}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
-await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m)
+let linkDirecto = link.split('?')[0]
+if (!linkDirecto.match(/\.(jpg|jpeg|png|gif|mp4)$/i)) {
+linkDirecto = linkDirecto + '.jpg'
+}
+const txt = `☑️ *𝙲𝙰𝚃𝙱𝙾𝚇 - 𝚄𝙿𝙻𝙾𝙰𝙳𝙴𝚁*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎:* ${linkDirecto}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
+await conn.sendMessage(m.chat, { image: { url: linkDirecto }, caption: txt })
 await m.react('✔️')
 break
 }
