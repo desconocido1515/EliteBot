@@ -46,38 +46,27 @@ handler.before = async function (m, { conn }) {
             mencionado = m.quoted.sender
         }
         
-        // Forma 3: Mostrar instrucciones si no hay mención
+        // Forma 3: Extraer del texto
+        if (!mencionado && m.text) {
+            const regex = /@(\d+)/g
+            const match = regex.exec(m.text)
+            if (match) {
+                mencionado = match[1] + '@s.whatsapp.net'
+            }
+        }
+        
         if (!mencionado) {
-            const instrucciones = `⚠️ *CÓMO USAR EL COMANDO PVP* ⚠️
-
-📌 *OPCIÓN 1 - MENCIONAR:*
-1. Escribe *${textLimpio}* (con espacio)
-2. Escribe *@* y selecciona al usuario
-3. Envía el mensaje
-
-📌 *OPCIÓN 2 - RESPONDER:*
-1. Responde al mensaje del usuario
-2. Escribe *${textLimpio}*
-3. Envía el mensaje
-
-💡 *Ejemplo válido:*
-. pvpm1014 @usuario
-
-🎯 *PRUEBA RESPONDIENDO A ESTE MENSAJE*`
-            
-            await conn.reply(m.chat, instrucciones, m, rcanal)
+            await conn.reply(m.chat, `☑️ ¿A quién quieres desafiar?\n\nResponde al mensaje de la persona o menciónala con @`, m, rcanal)
             return
         }
         
-        // No permitir desafiarse a sí mismo
         if (mencionado === m.sender) {
-            await conn.reply(m.chat, `⚠️ *NO PUEDES DESAFIARTE A TI MISMO*\n\nMenciona a otro usuario o responde al mensaje de alguien más.`, m, rcanal)
+            await conn.reply(m.chat, `☑️ No puedes desafiarte a ti mismo`, m, rcanal)
             return
         }
         
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
         
-        // Reaccionar al mensaje original
         await conn.sendMessage(m.chat, {
             react: { text: '👺', key: m.key }
         })
