@@ -1,29 +1,43 @@
 // plugins/4vs4.js
 
-// Estado global de las listas por grupo (en memoria)
-let listasGrupos = new Map();
-let mensajesGrupos = new Map();
-
-// Función para obtener o crear las listas de un grupo
-const getListasGrupo = (groupId) => {
-    if (!listasGrupos.has(groupId)) {
-        listasGrupos.set(groupId, {
+// Función para obtener o crear las listas de un grupo (usando base de datos persistente)
+const getListasGrupo = (groupId, db) => {
+    if (!db.data.chats[groupId]) {
+        db.data.chats[groupId] = {}
+    }
+    if (!db.data.chats[groupId].listas4vs4) {
+        db.data.chats[groupId].listas4vs4 = {
             squad1: ['➤', '➤', '➤', '➤'],
             suplente: ['➤', '➤', '➤', '➤']
-        });
+        }
     }
-    return listasGrupos.get(groupId);
-};
+    return db.data.chats[groupId].listas4vs4
+}
 
 // Función para reiniciar las listas
-const reiniciarListas = (groupId) => {
-    listasGrupos.set(groupId, {
+const reiniciarListas = (groupId, db) => {
+    if (!db.data.chats[groupId]) {
+        db.data.chats[groupId] = {}
+    }
+    db.data.chats[groupId].listas4vs4 = {
         squad1: ['➤', '➤', '➤', '➤'],
         suplente: ['➤', '➤', '➤', '➤']
-    });
-};
+    }
+}
 
-// Función para mostrar la lista con botones (formato que funciona)
+// Guardar y obtener mensaje (horario)
+const guardarMensaje = (groupId, mensaje, db) => {
+    if (!db.data.chats[groupId]) {
+        db.data.chats[groupId] = {}
+    }
+    db.data.chats[groupId].mensaje4vs4 = mensaje
+}
+
+const obtenerMensaje = (groupId, db) => {
+    return db.data.chats[groupId]?.mensaje4vs4 || ''
+}
+
+// Función para mostrar la lista con botones
 async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
     const texto = `🕓 𝗛𝗢𝗥𝗔: ${mensajeUsuario ? `*${mensajeUsuario}*\n` : ''} 📑 𝗥𝗘𝗚𝗟𝗔𝗦: 𝗖𝗟𝗞
     
@@ -60,12 +74,12 @@ async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
 
 let handler = m => m
 
-handler.before = async function (m, { conn }) {
+handler.before = async function (m, { conn, db }) {
     // DETECTAR RESPUESTA DE BOTONES
     if (m.message?.buttonsResponseMessage) {
         const buttonId = m.message.buttonsResponseMessage.selectedButtonId
         const groupId = m.chat
-        let listas = getListasGrupo(groupId)
+        let listas = getListasGrupo(groupId, db)
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
         
         console.log('Botón 4vs4 presionado:', buttonId)
@@ -93,7 +107,7 @@ handler.before = async function (m, { conn }) {
             listas[squadType][libre] = `@${nombreUsuario}`
         }
         
-        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        const mensajeGuardado = obtenerMensaje(groupId, db)
         await mostrarLista(conn, m.chat, listas, mensajeGuardado)
         return
     }
@@ -114,9 +128,9 @@ handler.before = async function (m, { conn }) {
             return
         }
         
-        reiniciarListas(m.chat)
-        mensajesGrupos.set(m.chat, mensaje)
-        let listas = getListasGrupo(m.chat)
+        reiniciarListas(m.chat, db)
+        guardarMensaje(m.chat, mensaje, db)
+        let listas = getListasGrupo(m.chat, db)
         
         await mostrarLista(conn, m.chat, listas, mensaje)
         return
