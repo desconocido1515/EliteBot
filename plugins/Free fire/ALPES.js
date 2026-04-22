@@ -14,6 +14,14 @@ var handler = async (m, { conn, command, args, usedPrefix, DevMode }) => {
         "participant": "0@s.whatsapp.net" 
     }
     
+    // Reaccionar al mensaje con 🖼️
+    await conn.sendMessage(m.chat, {
+        react: {
+            text: '🖼️',
+            key: m.key
+        }
+    })
+    
     // Ruta correcta de la imagen
     const pp = './media/menus/alpes.jpg'
     
