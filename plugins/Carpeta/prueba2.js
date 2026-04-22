@@ -17,6 +17,7 @@ const logos = {
   logointro: { url: 'https://en.ephoto360.com/free-logo-intro-video-maker-online-558.html', palabras: 1 },
 
   // === 2 PALABRAS ===
+  logodead: { url: 'https://en.ephoto360.com/create-text-effects-in-the-style-of-the-deadpool-logo-818.html', palabras: 2 },
   logoletters: { url: 'https://en.ephoto360.com/create-letter-logos-online-for-free-545.html', palabras: 2 },
   logopornhub: { url: 'https://en.ephoto360.com/create-pornhub-style-logos-online-free-549.html', palabras: 2 },
   logomascot: { url: 'https://en.ephoto360.com/create-logo-avatar-mascot-style-364.html', palabras: 2 },
