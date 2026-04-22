@@ -1,5 +1,3 @@
-import fetch from "node-fetch"
-
 const triviaImages = [
   'https://cdn.yupra.my.id/yp/o720p39m.jpg',
   'https://cdn.yupra.my.id/yp/ey5l5cct.jpg',
@@ -60,17 +58,12 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
         
         let respuestaTexto = ""
         if (isCorrect) {
-          respuestaTexto = `☑️ *✨ ¡CORRECTO! ✨*\n\n🎉 ${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]} era la respuesta correcta.\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: ${points} 𝚙𝚞𝚗𝚝𝚘𝚜`
+          respuestaTexto = `☑️ *✨ ¡CORRECTO! ✨*\n\n🎉 La respuesta correcta era: *${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}*\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: *${points}* 𝚙𝚞𝚗𝚝𝚘𝚜\n\n📝 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝙻𝙰 𝚂𝙸𝙶𝚄𝙸𝙴𝙽𝚃𝙴 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰`
         } else {
-          respuestaTexto = `☑️ *💔 INCORRECTO 💔*\n\n❌ 𝚃𝚄 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: ${userAnswer}\n✅ 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙰: ${correctAnswer}\n📖 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: ${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: ${points} 𝚙𝚞𝚗𝚝𝚘𝚜`
+          respuestaTexto = `☑️ *💔 INCORRECTO 💔*\n\n❌ 𝚃𝚄 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: *${userAnswer}*\n✅ 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙰: *${correctAnswer}*\n📖 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: *${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}*\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: *${points}* 𝚙𝚞𝚗𝚝𝚘𝚜\n\n📝 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝙻𝙰 𝚂𝙸𝙶𝚄𝙸𝙴𝙽𝚃𝙴 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰`
         }
 
-        const buttons = [
-          { buttonId: `${usedPrefix}trivia`, buttonText: { displayText: `🎯 𝙽𝚄𝙴𝚅𝙰 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰` }, type: 1 },
-          { buttonId: `${usedPrefix}triviascore`, buttonText: { displayText: `🏆 𝚅𝙴𝚁 𝙿𝚄𝙽𝚃𝙰𝙹𝙴` }, type: 1 }
-        ]
-
-        await conn.sendMessage(m.chat, { text: respuestaTexto, buttons, viewOnce: true }, { quoted: m })
+        await conn.reply(m.chat, respuestaTexto, m, rcanal)
         await m.react(isCorrect ? "✅" : "❌")
 
         triviaSessions.set(m.chat, { ...session, answered: true })
@@ -87,7 +80,7 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
 
       if (availableQuestions.length === 0) {
         triviaSessions.delete(m.chat)
-        return conn.reply(m.chat, "☑️ 🎉 *𝚈𝙰 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙸𝚂𝚃𝙴 𝚃𝙾𝙳𝙰𝚂 𝙻𝙰𝚂 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰𝚂!* 𝚄𝚂𝙰 𝙽𝚄𝙴𝚅𝙰𝙼𝙴𝙽𝚃𝙴 𝙴𝙻 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝙿𝙰𝚁𝙰 𝚁𝙴𝙸𝙽𝙸𝙲𝙸𝙰𝚁", m, rcanal)
+        return conn.reply(m.chat, "☑️ 🎉 *𝚈𝙰 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙸𝚂𝚃𝙴 𝚃𝙾𝙳𝙰𝚂 𝙻𝙰𝚂 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰𝚂!* 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝚁𝙴𝙸𝙽𝙸𝙲𝙸𝙰𝚁", m, rcanal)
       }
 
       const randomIndex = Math.floor(Math.random() * availableQuestions.length)
@@ -104,9 +97,9 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
       const caption = `☑️ *🎓 𝐓𝐑𝐈𝐕𝐈𝐀 𝐃𝐄 𝐂𝐔𝐋𝐓𝐔𝐑𝐀 🎓*\n\n📖 ${q.question}\n\n🌿 *𝙾𝙿𝙲𝙸𝙾𝙽𝙴𝚂:*\n▸ *A)* ${q.options[0]}\n▸ *B)* ${q.options[1]}\n▸ *C)* ${q.options[2]}\n\n🎯 𝚂𝙴𝙻𝙴𝙲𝙲𝙸𝙾𝙽𝙰 𝚄𝙽𝙰 𝙾𝙿𝙲𝙸𝙾́𝙽`
 
       const buttons = [
-        { buttonId: `${usedPrefix}trivia A`, buttonText: { displayText: `🅰 ${q.options[0].substring(0, 15)}...` }, type: 1 },
-        { buttonId: `${usedPrefix}trivia B`, buttonText: { displayText: `🅱 ${q.options[1].substring(0, 15)}...` }, type: 1 },
-        { buttonId: `${usedPrefix}trivia C`, buttonText: { displayText: `🅲 ${q.options[2].substring(0, 15)}...` }, type: 1 }
+        { buttonId: `${usedPrefix}trivia A`, buttonText: { displayText: `🅰 ${q.options[0].substring(0, 20)}` }, type: 1 },
+        { buttonId: `${usedPrefix}trivia B`, buttonText: { displayText: `🅱 ${q.options[1].substring(0, 20)}` }, type: 1 },
+        { buttonId: `${usedPrefix}trivia C`, buttonText: { displayText: `🅲 ${q.options[2].substring(0, 20)}` }, type: 1 }
       ]
 
       await conn.sendMessage(m.chat, { image: { url: img }, caption, buttons, viewOnce: true }, { quoted: m })
