@@ -88,7 +88,6 @@ handler.before = async function (m, { conn }) {
         const groupId = m.chat
         let listas = getListasGrupo(groupId)
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        const tag = m.sender
         
         console.log('Botón 12vs12 presionado:', buttonId) // Debug
         
@@ -101,24 +100,19 @@ handler.before = async function (m, { conn }) {
         })
         
         let squadType
-        let squadNombre
         
         switch(buttonId) {
             case 'escuadra1':
                 squadType = 'squad1'
-                squadNombre = 'Escuadra 1'
                 break
             case 'escuadra2':
                 squadType = 'squad2'
-                squadNombre = 'Escuadra 2'
                 break
             case 'escuadra3':
                 squadType = 'squad3'
-                squadNombre = 'Escuadra 3'
                 break
             case 'suplente12vs12':
                 squadType = 'suplente'
-                squadNombre = 'Suplentes'
                 break
             default:
                 return
@@ -127,29 +121,31 @@ handler.before = async function (m, { conn }) {
         const libre = listas[squadType].findIndex(p => p === '➤')
         if (libre !== -1) {
             listas[squadType][libre] = `@${nombreUsuario}`
-            await conn.sendMessage(m.chat, {
-                text: `✅ @${nombreUsuario} agregado a ${squadNombre}`,
-                mentions: [tag]
-            })
-        } else {
-            await conn.sendMessage(m.chat, {
-                text: `⚠️ ${squadNombre} está llena. No puedes agregarte.`,
-                mentions: [tag]
-            })
+            // Ya no envía mensaje de "agregado a..."
         }
         
         const mensajeGuardado = mensajesGrupos.get(groupId)
-        await mostrarLista(conn, m.chat, listas, [tag], mensajeGuardado)
+        await mostrarLista(conn, m.chat, listas, [], mensajeGuardado)
         return
     }
     
-    // COMANDO .12vs12 para crear nueva lista
-    if (m.text && m.text.toLowerCase().startsWith('.12vs12')) {
-        const mensaje = m.text.substring(7).trim()
+    // Detectar .12vs12 con o sin espacio
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
+    
+    if (textLimpio === '.12vs12' || textLimpio === '. 12vs12' || textLimpio.startsWith('.12vs12 ') || textLimpio.startsWith('. 12vs12 ')) {
+        // Extraer el mensaje (horario)
+        let mensaje = ''
+        if (textLimpio.startsWith('.12vs12 ')) {
+            mensaje = m.text.substring(7).trim()
+        } else if (textLimpio.startsWith('. 12vs12 ')) {
+            mensaje = m.text.substring(8).trim()
+        }
+        
         if (!mensaje) {
-            await conn.reply(m.chat, `🕓 𝗜𝗡𝗚𝗥𝗘𝗦𝗔 𝗨𝗡 𝗛𝗢𝗥𝗔𝗥𝗜𝗢.\n𝗘𝗷𝗲𝗺𝗽𝗹𝗼:\n.12vs12 4pm🇪🇨/3pm🇲🇽`, m)
+            await conn.reply(m.chat, `🕓 𝗜𝗡𝗚𝗥𝗘𝗦𝗔 𝗨𝗡 𝗛𝗢𝗥𝗔𝗥𝗜𝗢.\n𝗘𝗷𝗲𝗺𝗽𝗹𝗼:\n.12vs12 4pm🇪🇨/3pm🇲🇽`, m, rcanal)
             return
         }
+        
         reiniciarListas(m.chat)
         let listas = getListasGrupo(m.chat)
         mensajesGrupos.set(m.chat, mensaje)
