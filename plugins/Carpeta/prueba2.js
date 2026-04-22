@@ -1,4 +1,4 @@
-/*import { Maker } from 'imagemaker.js';
+import { Maker } from 'imagemaker.js';
 
 const logos = {
   // === 1 PALABRA 
@@ -127,4 +127,3 @@ const handler = async (m, { conn, args, command }) => {
 handler.command = ['logo', ...Object.keys(logos)];
 
 export default handler;
-*/
