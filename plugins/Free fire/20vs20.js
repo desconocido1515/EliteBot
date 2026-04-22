@@ -1,5 +1,4 @@
-import pkg from '@whiskeysockets/baileys';
-const { generateWAMessageFromContent, proto } = pkg;
+// plugins/20vs20.js
 
 // Estado global de las listas por grupo
 let listasGrupos = new Map();
@@ -32,89 +31,8 @@ const reiniciarListas = (groupId) => {
     });
 };
 
-let handler = async (m, { conn, text, args }) => {
-    const msgText = m.text;
-    const groupId = m.chat;
-    let listas = getListasGrupo(groupId);
-    
-    if (msgText.toLowerCase().startsWith('.20vs20')) {
-        const mensaje = msgText.substring(7).trim();
-        if (!mensaje) {
-            await conn.sendMessage(m.chat, { 
-                text: `🕓 𝗜𝗡𝗚𝗥𝗘𝗦𝗔 𝗨𝗡 𝗛𝗢𝗥𝗔𝗥𝗜𝗢.\n𝗘𝗷𝗲𝗺𝗽𝗹𝗼:\n.20vs20 4pm🇪🇨/3pm🇲🇽` 
-            });
-            return;
-        }
-        reiniciarListas(groupId);
-        listas = getListasGrupo(groupId);
-        mensajesGrupos.set(groupId, mensaje);
-
-        await mostrarLista(conn, m.chat, listas, [], mensaje);
-        return;
-    }
-
-    if (!['escuadra   1', 'escuadra   2', 'escuadra   3', 'escuadra   4', 'escuadra   5', 'suplente20vs20'].includes(msgText.toLowerCase())) return;
-    
-    const usuario = m.sender.split('@')[0];
-    const nombreUsuario = m.pushName || usuario;
-    
-    let squadType;
-    let mentions = [];
-    
-    switch(msgText.toLowerCase()) {
-        case 'escuadra   1':
-            squadType = 'squad1';
-            break;
-        case 'escuadra   2':
-            squadType = 'squad2';
-            break;
-        case 'escuadra   3':
-            squadType = 'squad3';
-            break;
-        case 'escuadra   4':
-            squadType = 'squad4';
-            break;
-        case 'escuadra   5':
-            squadType = 'squad5';
-            break;
-        case 'suplente20vs20':
-            squadType = 'suplente';
-            break;
-    }
-    
-    // Borrar al usuario de otras escuadras
-    Object.keys(listas).forEach(key => {
-        const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`));
-        if (index !== -1) {
-            listas[key][index] = '➤';
-        }
-    });
-    
-    const libre = listas[squadType].findIndex(p => p === '➤');
-    if (libre !== -1) {
-        listas[squadType][libre] = `@${nombreUsuario}`;
-        mentions.push(m.sender);
-    }
-
-    Object.values(listas).forEach(squad => {
-        squad.forEach(member => {
-            if (member !== '➤') {
-                const userName = member.slice(1);
-                const userJid = Object.keys(m.message.extendedTextMessage?.contextInfo?.mentionedJid || {}).find(jid => 
-                    jid.split('@')[0] === userName || 
-                    conn.getName(jid) === userName
-                );
-                if (userJid) mentions.push(userJid);
-            }
-        });
-    });
-
-    const mensajeGuardado = mensajesGrupos.get(groupId);
-    await mostrarLista(conn, m.chat, listas, mentions, mensajeGuardado);
-    return;
-}
-
-async function mostrarLista(conn, chat, listas, mentions = [], mensajeUsuario = '') {
+// Función para mostrar la lista con botones
+async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
     const texto = `🕓 𝗛𝗢𝗥𝗔: ${mensajeUsuario ? `*${mensajeUsuario}*\n` : ''} 🗣️ 𝗜𝗡𝗗𝗜𝗖𝗔𝗖𝗜𝗢𝗡𝗘𝗦 :
 » Reglas y color se avisa al llenar este listado.
 
@@ -163,139 +81,102 @@ async function mostrarLista(conn, chat, listas, mentions = [], mensajeUsuario = 
 │🥷🏻 ${listas.suplente[2]}
 │🥷🏻 ${listas.suplente[3]}
 ╰─────────────╯
-©EliteBotGlobal 2023 `;
+©EliteBotGlobal 2023`;
 
     const buttons = [
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Escuadra   1",
-                id: "escuadra   1"
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Escuadra   2",
-                id: "escuadra   2"
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Escuadra   3",
-                id: "escuadra   3"
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Escuadra   4",
-                id: "escuadra   4"
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Escuadra   5",
-                id: "escuadra   5"
-            })
-        },
-        {
-            name: "quick_reply",
-            buttonParamsJson: JSON.stringify({
-                display_text: "Suplente20vs20",
-                id: "suplente20vs20"
-            })
-        }
+        { buttonId: 'escuadra1_20', buttonText: { displayText: "⚔️ ESCUADRA 1" }, type: 1 },
+        { buttonId: 'escuadra2_20', buttonText: { displayText: "⚔️ ESCUADRA 2" }, type: 1 },
+        { buttonId: 'escuadra3_20', buttonText: { displayText: "⚔️ ESCUADRA 3" }, type: 1 },
+        { buttonId: 'escuadra4_20', buttonText: { displayText: "⚔️ ESCUADRA 4" }, type: 1 },
+        { buttonId: 'escuadra5_20', buttonText: { displayText: "⚔️ ESCUADRA 5" }, type: 1 },
+        { buttonId: 'suplente20', buttonText: { displayText: "🔄 SUPLENTES" }, type: 1 }
     ];
 
-    const mensaje = generateWAMessageFromContent(chat, {
-        viewOnceMessage: {
-            message: {
-                messageContextInfo: {
-                    deviceListMetadata: {},
-                    mentionedJid: mentions
-                },
-                interactiveMessage: proto.Message.InteractiveMessage.create({
-                    body: { text: texto },
-                    footer: { text: "Selecciona una opción:" },
-                    nativeFlowMessage: { buttons }
-                })
-            }
-        }
-    }, {});
-
-    await conn.relayMessage(chat, mensaje.message, { messageId: mensaje.key.id });
+    await conn.sendMessage(chat, {
+        text: texto,
+        buttons: buttons,
+        viewOnce: true
+    });
 }
 
-export async function after(m, { conn }) {
-    try {
-        const button = m?.message?.buttonsResponseMessage;
-        if (!button) return;
+let handler = m => m
 
-        const id = button.selectedButtonId;
-        const groupId = m.chat;
-        let listas = getListasGrupo(groupId);
-        const numero = m.sender.split('@')[0];
-        const nombreUsuario = m.pushName || numero;
-        const tag = m.sender;
-
+handler.before = async function (m, { conn }) {
+    // DETECTAR RESPUESTA DE BOTONES
+    if (m.message?.buttonsResponseMessage) {
+        const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+        const groupId = m.chat
+        let listas = getListasGrupo(groupId)
+        const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        
+        console.log('Botón 20vs20 presionado:', buttonId)
+        
+        // Borrar al usuario de todas las escuadras
         Object.keys(listas).forEach(key => {
-            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`));
+            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
             if (index !== -1) {
-                listas[key][index] = '➤';
+                listas[key][index] = '➤'
             }
-        });
-
-        let squadType;
-        switch(id) {
-            case 'escuadra   1':
-                squadType = 'squad1';
-                break;
-            case 'escuadra   2':
-                squadType = 'squad2';
-                break;
-            case 'escuadra   3':
-                squadType = 'squad3';
-                break;
-            case 'escuadra   4':
-                squadType = 'squad4';
-                break;
-            case 'escuadra   5':
-                squadType = 'squad5';
-                break;
-            case 'suplente20vs20':
-                squadType = 'suplente';
-                break;
-        }
-
-        if (squadType) {
-            const libre = listas[squadType].findIndex(p => p === '➤');
-            if (libre !== -1) {
-                listas[squadType][libre] = `@${nombreUsuario}`;
-                await conn.sendMessage(m.chat, {
-                    text: `✅ @${nombreUsuario} agregado a ${squadType === 'suplente' ? 'Suplentes' : `Escuadra ${squadType.slice(-1)}`}`,
-                    mentions: [tag]
-                });
-            } else {
-                await conn.sendMessage(m.chat, {
-                    text: `⚠️ ${squadType === 'suplente' ? 'Suplentes' : `Escuadra ${squadType.slice(-1)}`} está llena`,
-                    mentions: [tag]
-                });
-            }
+        })
+        
+        let squadType
+        
+        switch(buttonId) {
+            case 'escuadra1_20':
+                squadType = 'squad1'
+                break
+            case 'escuadra2_20':
+                squadType = 'squad2'
+                break
+            case 'escuadra3_20':
+                squadType = 'squad3'
+                break
+            case 'escuadra4_20':
+                squadType = 'squad4'
+                break
+            case 'escuadra5_20':
+                squadType = 'squad5'
+                break
+            case 'suplente20':
+                squadType = 'suplente'
+                break
+            default:
+                return
         }
         
-        const mensajeGuardado = mensajesGrupos.get(groupId);
-        await mostrarLista(conn, m.chat, listas, [tag], mensajeGuardado);
-    } catch (error) {
-        console.error('Error en after:', error);
-        await conn.sendMessage(m.chat, { text: '❌ Error al procesar tu selección' });
+        const libre = listas[squadType].findIndex(p => p === '➤')
+        if (libre !== -1) {
+            listas[squadType][libre] = `@${nombreUsuario}`
+        }
+        
+        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
+        return
+    }
+    
+    // DETECTAR COMANDO .20vs20 (con o sin espacio)
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
+    
+    if (textLimpio === '.20vs20' || textLimpio === '. 20vs20' || textLimpio.startsWith('.20vs20 ') || textLimpio.startsWith('. 20vs20 ')) {
+        let mensaje = ''
+        if (textLimpio.startsWith('.20vs20 ')) {
+            mensaje = m.text.substring(7).trim()
+        } else if (textLimpio.startsWith('. 20vs20 ')) {
+            mensaje = m.text.substring(8).trim()
+        }
+        
+        if (!mensaje) {
+            await conn.reply(m.chat, `🕓 𝗜𝗡𝗚𝗥𝗘𝗦𝗔 𝗨𝗡 𝗛𝗢𝗥𝗔𝗥𝗜𝗢.\n𝗘𝗷𝗲𝗺𝗽𝗹𝗼:\n.20vs20 4pm🇪🇨/3pm🇲🇽`, m, rcanal)
+            return
+        }
+        
+        reiniciarListas(m.chat)
+        mensajesGrupos.set(m.chat, mensaje)
+        let listas = getListasGrupo(m.chat)
+        
+        await mostrarLista(conn, m.chat, listas, mensaje)
+        return
     }
 }
-
-handler.customPrefix = /^(escuadra   1|escuadra   2|escuadra   3|escuadra   4|escuadra   5|suplente20vs20|\.20vs20.*)$/i
-handler.command = new RegExp
-handler.group = true
 
 export default handler
