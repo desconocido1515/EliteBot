@@ -1,163 +1,62 @@
-import axios from "axios"
-import cheerio from "cheerio"
-import FormData from "form-data"
+import { Maker } from 'imagemaker.js';
 
-const handler = async (m, { conn, args, usedPrefix, command }) => {
+const logos = {
+  logobrillante: 'https://en.ephoto360.com/create-glowing-text-effects-online-706.html',
+  logometal: 'https://en.ephoto360.com/metal-text-effect-online-702.html',
+  logodiamante: 'https://en.ephoto360.com/diamond-text-effect-online-701.html',
+  logofuego: 'https://en.ephoto360.com/fire-text-effect-online-705.html',
+  logohielo: 'https://en.ephoto360.com/ice-text-effect-online-706.html'
+};
 
-let rcanal = { contextInfo: { forwardingScore: 200, isForwarded: true }}
+const handler = async (m, { conn, args, command }) => {
+  const texto = args.join(' ').trim();
 
-if (!args[0]) {
-return conn.reply(m.chat,
-`✦ *GENERADOR DE LOGOS*
+  if (!texto) {
+    return conn.reply(
+      m.chat,
+      `✦ ¡Hey!\nIngresa la palabra.\nEjemplo :\n.${command} Kevv`,
+      m,
+      rcanal
+    );
+  }
 
-📌 Uso correcto:
-${usedPrefix + command} efecto texto
+  const url = logos[command];
+  if (!url) return;
 
-📌 Ejemplo:
-${usedPrefix + command} american GOJOBOT
+  try {
+    await conn.sendMessage(m.chat, {
+      react: { text: '🖼️', key: m.key }
+    });
 
-⚠️ Debes ingresar un efecto y un texto.`,
-m, rcanal)
-}
+    await conn.reply(
+      m.chat,
+      `*Espera por favor, estoy creando tu imagen* 🚀`,
+      m,
+      rcanal
+    );
 
-let effect = args[0].toLowerCase()
-let text = args.slice(1).join(" ")
+    const res = await new Maker().Ephoto360(url, [texto]);
 
-if (!text) {
-return conn.reply(m.chat,
-`⚠️ *Debes ingresar un texto*
+    await conn.sendMessage(m.chat, {
+      image: { url: res.imageUrl },
+      caption: `IMAGEN ENVIADA ☑️\nElite Bot Global - Since 2023®`
+    });
 
-📌 Ejemplo:
-${usedPrefix + command} ${effect} GOJOBOT`,
-m, rcanal)
-}
+    await conn.sendMessage(m.chat, {
+      react: { text: '☑️', key: m.key }
+    });
 
-let effectData = effects.find(v => v.title.toLowerCase() === effect)
+  } catch (e) {
+    console.error(e);
+    await conn.reply(
+      m.chat,
+      `✦ ¡Hey!\nNo se pudo generar la imagen, intenta con otra palabra.`,
+      m,
+      rcanal
+    );
+  }
+};
 
-if (!effectData) {
-return conn.reply(m.chat,
-`❌ *Efecto no válido*
+handler.command = Object.keys(logos);
 
-📌 Usa uno de la lista disponible.`,
-m, rcanal)
-}
-
-try {
-await m.react('🕓')
-
-let result = await maker(effectData.url, text)
-
-if (!result || !result.image) {
-throw 'No se generó imagen'
-}
-
-await conn.sendMessage(m.chat, {
-image: { url: result.image },
-caption: `✅ *LOGO GENERADO CORRECTAMENTE*
-
-🎨 Efecto: ${effect}
-📝 Texto: ${text}`
-}, { quoted: m })
-
-await m.react('✅')
-
-} catch (e) {
-console.log(e)
-
-await conn.reply(m.chat,
-`❌ *Error al generar el logo*
-
-⚠️ Posible causa:
-• Bloqueo de la web (403)
-• Error temporal
-
-🔄 Intenta nuevamente.`,
-m, rcanal)
-
-await m.react('✖️')
-}
-}
-
-handler.command = ['logo']
-export default handler
-
-// ================= MAKER =================
-
-async function maker(url, text) {
-try {
-let res = await axios.get(url, {
-headers: {
-"User-Agent": "Mozilla/5.0",
-"Accept": "text/html"
-}
-})
-
-let $ = cheerio.load(res.data)
-
-let token = $('#token').val()
-let build_server = $('#build_server').val()
-let build_server_id = $('#build_server_id').val()
-
-if (!token) throw 'Token no encontrado'
-
-let form = new FormData()
-form.append('token', token)
-form.append('build_server', build_server)
-form.append('build_server_id', build_server_id)
-form.append('submit', 'Go')
-
-form.append('text[]', text)
-
-let post = await axios.post(url, form, {
-headers: {
-...form.getHeaders(),
-"User-Agent": "Mozilla/5.0",
-"Referer": url
-}
-})
-
-let $$ = cheerio.load(post.data)
-let json = $$('#form_value').val() || $$('#form_value').text()
-
-if (!json) throw 'No hay respuesta del servidor'
-
-let result = await axios.post(
-new URL(url).origin + '/effect/create-image',
-JSON.parse(json),
-{
-headers: {
-"Content-Type": "application/json",
-"User-Agent": "Mozilla/5.0"
-}
-}
-)
-
-return {
-image: build_server + (result.data.image || result.data.fullsize_image)
-}
-
-} catch (e) {
-throw e
-}
-}
-
-// ================= EFECTOS =================
-
-const effects = [
-{
-title: "american",
-url: "https://textpro.me/create-american-flag-3d-text-effect-online-1051.html"
-},
-{
-title: "neon",
-url: "https://textpro.me/neon-text-effect-online-963.html"
-},
-{
-title: "glitch",
-url: "https://textpro.me/create-a-glitch-text-effect-online-free-1026.html"
-},
-{
-title: "metallic",
-url: "https://textpro.me/create-a-metallic-text-effect-free-online-1041.html"
-}
-]
+export default handler;
