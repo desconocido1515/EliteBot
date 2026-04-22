@@ -1,44 +1,46 @@
 import fetch from 'node-fetch';
 
-let handler = async (m, { conn, text, usedPrefix }) => {
+let handler = async (m, { conn, text, usedPrefix, participants }) => {
     
-    // Validar que haya texto o mención
     if (!text) {
         return conn.reply(m.chat, `☑️ ¿A quién quieres desafiar?\n\nEjemplo: .pvpm1014 @usuario`, m, rcanal)
     }
     
-    // Obtener la mención (misma lógica que funciona)
-    let targetTag = text.toUpperCase()
-    let mentions = []
+    let usuario = null
     
-    // Si el texto contiene una mención (@algo), extraer el JID
+    // Buscar por mención directa
     if (m.mentionedJid && m.mentionedJid.length > 0) {
-        mentions = m.mentionedJid
-        targetTag = '@' + mentions[0].split('@')[0]
-    } else {
-        // Si no hay mención, buscar por nombre en el grupo
-        const participants = await conn.groupMetadata(m.chat).then(g => g.participants)
-        const searchName = text.toLowerCase()
-        const found = participants.find(p => {
-            const name = conn.getName(p.id)?.toLowerCase() || ''
-            return name.includes(searchName)
-        })
-        if (found) {
-            mentions = [found.id]
-            targetTag = '@' + found.id.split('@')[0]
-        } else {
-            return conn.reply(m.chat, `☑️ Usuario no encontrado. Menciona a la persona o escribe su nombre correctamente.`, m, rcanal)
+        usuario = m.mentionedJid[0]
+    }
+    
+    // Buscar por quoted (responder al mensaje)
+    if (!usuario && m.quoted?.sender) {
+        usuario = m.quoted.sender
+    }
+    
+    // Buscar por nombre en participantes
+    if (!usuario) {
+        const nombreBuscar = text.toLowerCase()
+        for (let p of participants) {
+            const name = await conn.getName(p.id)
+            if (name.toLowerCase().includes(nombreBuscar)) {
+                usuario = p.id
+                break
+            }
         }
     }
     
-    // No permitir desafiarse a sí mismo
-    if (mentions[0] === m.sender) {
+    if (!usuario) {
+        return conn.reply(m.chat, `☑️ Usuario no encontrado.\n\n💡 *Consejo:* Responde al mensaje de la persona que quieres desafiar y escribe .pvpm1014`, m, rcanal)
+    }
+    
+    if (usuario === m.sender) {
         return conn.reply(m.chat, `☑️ No puedes desafiarte a ti mismo`, m, rcanal)
     }
     
     const nombreUsuario = m.pushName || m.sender.split('@')[0]
+    const nombreOponente = await conn.getName(usuario)
     
-    // Reaccionar al mensaje original
     await conn.sendMessage(m.chat, {
         react: { text: '👺', key: m.key }
     })
@@ -52,7 +54,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
     
     const texto = `👺 *${nombreUsuario}* TE ESTÁ DESAFIANDO A PVP 👺
         
-🎮 *OPONENTE:* ${targetTag}
+🎮 *OPONENTE:* @${usuario.split('@')[0]}
 
 ¿CREES PODER SACARME +4 RONDAS? 😂
 
@@ -64,7 +66,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
         image: { url: imagePath },
         caption: texto,
         buttons: buttons,
-        mentions: [m.sender, mentions[0]],
+        mentions: [m.sender, usuario],
         viewOnce: true
     })
 }
