@@ -2,10 +2,12 @@ import { Maker } from 'imagemaker.js';
 
 const logos = {
   logobrillante: 'https://en.ephoto360.com/create-glowing-text-effects-online-706.html',
-  logometal: 'https://en.ephoto360.com/metal-text-effect-online-702.html',
-  logodiamante: 'https://en.ephoto360.com/diamond-text-effect-online-701.html',
   logofuego: 'https://en.ephoto360.com/fire-text-effect-online-705.html',
-  logohielo: 'https://en.ephoto360.com/ice-text-effect-online-706.html'
+  logoneon: 'https://en.ephoto360.com/create-impressive-neon-glitch-text-effects-online-768.html',
+  logorombos: 'https://en.ephoto360.com/romantic-text-effect-online-711.html',
+  logovidrio: 'https://en.ephoto360.com/write-text-on-wet-glass-online-589.html',
+  logograffiti: 'https://en.ephoto360.com/graffiti-text-effect-online-710.html',
+  logonube: 'https://en.ephoto360.com/cloud-text-effect-139.html'
 };
 
 const handler = async (m, { conn, args, command }) => {
