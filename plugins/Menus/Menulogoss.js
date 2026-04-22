@@ -30,15 +30,15 @@ let menu = `
 │° 🔰 .logoassassin texto
 │° 🔰 .logoshield texto
 │° 🔰 .logofootball texto
-│° 🔰 .logominimal texto
+│° 🔰 .logogirl texto
 │° 🔰 .logometal texto
 │° 🔰 .logobw texto
 │° 🔰 .logoqueen texto
 │° 🔰 .logoamerican texto
 │° 🔰 .logoaov texto
 │° 🔰 .logocomix texto
-│° 🔰 .logorotation texto
-│° 🔰 .logointro texto
+│° 🔰 .logosilver texto
+│° 🔰 .logoneon texto
 
 │ 🔹 *2 PALABRAS*
 │° 🔰 .logodead texto texto
@@ -49,7 +49,7 @@ let menu = `
 │° 🔰 .logowarzone texto texto
 │° 🔰 .logoamongus texto texto
 │° 🔰 .logololbanner texto texto
-│° 🔰 .logowanted texto texto
+│° 🔰 .logostone texto texto
 
 ╰━━━━━━⋆★⋆━━━━━━⬣`.trim()
     
