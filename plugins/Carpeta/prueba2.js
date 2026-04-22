@@ -5,9 +5,9 @@ const logos = {
   logofuego: 'https://en.ephoto360.com/fire-text-effect-online-705.html',
   logoneon: 'https://en.ephoto360.com/create-impressive-neon-glitch-text-effects-online-768.html',
   logorombos: 'https://en.ephoto360.com/romantic-text-effect-online-711.html',
-  logovidrio: 'https://en.ephoto360.com/write-text-on-wet-glass-online-589.html',
-  logograffiti: 'https://en.ephoto360.com/graffiti-text-effect-online-710.html',
-  logonube: 'https://en.ephoto360.com/cloud-text-effect-139.html'
+  logocristal: 'https://en.ephoto360.com/crystal-text-effect-online-701.html',
+  logopapel: 'https://en.ephoto360.com/paper-text-effect-online-703.html',
+  logomadera: 'https://en.ephoto360.com/wood-text-effect-online-704.html'
 };
 
 const handler = async (m, { conn, args, command }) => {
