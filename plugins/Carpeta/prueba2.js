@@ -1,11 +1,15 @@
-import axios from 'axios';
-import cheerio from 'cheerio';
+import { Maker } from 'imagemaker.js';
 
 let handler = async (m, { conn, args }) => {
 
   const texto = args.join(' ').trim();
+
   if (!texto) {
-    return conn.reply(m.chat, `✦ Ejemplo:\n.logominimal Kevv`, m);
+    return conn.reply(
+      m.chat,
+      `✦ Ejemplo:\n.logominimal Kevv`,
+      m
+    );
   }
 
   try {
@@ -13,43 +17,43 @@ let handler = async (m, { conn, args }) => {
       react: { text: '🖼️', key: m.key }
     });
 
-    await conn.reply(m.chat, `*Generando logo minimal...* 🚀`, m);
-
-    // 🔥 Paso 1: obtener página
-    const { data } = await axios.get('https://en.ephoto360.com/free-minimal-logo-maker-online-445.html');
-
-    const $ = cheerio.load(data);
-
-    const token = $('input[name="token"]').attr('value');
-    const build_server = $('#build_server').attr('value');
-    const build_server_id = $('#build_server_id').attr('value');
-
-    // 🔥 Paso 2: enviar datos (simula formulario)
-    const form = new URLSearchParams();
-    form.append('text[]', texto);
-    form.append('token', token);
-    form.append('build_server', build_server);
-    form.append('build_server_id', build_server_id);
-
-    const post = await axios.post(
-      'https://en.ephoto360.com/effect/create-image',
-      form,
-      {
-        headers: {
-          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        }
-      }
+    await conn.reply(
+      m.chat,
+      `*Creando logo minimal...* 🚀`,
+      m
     );
 
-    const json = post.data;
+    const url = 'https://en.ephoto360.com/free-minimal-logo-maker-online-445.html';
 
-    if (!json.success) throw 'Error en generación';
+    let res;
+    const colores = ['1', '2', '3', '4', '5', '6'];
 
-    // 🔥 Paso 3: obtener imagen final
-    const result = `https:${json.image}`;
+    // 🔥 AUTO COLOR + ANTI ERROR
+    for (let color of colores) {
+      try {
+        let temp = await new Maker().Ephoto360(url, [texto, color]);
+
+        if (temp && temp.imageUrl) {
+          res = temp;
+          break;
+        }
+
+      } catch (e) {
+        console.log('falló color:', color);
+      }
+    }
+
+    // 👉 si no responde
+    if (!res) {
+      return conn.reply(
+        m.chat,
+        `❌ No se pudo generar el logo (Ephoto360 no respondió)`,
+        m
+      );
+    }
 
     await conn.sendMessage(m.chat, {
-      image: { url: result },
+      image: { url: res.imageUrl },
       caption: `✔️ Logo minimal generado`
     });
 
@@ -59,7 +63,11 @@ let handler = async (m, { conn, args }) => {
 
   } catch (e) {
     console.error(e);
-    conn.reply(m.chat, `❌ Error real al generar logo`, m);
+    conn.reply(
+      m.chat,
+      `❌ Error al generar logo`,
+      m
+    );
   }
 };
 
