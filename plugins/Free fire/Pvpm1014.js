@@ -29,29 +29,49 @@ handler.before = async function (m, { conn }) {
         return
     }
     
-    // DETECTAR COMANDO .pvpm1014 (con o sin espacio)
+    // DETECTAR COMANDO .pvpm1014
     const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
     
     if (textLimpio === '.pvpm1014' || textLimpio === '. pvpm1014' || textLimpio.startsWith('.pvpm1014 ') || textLimpio.startsWith('. pvpm1014 ')) {
         
-        // Obtener usuario mencionado
         let mencionado = null
         
+        // Forma 1: Si hay mención directa
         if (m.mentionedJid && m.mentionedJid.length > 0) {
             mencionado = m.mentionedJid[0]
         }
         
+        // Forma 2: Si responde a un mensaje
         if (!mencionado && m.quoted?.sender) {
             mencionado = m.quoted.sender
         }
         
+        // Forma 3: Mostrar instrucciones si no hay mención
         if (!mencionado) {
-            await conn.reply(m.chat, `⚠️ *MENCIONA A QUIEN QUIERES DESAFIAR*\n\n📝 *Ejemplos:*\n.pvpm1014 @usuario\n.pvpm1014 (respondiendo al mensaje del usuario)`, m, rcanal)
+            const instrucciones = `⚠️ *CÓMO USAR EL COMANDO PVP* ⚠️
+
+📌 *OPCIÓN 1 - MENCIONAR:*
+1. Escribe *${textLimpio}* (con espacio)
+2. Escribe *@* y selecciona al usuario
+3. Envía el mensaje
+
+📌 *OPCIÓN 2 - RESPONDER:*
+1. Responde al mensaje del usuario
+2. Escribe *${textLimpio}*
+3. Envía el mensaje
+
+💡 *Ejemplo válido:*
+. pvpm1014 @usuario
+
+🎯 *PRUEBA RESPONDIENDO A ESTE MENSAJE*`
+            
+            await conn.reply(m.chat, instrucciones, m, rcanal)
             return
         }
         
+        // No permitir desafiarse a sí mismo
         if (mencionado === m.sender) {
-            await conn.reply(m.chat, `⚠️ *NO PUEDES DESAFIARTE A TI MISMO*\n\nMenciona a otro usuario.`, m, rcanal)
+            await conn.reply(m.chat, `⚠️ *NO PUEDES DESAFIARTE A TI MISMO*\n\nMenciona a otro usuario o responde al mensaje de alguien más.`, m, rcanal)
             return
         }
         
@@ -67,7 +87,6 @@ handler.before = async function (m, { conn }) {
             { buttonId: 'miedo_pvp', buttonText: { displayText: "🫦 TENGO MIEDO" }, type: 1 }
         ]
         
-        // Ruta de la imagen
         const imagePath = './src/1x1.jpg'
         
         const texto = `👺 *${nombreUsuario}* TE ESTÁ DESAFIANDO A PVP 👺
@@ -80,7 +99,6 @@ handler.before = async function (m, { conn }) {
 
 *¿ACEPTAS EL DESAFÍO?*`.trim()
         
-        // Enviar imagen con botones
         await conn.sendMessage(m.chat, {
             image: { url: imagePath },
             caption: texto,
