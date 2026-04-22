@@ -2,7 +2,6 @@ import { Maker } from 'imagemaker.js';
 
 const logos = {
   // === 1 PALABRA 
-  
   logoassassin: { url: 'https://en.ephoto360.com/create-logo-team-logo-gaming-assassin-style-574.html', palabras: 1 },
   logoshield: { url: 'https://en.ephoto360.com/create-mascot-shield-logo-online-for-free-758.html', palabras: 1 },
   logofootball: { url: 'https://en.ephoto360.com/create-football-team-logo-online-free-671.html', palabras: 1 },
@@ -29,23 +28,40 @@ const logos = {
 };
 
 const handler = async (m, { conn, args, command }) => {
+
+  // 👉 SI SOLO PONE ".logo"
+  if (command === 'logo') {
+    return conn.reply(
+      m.chat,
+      `✦ Ingresa la palabra que deseas hacer logo por favor.`,
+      m,
+      rcanal
+    );
+  }
+
   const texto = args.join(' ').trim();
 
   if (!texto) {
-    return conn.reply(m.chat, `✦ ¡Hey!\nIngresa el texto.\n\n📌 *Ejemplo:*\n.${command} Kevv`, m, rcanal);
+    return conn.reply(
+      m.chat,
+      `✦ Ingresa la palabra que deseas hacer logo por favor.`,
+      m,
+      rcanal
+    );
   }
 
   const config = logos[command];
   if (!config) return;
 
-  const necesitaPalabras = config.palabras;
-  const url = config.url;
-
-  // Separar palabras
   const palabras = texto.split(' ');
-  
-  if (necesitaPalabras === 2 && palabras.length < 2) {
-    return conn.reply(m.chat, `✦ ¡Hey!\nEste comando necesita *DOS palabras* separadas por *espacio*\n\n📌 *Ejemplo:*\n.${command} Kevv Elite`, m, rcanal);
+
+  if (config.palabras === 2 && palabras.length < 2) {
+    return conn.reply(
+      m.chat,
+      `✦ Este comando necesita *DOS palabras*\n\n📌 Ejemplo:\n.${command} Kevv Elite`,
+      m,
+      rcanal
+    );
   }
 
   try {
@@ -53,20 +69,25 @@ const handler = async (m, { conn, args, command }) => {
       react: { text: '🖼️', key: m.key }
     });
 
-    await conn.reply(m.chat, `*Espera por favor, estoy creando tu imagen* 🚀`, m, rcanal);
+    await conn.reply(
+      m.chat,
+      `*Espera por favor, estoy creando tu imagen* 🚀`,
+      m,
+      rcanal
+    );
 
     let res;
-    if (necesitaPalabras === 2) {
-      const texto1 = palabras[0].trim();
-      const texto2 = palabras.slice(1).join(' ').trim();
-      res = await new Maker().Ephoto360(url, [texto1, texto2]);
+    if (config.palabras === 2) {
+      const texto1 = palabras[0];
+      const texto2 = palabras.slice(1).join(' ');
+      res = await new Maker().Ephoto360(config.url, [texto1, texto2]);
     } else {
-      res = await new Maker().Ephoto360(url, [texto]);
+      res = await new Maker().Ephoto360(config.url, [texto]);
     }
 
     await conn.sendMessage(m.chat, {
       image: { url: res.imageUrl },
-      caption: `IMAGEN ENVIADA ☑️\nElite Bot Global - Since 2023®`
+      caption: `IMAGEN ENVIADA ☑️`
     });
 
     await conn.sendMessage(m.chat, {
@@ -75,10 +96,16 @@ const handler = async (m, { conn, args, command }) => {
 
   } catch (e) {
     console.error(e);
-    await conn.reply(m.chat, `✦ ¡Hey!\nNo se pudo generar la imagen.`, m, rcanal);
+    await conn.reply(
+      m.chat,
+      `✦ No se pudo generar la imagen.`,
+      m,
+      rcanal
+    );
   }
 };
 
-handler.command = Object.keys(logos);
+// 🔥 AQUÍ ESTÁ LA CLAVE
+handler.command = ['logo', ...Object.keys(logos)];
 
 export default handler;
