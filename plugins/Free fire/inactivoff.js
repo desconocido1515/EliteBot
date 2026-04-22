@@ -14,7 +14,7 @@ let handler = async (m, { conn, participants }) => {
     let nombreVictima = await conn.getName(victim)
     
     // Ruta de imagen
-    let imagePath = './src/inactivo.jpg'
+    let imagePath = './src/inactivoff.jpg'
     
     // Mensajes aleatorios de inactividad
     const mensajes = [
