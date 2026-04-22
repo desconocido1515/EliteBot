@@ -1,37 +1,13 @@
 import fetch from 'node-fetch';
 
-let handler = async (m, { conn, text, usedPrefix, participants }) => {
+let handler = async (m, { conn, text, usedPrefix }) => {
     
-    if (!text) {
-        return conn.reply(m.chat, `☑️ ¿A quién quieres desafiar?\n\nEjemplo: .pvpm1014 @usuario`, m, rcanal)
-    }
-    
-    let usuario = null
-    
-    // Buscar por mención directa
-    if (m.mentionedJid && m.mentionedJid.length > 0) {
-        usuario = m.mentionedJid[0]
-    }
-    
-    // Buscar por quoted (responder al mensaje)
-    if (!usuario && m.quoted?.sender) {
-        usuario = m.quoted.sender
-    }
-    
-    // Buscar por nombre en participantes
-    if (!usuario) {
-        const nombreBuscar = text.toLowerCase()
-        for (let p of participants) {
-            const name = await conn.getName(p.id)
-            if (name.toLowerCase().includes(nombreBuscar)) {
-                usuario = p.id
-                break
-            }
-        }
-    }
+    // Usar la misma lógica que funciona en promote
+    let mentionedJid = await m.mentionedJid
+    let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!usuario) {
-        return conn.reply(m.chat, `☑️ Usuario no encontrado.\n\n💡 *Consejo:* Responde al mensaje de la persona que quieres desafiar y escribe .pvpm1014`, m, rcanal)
+        return conn.reply(m.chat, `☑️ ¿A quién quieres desafiar?\n\n💡 *RESPONDE al mensaje de la persona* o *MENCIÓNALA* con @`, m, rcanal)
     }
     
     if (usuario === m.sender) {
@@ -39,7 +15,6 @@ let handler = async (m, { conn, text, usedPrefix, participants }) => {
     }
     
     const nombreUsuario = m.pushName || m.sender.split('@')[0]
-    const nombreOponente = await conn.getName(usuario)
     
     await conn.sendMessage(m.chat, {
         react: { text: '👺', key: m.key }
