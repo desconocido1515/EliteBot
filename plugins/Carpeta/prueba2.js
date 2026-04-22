@@ -116,7 +116,7 @@ const handler = async (m, { conn, args, command }) => {
   if (command === 'logo') {
     return conn.reply(
       m.chat,
-      `✦ Ingresa la palabra que deseas hacer logo por favor.`,
+      `✦ Ingresa al menú de logos con el comando\n.menulogos.`,
       m,
       rcanal
     );
