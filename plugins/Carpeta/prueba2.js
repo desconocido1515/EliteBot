@@ -29,7 +29,90 @@ const logos = {
 
 const handler = async (m, { conn, args, command }) => {
 
-  // 👉 SI SOLO PONE ".logo"
+  const config = logos[command];
+  const texto = args.join(' ').trim();
+
+  // ==============================
+  // 🔥 COMANDOS ESPECÍFICOS (.logoxxx)
+  // ==============================
+  if (config) {
+
+    // 👉 Si no escribe nada
+    if (!texto) {
+      if (config.palabras === 2) {
+        return conn.reply(
+          m.chat,
+          `✦ Ingresa *2 palabras*\n\n📌 Ejemplo:\n.${command} Kevv Elite`,
+          m,
+          rcanal
+        );
+      } else {
+        return conn.reply(
+          m.chat,
+          `✦ Ingresa *1 palabra*\n\n📌 Ejemplo:\n.${command} Kevv`,
+          m,
+          rcanal
+        );
+      }
+    }
+
+    const palabras = texto.split(' ');
+
+    // 👉 Validar cantidad
+    if (config.palabras === 2 && palabras.length < 2) {
+      return conn.reply(
+        m.chat,
+        `✦ Este comando necesita *2 palabras*\n\n📌 Ejemplo:\n.${command} Kevv Elite`,
+        m,
+        rcanal
+      );
+    }
+
+    try {
+      await conn.sendMessage(m.chat, {
+        react: { text: '🖼️', key: m.key }
+      });
+
+      await conn.reply(
+        m.chat,
+        `*Creando tu logo...* 🚀`,
+        m,
+        rcanal
+      );
+
+      let res;
+
+      if (config.palabras === 2) {
+        const texto1 = palabras[0];
+        const texto2 = palabras.slice(1).join(' ');
+        res = await new Maker().Ephoto360(config.url, [texto1, texto2]);
+      } else {
+        res = await new Maker().Ephoto360(config.url, [texto]);
+      }
+
+      await conn.sendMessage(m.chat, {
+        image: { url: res.imageUrl },
+        caption: `IMAGEN ENVIADA ☑️\nElite Bot Global - Since 2023®`
+      });
+
+      await conn.sendMessage(m.chat, {
+        react: { text: '🌟', key: m.key }
+      });
+
+    } catch (e) {
+      console.error(e);
+      return conn.reply(
+        m.chat,
+        `✦ No se pudo generar la imagen.`,
+        m,
+        rcanal
+      );
+    }
+  }
+
+  // ==============================
+  // 🔥 COMANDO GENERAL (.logo)
+  // ==============================
   if (command === 'logo') {
     return conn.reply(
       m.chat,
@@ -38,74 +121,9 @@ const handler = async (m, { conn, args, command }) => {
       rcanal
     );
   }
-
-  const texto = args.join(' ').trim();
-
-  if (!texto) {
-    return conn.reply(
-      m.chat,
-      `✦ Ingresa la palabra que deseas hacer logo por favor.`,
-      m,
-      rcanal
-    );
-  }
-
-  const config = logos[command];
-  if (!config) return;
-
-  const palabras = texto.split(' ');
-
-  if (config.palabras === 2 && palabras.length < 2) {
-    return conn.reply(
-      m.chat,
-      `✦ Este comando necesita *DOS palabras*\n\n📌 Ejemplo:\n.${command} Kevv Elite`,
-      m,
-      rcanal
-    );
-  }
-
-  try {
-    await conn.sendMessage(m.chat, {
-      react: { text: '🖼️', key: m.key }
-    });
-
-    await conn.reply(
-      m.chat,
-      `*Espera por favor, estoy creando tu imagen* 🚀`,
-      m,
-      rcanal
-    );
-
-    let res;
-    if (config.palabras === 2) {
-      const texto1 = palabras[0];
-      const texto2 = palabras.slice(1).join(' ');
-      res = await new Maker().Ephoto360(config.url, [texto1, texto2]);
-    } else {
-      res = await new Maker().Ephoto360(config.url, [texto]);
-    }
-
-    await conn.sendMessage(m.chat, {
-      image: { url: res.imageUrl },
-      caption: `IMAGEN ENVIADA ☑️`
-    });
-
-    await conn.sendMessage(m.chat, {
-      react: { text: '🌟', key: m.key }
-    });
-
-  } catch (e) {
-    console.error(e);
-    await conn.reply(
-      m.chat,
-      `✦ No se pudo generar la imagen.`,
-      m,
-      rcanal
-    );
-  }
 };
 
-// 🔥 AQUÍ ESTÁ LA CLAVE
+// 🔥 IMPORTANTE
 handler.command = ['logo', ...Object.keys(logos)];
 
 export default handler;
