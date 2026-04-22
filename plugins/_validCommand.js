@@ -42,7 +42,7 @@ export async function before(m, { conn }) {
 'tomp3',
 'trivia',
 'vegueta',
-'vestimencuadri', 
+'vestimencuadri', 'menulogos', 'menulogo','logos' 'menuimg', 
 
 
     
