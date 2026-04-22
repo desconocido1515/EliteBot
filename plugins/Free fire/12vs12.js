@@ -27,7 +27,7 @@ const reiniciarListas = (groupId) => {
     });
 };
 
-// Función para mostrar la lista SIN botones (usando texto normal)
+// Función para mostrar la lista con botones (usando el formato que funciona)
 async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
     const texto = `🕓 𝗛𝗢𝗥𝗔: ${mensajeUsuario ? `*${mensajeUsuario}*\n` : ''} 🗣️ 𝗜𝗡𝗗𝗜𝗖𝗔𝗖𝗜𝗢𝗡𝗘𝗦 :
 » Reglas y color se avisa al llenar este listado.
@@ -63,28 +63,33 @@ async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
 │🥷🏻 ${listas.suplente[2]}
 │🥷🏻 ${listas.suplente[3]}
 ╰─────────────╯
-
-⚔️ *COMANDOS PARA AGREGARTE:*
-▸ .esc1 - Agregar a Escuadra 1
-▸ .esc2 - Agregar a Escuadra 2
-▸ .esc3 - Agregar a Escuadra 3
-▸ .sup - Agregar a Suplentes
-
 ©EliteBotGlobal 2023`;
 
-    await conn.sendMessage(chat, { text: texto });
+    const buttons = [
+        { buttonId: 'escuadra1', buttonText: { displayText: "⚔️ ESCUADRA 1" }, type: 1 },
+        { buttonId: 'escuadra2', buttonText: { displayText: "⚔️ ESCUADRA 2" }, type: 1 },
+        { buttonId: 'escuadra3', buttonText: { displayText: "⚔️ ESCUADRA 3" }, type: 1 },
+        { buttonId: 'suplente12vs12', buttonText: { displayText: "🔄 SUPLENTES" }, type: 1 }
+    ];
+
+    await conn.sendMessage(chat, {
+        text: texto,
+        buttons: buttons,
+        viewOnce: true
+    });
 }
 
 let handler = m => m
 
 handler.before = async function (m, { conn }) {
-    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
-    
-    // COMANDOS PARA AGREGARSE
-    if (textLimpio === '.esc1') {
+    // DETECTAR RESPUESTA DE BOTONES (misma lógica que funcionó)
+    if (m.message?.buttonsResponseMessage) {
+        const buttonId = m.message.buttonsResponseMessage.selectedButtonId
         const groupId = m.chat
         let listas = getListasGrupo(groupId)
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        
+        console.log('Botón 12vs12 presionado:', buttonId)
         
         // Borrar al usuario de todas las escuadras
         Object.keys(listas).forEach(key => {
@@ -94,9 +99,28 @@ handler.before = async function (m, { conn }) {
             }
         })
         
-        const libre = listas.squad1.findIndex(p => p === '➤')
+        let squadType
+        
+        switch(buttonId) {
+            case 'escuadra1':
+                squadType = 'squad1'
+                break
+            case 'escuadra2':
+                squadType = 'squad2'
+                break
+            case 'escuadra3':
+                squadType = 'squad3'
+                break
+            case 'suplente12vs12':
+                squadType = 'suplente'
+                break
+            default:
+                return
+        }
+        
+        const libre = listas[squadType].findIndex(p => p === '➤')
         if (libre !== -1) {
-            listas.squad1[libre] = `@${nombreUsuario}`
+            listas[squadType][libre] = `@${nombreUsuario}`
         }
         
         const mensajeGuardado = mensajesGrupos.get(groupId) || ''
@@ -104,75 +128,10 @@ handler.before = async function (m, { conn }) {
         return
     }
     
-    if (textLimpio === '.esc2') {
-        const groupId = m.chat
-        let listas = getListasGrupo(groupId)
-        const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        
-        Object.keys(listas).forEach(key => {
-            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
-            if (index !== -1) {
-                listas[key][index] = '➤'
-            }
-        })
-        
-        const libre = listas.squad2.findIndex(p => p === '➤')
-        if (libre !== -1) {
-            listas.squad2[libre] = `@${nombreUsuario}`
-        }
-        
-        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
-        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
-        return
-    }
+    // DETECTAR COMANDO .12vs12 (con o sin espacio)
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
     
-    if (textLimpio === '.esc3') {
-        const groupId = m.chat
-        let listas = getListasGrupo(groupId)
-        const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        
-        Object.keys(listas).forEach(key => {
-            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
-            if (index !== -1) {
-                listas[key][index] = '➤'
-            }
-        })
-        
-        const libre = listas.squad3.findIndex(p => p === '➤')
-        if (libre !== -1) {
-            listas.squad3[libre] = `@${nombreUsuario}`
-        }
-        
-        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
-        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
-        return
-    }
-    
-    if (textLimpio === '.sup') {
-        const groupId = m.chat
-        let listas = getListasGrupo(groupId)
-        const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        
-        Object.keys(listas).forEach(key => {
-            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
-            if (index !== -1) {
-                listas[key][index] = '➤'
-            }
-        })
-        
-        const libre = listas.suplente.findIndex(p => p === '➤')
-        if (libre !== -1) {
-            listas.suplente[libre] = `@${nombreUsuario}`
-        }
-        
-        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
-        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
-        return
-    }
-    
-    // Detectar .12vs12 con o sin espacio
     if (textLimpio === '.12vs12' || textLimpio === '. 12vs12' || textLimpio.startsWith('.12vs12 ') || textLimpio.startsWith('. 12vs12 ')) {
-        // Extraer el mensaje (horario)
         let mensaje = ''
         if (textLimpio.startsWith('.12vs12 ')) {
             mensaje = m.text.substring(7).trim()
