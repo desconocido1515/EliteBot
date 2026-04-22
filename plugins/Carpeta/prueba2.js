@@ -1,3 +1,5 @@
+import { Maker } from 'imagemaker.js';
+
 const logos = {
 // === 1 PALABRA
 logoassassin: { url: 'https://en.ephoto360.com/create-logo-team-logo-gaming-assassin-style-574.html', palabras: 1 },
