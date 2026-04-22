@@ -12,29 +12,34 @@ let q = m.quoted ? m.quoted : m
 let mime = (q.msg || q).mimetype || ''
 switch (command) {
 case 'tourl': {
-if (!mime) return conn.reply(m.chat, `❀ Por favor, responde a una *Imagen* o *Vídeo.*`, m)
+if (!mime) return conn.reply(m.chat, `☑️ 𝙿𝙾𝚁 𝙵𝙰𝚅𝙾𝚁, 𝚁𝙴𝚂𝙿𝙾𝙽𝙳𝙴 𝙰 𝚄𝙽𝙰 𝙸𝙼𝙰𝙶𝙴𝙽 𝙾 𝚅𝙸𝙳𝙴𝙾`, m, rcanal)
 await m.react('🕒')
 const media = await q.download()
 const isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime)
 const link = await uploadImage(media)
-const txt = `乂  *L I N K - E N L A C E*  乂\n\n*» Enlace* : ${link}\n*» Tamaño* : ${formatBytes(media.length)}\n*» Expiración* : ${isTele ? 'No expira' : 'Desconocido'}\n\n> *${dev}*`
-await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, fkontak)
+// Convertir link a .jpg si es posible
+const linkJpg = link.split('?')[0] + '.jpg'
+const txt = `☑️ *𝙻𝙸𝙽𝙺 - 𝙴𝙽𝙻𝙰𝙲𝙴*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎:* ${linkJpg}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
+await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m)
 await m.react('✔️')
 break
 }
 case 'catbox': {
-if (!mime) return conn.reply(m.chat, `❀ Por favor, responde a una *Imagen* o *Vídeo.*`, m)
+if (!mime) return conn.reply(m.chat, `☑️ 𝙿𝙾𝚁 𝙵𝙰𝚅𝙾𝚁, 𝚁𝙴𝚂𝙿𝙾𝙽𝙳𝙴 𝙰 𝚄𝙽𝙰 𝙸𝙼𝙰𝙶𝙴𝙽 𝙾 𝚅𝙸𝙳𝙴𝙾`, m, rcanal)
 await m.react('🕒')
 const media = await q.download()
 const isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime)
 const link = await catbox(media)
-const txt = `*乂 C A T B O X - U P L O A D E R 乂*\n\n*» Enlace* : ${link}\n*» Tamaño* : ${formatBytes(media.length)}\n*» Expiración* : ${isTele ? 'No expira' : 'Desconocido'}\n\n> *${dev}*`
-await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, fkontak)
+// Convertir link a .jpg
+const linkJpg = link.split('?')[0] + '.jpg'
+const txt = `☑️ *𝙲𝙰𝚃𝙱𝙾𝚇 - 𝚄𝙿𝙻𝙾𝙰𝙳𝙴𝚁*\n\n» *𝙴𝚗𝚕𝚊𝚌𝚎:* ${linkJpg}\n» *𝚃𝚊𝚖𝚊ñ𝚘:* ${formatBytes(media.length)}\n» *𝙴𝚡𝚙𝚒𝚛𝚊𝚌𝚒ó𝚗:* ${isTele ? '𝙽𝚘 𝚎𝚡𝚙𝚒𝚛𝚊' : '𝙳𝚎𝚜𝚌𝚘𝚗𝚘𝚌𝚒𝚍𝚘'}`
+await conn.sendFile(m.chat, media, 'thumbnail.jpg', txt, m)
 await m.react('✔️')
 break
-}}} catch (error) {
+}
+}} catch (error) {
 await m.react('✖️')
-await conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${error.message}`, m)
+await conn.reply(m.chat, `☑️ 𝚂𝙴 𝙷𝙰 𝙿𝚁𝙾𝙳𝚄𝙲𝙸𝙳𝙾 𝚄𝙽 𝙿𝚁𝙾𝙱𝙻𝙴𝙼𝙰\n\n𝙴𝚁𝚁𝙾𝚁: ${error.message}`, m, rcanal)
 }}
 
 handler.help = ['tourl', 'catbox']
@@ -49,10 +54,12 @@ const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
 const i = Math.floor(Math.log(bytes) / Math.log(1024))
 return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`
 }
+
 async function shortUrl(url) {
 const res = await fetch(`https://tinyurl.com/api-create.php?url=${url}`)
 return await res.text()
 }
+
 async function catbox(content) {
 const { ext, mime } = (await fileTypeFromBuffer(content)) || {}
 const blob = new Blob([content.toArrayBuffer()], { type: mime })
