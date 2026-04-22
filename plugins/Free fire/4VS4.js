@@ -1,6 +1,6 @@
 // plugins/4vs4.js
 
-// Estado global de las listas por grupo
+// Estado global de las listas por grupo (en memoria)
 let listasGrupos = new Map();
 let mensajesGrupos = new Map();
 
@@ -15,7 +15,7 @@ const getListasGrupo = (groupId) => {
     return listasGrupos.get(groupId);
 };
 
-// Función para reiniciar las listas de un grupo específico
+// Función para reiniciar las listas
 const reiniciarListas = (groupId) => {
     listasGrupos.set(groupId, {
         squad1: ['➤', '➤', '➤', '➤'],
@@ -23,7 +23,7 @@ const reiniciarListas = (groupId) => {
     });
 };
 
-// Función para mostrar la lista con botones
+// Función para mostrar la lista con botones (formato que funciona)
 async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
     const texto = `🕓 𝗛𝗢𝗥𝗔: ${mensajeUsuario ? `*${mensajeUsuario}*\n` : ''} 📑 𝗥𝗘𝗚𝗟𝗔𝗦: 𝗖𝗟𝗞
     
@@ -47,8 +47,8 @@ async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
 ©EliteBotGlobal 2023`;
 
     const buttons = [
-        { buttonId: 'asistir4vs4', buttonText: { displayText: "⚔️ ASISTIR" }, type: 1 },
-        { buttonId: 'suplente4vs4', buttonText: { displayText: "🔄 SUPLENTE" }, type: 1 }
+        { buttonId: 'asistir4', buttonText: { displayText: "⚔️ ASISTIR" }, type: 1 },
+        { buttonId: 'suplente4', buttonText: { displayText: "🔄 SUPLENTE" }, type: 1 }
     ];
 
     await conn.sendMessage(chat, {
@@ -80,9 +80,9 @@ handler.before = async function (m, { conn }) {
         
         let squadType
         
-        if (buttonId === 'asistir4vs4') {
+        if (buttonId === 'asistir4') {
             squadType = 'squad1'
-        } else if (buttonId === 'suplente4vs4') {
+        } else if (buttonId === 'suplente4') {
             squadType = 'suplente'
         } else {
             return
