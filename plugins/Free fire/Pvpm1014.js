@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 let handler = m => m
 
-handler.before = async function (m, { conn }) {
+handler.before = async function (m, { conn, participants }) {
     // DETECTAR RESPUESTA DE BOTONES
     if (m.message?.buttonsResponseMessage) {
         const buttonId = m.message.buttonsResponseMessage.selectedButtonId
@@ -36,22 +36,27 @@ handler.before = async function (m, { conn }) {
         
         let mencionado = null
         
-        // Forma 1: Si hay mención directa
-        if (m.mentionedJid && m.mentionedJid.length > 0) {
-            mencionado = m.mentionedJid[0]
-        }
-        
-        // Forma 2: Si responde a un mensaje
-        if (!mencionado && m.quoted?.sender) {
+        // Forma 1: Si responde a un mensaje (la más confiable)
+        if (m.quoted?.sender) {
             mencionado = m.quoted.sender
         }
         
-        // Forma 3: Extraer del texto
+        // Forma 2: Si hay mención directa
+        if (!mencionado && m.mentionedJid && m.mentionedJid.length > 0) {
+            mencionado = m.mentionedJid[0]
+        }
+        
+        // Forma 3: Buscar en participantes del grupo por nombre
         if (!mencionado && m.text) {
-            const regex = /@(\d+)/g
-            const match = regex.exec(m.text)
-            if (match) {
-                mencionado = match[1] + '@s.whatsapp.net'
+            const nombreBuscado = m.text.match(/@([a-zA-Z0-9]+)/)?.[1]
+            if (nombreBuscado && participants) {
+                const encontrado = participants.find(p => {
+                    const nombre = conn.getName(p.id) || ''
+                    return nombre.toLowerCase().includes(nombreBuscado.toLowerCase())
+                })
+                if (encontrado) {
+                    mencionado = encontrado.id
+                }
             }
         }
         
@@ -78,9 +83,12 @@ handler.before = async function (m, { conn }) {
         
         const imagePath = './src/1x1.jpg'
         
+        // Obtener el número limpio del mencionado (sin prefijo raro)
+        const numeroLimpio = mencionado.split('@')[0].replace(/[^0-9]/g, '')
+        
         const texto = `👺 *${nombreUsuario}* TE ESTÁ DESAFIANDO A PVP 👺
         
-🎮 *OPONENTE:* @${mencionado.split('@')[0]}
+🎮 *OPONENTE:* @${numeroLimpio}
 
 ¿CREES PODER SACARME +4 RONDAS? 😂
 
