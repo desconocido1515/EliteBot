@@ -12,10 +12,7 @@ handler.before = async function (m, { conn }) {
         console.log('Botón PVP presionado:', buttonId)
         
         if (buttonId === 'acepto_pvp') {
-            await conn.sendMessage(m.chat, {
-                text: `🔥 *@${senderName} ACEPTÓ EL DESAFÍO!* 🔥\n\nPrepárate para la batalla... 💀`,
-                mentions: [sender]
-            })
+            await conn.reply(m.chat, `🔥 *@${senderName} ACEPTÓ EL DESAFÍO!* 🔥\n\nPrepárate para la batalla... 💀`, m, rcanal)
             await conn.sendMessage(m.chat, {
                 react: { text: '🔥', key: m.key }
             })
@@ -23,10 +20,7 @@ handler.before = async function (m, { conn }) {
         }
         
         if (buttonId === 'miedo_pvp') {
-            await conn.sendMessage(m.chat, {
-                text: `😨 *@${senderName} RECHAZÓ EL DESAFÍO!* 🫦\n\nMejor suerte para la próxima.`,
-                mentions: [sender]
-            })
+            await conn.reply(m.chat, `😨 *@${senderName} RECHAZÓ EL DESAFÍO!* 🫦\n\nMejor suerte para la próxima.`, m, rcanal)
             await conn.sendMessage(m.chat, {
                 react: { text: '😭', key: m.key }
             })
@@ -38,26 +32,15 @@ handler.before = async function (m, { conn }) {
     // DETECTAR COMANDO .pvpm1014 (con o sin espacio)
     const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
     
-    // Detectar .pvpm1014 y . pvpm1014 (con espacio)
     if (textLimpio === '.pvpm1014' || textLimpio === '. pvpm1014' || textLimpio.startsWith('.pvpm1014 ') || textLimpio.startsWith('. pvpm1014 ')) {
         
-        // Obtener usuario mencionado de diferentes formas
+        // Obtener usuario mencionado
         let mencionado = null
         
-        // Forma 1: De los mentionedJid
         if (m.mentionedJid && m.mentionedJid.length > 0) {
             mencionado = m.mentionedJid[0]
         }
         
-        // Forma 2: Del texto del mensaje (extraer @usuario)
-        if (!mencionado && m.text) {
-            const match = m.text.match(/@(\d+)/)
-            if (match) {
-                mencionado = match[1] + '@s.whatsapp.net'
-            }
-        }
-        
-        // Forma 3: De quoted (respondiendo a alguien)
         if (!mencionado && m.quoted?.sender) {
             mencionado = m.quoted.sender
         }
@@ -67,14 +50,12 @@ handler.before = async function (m, { conn }) {
             return
         }
         
-        // No permitir desafiarse a sí mismo
         if (mencionado === m.sender) {
             await conn.reply(m.chat, `⚠️ *NO PUEDES DESAFIARTE A TI MISMO*\n\nMenciona a otro usuario.`, m, rcanal)
             return
         }
         
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        const nombreMencionado = await conn.getName(mencionado)
         
         // Reaccionar al mensaje original
         await conn.sendMessage(m.chat, {
@@ -86,6 +67,9 @@ handler.before = async function (m, { conn }) {
             { buttonId: 'miedo_pvp', buttonText: { displayText: "🫦 TENGO MIEDO" }, type: 1 }
         ]
         
+        // Ruta de la imagen
+        const imagePath = './src/1x1.jpg'
+        
         const texto = `👺 *${nombreUsuario}* TE ESTÁ DESAFIANDO A PVP 👺
         
 🎮 *OPONENTE:* @${mencionado.split('@')[0]}
@@ -96,8 +80,10 @@ handler.before = async function (m, { conn }) {
 
 *¿ACEPTAS EL DESAFÍO?*`.trim()
         
+        // Enviar imagen con botones
         await conn.sendMessage(m.chat, {
-            text: texto,
+            image: { url: imagePath },
+            caption: texto,
             buttons: buttons,
             mentions: [m.sender, mencionado],
             viewOnce: true
