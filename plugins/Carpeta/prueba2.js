@@ -24,7 +24,7 @@ const logos = {
   logowarzone: { url: 'https://en.ephoto360.com/create-call-of-duty-warzone-youtube-banner-online-548.html', palabras: 2 },  
   logoamongus: { url: 'https://en.ephoto360.com/create-a-banner-game-among-us-with-your-name-763.html', palabras: 2 },  
   logololbanner: { url: 'https://en.ephoto360.com/create-youtube-banner-league-of-legends-online-428.html', palabras: 2 },  
-  logowanted: { url: 'https://en.ephoto360.com/one-piece-wanted-237.html', palabras: 2 }  
+  logostone: { url: 'https://en.ephoto360.com/create-3d-stone-text-effect-online-508.html', palabras: 2 }  
 };  
   
 const handler = async (m, { conn, args, command }) => {  
