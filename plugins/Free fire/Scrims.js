@@ -22,10 +22,8 @@ let handler = async(m, { user, isOwner, isAdmin, conn, text, participants, args,
     teks += `🥷🏻➛\n\n`
     teks += `» 𝙈𝙄𝘾𝙍𝙊 𝙊𝘽𝙇𝙄𝙂𝘼𝙏𝙊𝙍𝙄𝙊/𝙉𝙊 𝙈𝙐𝘿𝘼𝙎 𝙔 𝙌𝙐𝙀 𝙏𝙍𝘼𝘽𝘼𝙅𝙀𝙉 𝙀𝙉 𝙀𝙌𝙐𝙄𝙋𝙊, 𝘼𝙌𝙐𝙄 𝙉𝘼𝘿𝙄𝙀 𝙀𝙎 𝘿𝙄𝙊𝙎.`
     
-    await conn.sendMessage(m.chat, { 
-        text: teks, 
-        mentions: participants.map(a => a.id) 
-    })
+    // Usar conn.reply para que tenga el botón "ver mensaje" de rcanal
+    await conn.reply(m.chat, teks, m, rcanal)
 }
 
 handler.help = ['scrims', 'scrim']
