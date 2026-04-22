@@ -44,7 +44,7 @@ export async function before(m, { conn }) {
 'vegueta',
 'vestimencuadri', 'menulogos', 'menulogo','logos' 'menuimg', 
 
-
+'imglogo', 'imglogo2', 'imglogo3', 'imglogo4', 'imgcorazon', 'imgnavidad', 'imgcarta', 'imgcumple', 'imgglobo', 'imgpareja', 'imgretro', 'imgretro2', 'imgretro3', 'imgnube', 'imgdbz', 'imgvidrio', 'imgvidrio2', 'imgcalle', 'imgcalle2', 'imggrafiti', 'imggrafiti2', 'imggrafiti3', 'imggrafiti4', 'imggrafiti5', 'imggrafiti6', 'imggrafiti7', 'imggrafiti8', 
     
     
     'chipmunk'];
