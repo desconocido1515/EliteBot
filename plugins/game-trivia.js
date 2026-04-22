@@ -38,12 +38,18 @@ let userScores = new Map()
 const handler = async (m, { conn, command, args, usedPrefix }) => {
   try {
     if (command === "trivia") {
-      // Si hay argumento, es una respuesta (viene del botón)
-      if (args[0] && /^[ABC]$/i.test(args[0])) {
+      console.log("Comando trivia ejecutado con args:", args) // Debug
+
+      // Verificar si es una respuesta (args contiene A, B o C)
+      if (args.length > 0 && /^[ABC]$/i.test(args[0])) {
         const session = triviaSessions.get(m.chat)
         
-        if (!session || session.answered) {
-          return conn.reply(m.chat, `☑️ 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝚄𝙽𝙰 𝙽𝚄𝙴𝚅𝙰 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰`, m, rcanal)
+        if (!session) {
+          return conn.reply(m.chat, `☑️ No hay una trivia activa. Usa *${usedPrefix}trivia* para comenzar una nueva.`, m)
+        }
+        
+        if (session.answered) {
+          return conn.reply(m.chat, `☑️ Ya respondiste esta pregunta. Usa *${usedPrefix}trivia* para la siguiente.`, m)
         }
 
         const userAnswer = args[0].toUpperCase()
@@ -56,21 +62,21 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
 
         const points = userScores.get(userId)
         
-        let respuestaTexto = ""
+        let respuestaTexto
         if (isCorrect) {
-          respuestaTexto = `☑️ *✨ ¡CORRECTO! ✨*\n\n🎉 La respuesta correcta era: *${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}*\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: *${points}* 𝚙𝚞𝚗𝚝𝚘𝚜\n\n📝 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝙻𝙰 𝚂𝙸𝙶𝚄𝙸𝙴𝙽𝚃𝙴 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰`
+          respuestaTexto = `✅ *¡CORRECTO!*\n\nLa respuesta correcta es: *${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}*\n\n🏅 Tu puntaje: *${points}* puntos\n\nUsa *${usedPrefix}trivia* para la siguiente pregunta`
         } else {
-          respuestaTexto = `☑️ *💔 INCORRECTO 💔*\n\n❌ 𝚃𝚄 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: *${userAnswer}*\n✅ 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰 𝙲𝙾𝚁𝚁𝙴𝙲𝚃𝙰: *${correctAnswer}*\n📖 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙰: *${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}*\n\n🏅 𝚃𝚄 𝙿𝚄𝙽𝚃𝙰𝙹𝙴: *${points}* 𝚙𝚞𝚗𝚝𝚘𝚜\n\n📝 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝙻𝙰 𝚂𝙸𝙶𝚄𝙸𝙴𝙽𝚃𝙴 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰`
+          respuestaTexto = `❌ *INCORRECTO*\n\nTu respuesta: *${userAnswer}*\nRespuesta correcta: *${correctAnswer}* - ${questions[session.index].options[correctAnswer === 'A' ? 0 : correctAnswer === 'B' ? 1 : 2]}\n\n🏅 Tu puntaje: *${points}* puntos\n\nUsa *${usedPrefix}trivia* para la siguiente pregunta`
         }
 
-        await conn.reply(m.chat, respuestaTexto, m, rcanal)
+        await conn.reply(m.chat, respuestaTexto, m)
         await m.react(isCorrect ? "✅" : "❌")
 
         triviaSessions.set(m.chat, { ...session, answered: true })
         return
       }
 
-      // Si no hay argumento, es una nueva pregunta
+      // Si no hay args, mostrar nueva pregunta
       let currentSession = triviaSessions.get(m.chat)
       let availableQuestions = [...questions]
 
@@ -80,7 +86,7 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
 
       if (availableQuestions.length === 0) {
         triviaSessions.delete(m.chat)
-        return conn.reply(m.chat, "☑️ 🎉 *𝚈𝙰 𝚁𝙴𝚂𝙿𝚄𝙴𝚂𝚃𝙸𝚂𝚃𝙴 𝚃𝙾𝙳𝙰𝚂 𝙻𝙰𝚂 𝙿𝚁𝙴𝙶𝚄𝙽𝚃𝙰𝚂!* 𝚄𝚂𝙰 *${usedPrefix}trivia* 𝙿𝙰𝚁𝙰 𝚁𝙴𝙸𝙽𝙸𝙲𝙸𝙰𝚁", m, rcanal)
+        return conn.reply(m.chat, `🎉 *¡Felicitaciones!* Respondiste todas las preguntas. Usa *${usedPrefix}trivia* para reiniciar.`, m)
       }
 
       const randomIndex = Math.floor(Math.random() * availableQuestions.length)
@@ -94,12 +100,12 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
         asked: currentSession?.asked ? [...currentSession.asked, questionIndex] : [questionIndex]
       })
 
-      const caption = `☑️ *🎓 𝐓𝐑𝐈𝐕𝐈𝐀 𝐃𝐄 𝐂𝐔𝐋𝐓𝐔𝐑𝐀 🎓*\n\n📖 ${q.question}\n\n🌿 *𝙾𝙿𝙲𝙸𝙾𝙽𝙴𝚂:*\n▸ *A)* ${q.options[0]}\n▸ *B)* ${q.options[1]}\n▸ *C)* ${q.options[2]}\n\n🎯 𝚂𝙴𝙻𝙴𝙲𝙲𝙸𝙾𝙽𝙰 𝚄𝙽𝙰 𝙾𝙿𝙲𝙸𝙾́𝙽`
+      const caption = `*🎓 TRIVIA DE CULTURA 🎓*\n\n📖 ${q.question}\n\n*OPCIONES:*\nA) ${q.options[0]}\nB) ${q.options[1]}\nC) ${q.options[2]}\n\n🎯 Presiona un botón para responder`
 
       const buttons = [
-        { buttonId: `${usedPrefix}trivia A`, buttonText: { displayText: `🅰 ${q.options[0].substring(0, 20)}` }, type: 1 },
-        { buttonId: `${usedPrefix}trivia B`, buttonText: { displayText: `🅱 ${q.options[1].substring(0, 20)}` }, type: 1 },
-        { buttonId: `${usedPrefix}trivia C`, buttonText: { displayText: `🅲 ${q.options[2].substring(0, 20)}` }, type: 1 }
+        { buttonId: `${usedPrefix}trivia A`, buttonText: { displayText: `A) ${q.options[0].substring(0, 15)}` }, type: 1 },
+        { buttonId: `${usedPrefix}trivia B`, buttonText: { displayText: `B) ${q.options[1].substring(0, 15)}` }, type: 1 },
+        { buttonId: `${usedPrefix}trivia C`, buttonText: { displayText: `C) ${q.options[2].substring(0, 15)}` }, type: 1 }
       ]
 
       await conn.sendMessage(m.chat, { image: { url: img }, caption, buttons, viewOnce: true }, { quoted: m })
@@ -109,27 +115,26 @@ const handler = async (m, { conn, command, args, usedPrefix }) => {
 
     if (command === "triviascore") {
       if (userScores.size === 0) {
-        return conn.reply(m.chat, "☑️ 📭 𝙽𝙰𝙳𝙸𝙴 𝙷𝙰 𝙿𝙰𝚁𝚃𝙸𝙲𝙸𝙿𝙰𝙳𝙾 𝙰𝚄𝙽 𝙴𝙽 𝙻𝙰 𝚃𝚁𝙸𝚅𝙸𝙰", m, rcanal)
+        return conn.reply(m.chat, "📭 Nadie ha participado aún en la trivia.", m)
       }
 
       const sorted = [...userScores.entries()].sort((a, b) => b[1] - a[1])
       const top = sorted.slice(0, 10)
       const mentions = top.map(([u]) => u)
 
-      const ranking = top
-        .map(([user, score], i) => `*${i + 1}.* @${user.split("@")[0]} — 🏅 *${score} pts*`)
-        .join("\n")
-
-      const caption = `☑️ *🏆 𝐑𝐀𝐍𝐊𝐈𝐍𝐆 𝐓𝐑𝐈𝐕𝐈𝐀 🏆*\n\n${ranking}\n\n🎓 𝚂𝙸𝙶𝚄𝙴 𝙿𝙰𝚁𝚃𝙸𝙲𝙸𝙿𝙰𝙽𝙳𝙾`
+      let ranking = `*🏆 RANKING TRIVIA 🏆*\n\n`
+      for (let i = 0; i < top.length; i++) {
+        ranking += `${i + 1}. @${top[i][0].split("@")[0]} — 🏅 *${top[i][1]} pts*\n`
+      }
 
       const img = triviaImages[Math.floor(Math.random() * triviaImages.length)]
 
-      await conn.sendMessage(m.chat, { image: { url: img }, caption, mentions }, { quoted: m })
+      await conn.sendMessage(m.chat, { image: { url: img }, caption: ranking, mentions }, { quoted: m })
       await m.react("🏆")
     }
   } catch (err) {
     console.error(err)
-    await conn.reply(m.chat, "☑️ ⚠️ 𝙾𝙲𝚄𝚁𝚁𝙸𝙾́ 𝚄𝙽 𝙴𝚁𝚁𝙾𝚁 𝙴𝙹𝙴𝙲𝚄𝚃𝙰𝙽𝙳𝙾 𝙻𝙰 𝚃𝚁𝙸𝚅𝙸𝙰", m, rcanal)
+    await conn.reply(m.chat, "⚠️ Ocurrió un error ejecutando la trivia.", m)
   }
 }
 
