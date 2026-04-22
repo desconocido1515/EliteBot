@@ -12,8 +12,8 @@ const logos = {
   logoamerican: { url: 'https://en.ephoto360.com/free-online-american-flag-3d-text-effect-generator-725.html', palabras: 1 },  
   logoaov: { url: 'https://en.ephoto360.com/generate-banner-arena-of-valor-aov-with-name-440.html', palabras: 1 },  
   logocomix: { url: 'https://en.ephoto360.com/create-online-3d-comic-style-text-effects-817.html', palabras: 1 },  
-  logorotation: { url: 'https://en.ephoto360.com/create-elegant-rotation-logo-online-586.html', palabras: 1 },  
-  logointro: { url: 'https://en.ephoto360.com/free-logo-intro-video-maker-online-558.html', palabras: 1 },  
+  logosilver: { url: 'https://en.ephoto360.com/create-glossy-silver-3d-text-effect-online-802.html', palabras: 1 },  
+  logoneon: { url: 'https://en.ephoto360.com/create-colorful-neon-light-text-effects-online-797.html', palabras: 1 },  
   
   // === 2 PALABRAS ===  
   logodead: { url: 'https://en.ephoto360.com/create-text-effects-in-the-style-of-the-deadpool-logo-818.html', palabras: 2 },  
