@@ -78,7 +78,7 @@ const handler = async (m, { conn, args, command }) => {
         url = 'https://en.ephoto360.com/graffiti-lettering-online-64.html';
         break;
       case 'imglogo':
-        url = 'https://en.ephoto360.com/create-a-black-and-white-mascot-logo-371.html';
+        url = 'https://en.ephoto360.com/free-gaming-logo-maker-for-fps-game-team-546.html';
         break;
       case 'imglogo2':
         url = 'https://en.ephoto360.com/create-a-gaming-mascot-logo-free-560.html';
