@@ -1,20 +1,28 @@
-// plugins/test_boton.js
+// plugins/boton_test.js
 
-const handler = async (m, { conn, usedPrefix }) => {
-  // Si es una respuesta de botón
-  if (m.text === '.si') {
-    await conn.reply(m.chat, '✅ Presionaste SI - El botón funciona correctamente', m)
-    await m.react('✅')
+let handler = m => m
+
+handler.before = async function (m, { conn }) {
+  // Detectar si es una respuesta de botón
+  if (m.message?.buttonsResponseMessage) {
+    const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+    const sender = m.sender
+    
+    console.log('Botón presionado:', buttonId)
+    
+    if (buttonId === '.si') {
+      await conn.reply(m.chat, '✅ Presionaste SI - El botón funciona!', m)
+      await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+    }
+    
+    if (buttonId === '.no') {
+      await conn.reply(m.chat, '❌ Presionaste NO - El botón funciona!', m)
+      await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    }
     return
   }
   
-  if (m.text === '.no') {
-    await conn.reply(m.chat, '❌ Presionaste NO - El botón funciona correctamente', m)
-    await m.react('❌')
-    return
-  }
-  
-  // Si es el comando para mostrar botones
+  // Mostrar botones
   if (m.text === '.testboton') {
     const buttons = [
       { buttonId: '.si', buttonText: { displayText: '✅ SI' }, type: 1 },
@@ -22,13 +30,11 @@ const handler = async (m, { conn, usedPrefix }) => {
     ]
     
     await conn.sendMessage(m.chat, {
-      text: '🧪 *PRUEBA DE BOTONES*\n\nPresiona un botón para ver si funciona:',
+      text: '🧪 *PRUEBA DE BOTONES*\n\nPresiona un botón:',
       buttons: buttons,
       viewOnce: true
-    }, { quoted: m })
-    return
+    })
   }
 }
 
-handler.command = ['testboton', 'si', 'no']
 export default handler
