@@ -5,7 +5,7 @@ const logos = {
   logoassassin: { url: 'https://en.ephoto360.com/create-logo-team-logo-gaming-assassin-style-574.html', palabras: 1 },  
   logoshield: { url: 'https://en.ephoto360.com/create-mascot-shield-logo-online-for-free-758.html', palabras: 1 },  
   logofootball: { url: 'https://en.ephoto360.com/create-football-team-logo-online-free-671.html', palabras: 1 },  
-  logominimal: { url: 'https://en.ephoto360.com/free-minimal-logo-maker-online-445.html', palabras: 1 },  
+  logogirl: { url: 'https://en.ephoto360.com/create-cute-girl-gamer-mascot-logo-online-687.html', palabras: 1 },  
   logometal: { url: 'https://en.ephoto360.com/metal-text-effect-online-110.html', palabras: 1 },  
   logobw: { url: 'https://en.ephoto360.com/create-a-black-and-white-mascot-logo-371.html', palabras: 1 },  
   logoqueen: { url: 'https://en.ephoto360.com/create-a-personalized-queen-card-avatar-730.html', palabras: 1 },  
