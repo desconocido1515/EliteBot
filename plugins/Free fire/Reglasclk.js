@@ -1,12 +1,36 @@
-var handler  = async (m, { conn, command, args, usedPrefix, DevMode }) => {
-let fkontak = { "key": { "participants":"0@s.whatsapp.net", "remoteJid": "status@broadcast", "fromMe": false, "id": "Halo" }, "message": { "contactMessage": { "vcard": `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` }}, "participant": "0@s.whatsapp.net" }
-let pp = reglasclk.getRandom()
-const cat = 
-`» 𝙍𝙀𝙂𝙇𝘼𝙎 𝘾𝙇𝙆 🇧🇷`
-
-await conn.sendFile(m.chat, pp, 'img5.jpg', cat, fkontak)
+var handler = async (m, { conn, command, args, usedPrefix, DevMode }) => {
+    let fkontak = { 
+        "key": { 
+            "participants": "0@s.whatsapp.net", 
+            "remoteJid": "status@broadcast", 
+            "fromMe": false, 
+            "id": "Halo" 
+        }, 
+        "message": { 
+            "contactMessage": { 
+                "vcard": `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD` 
+            }
+        }, 
+        "participant": "0@s.whatsapp.net" 
+    }
+    
+    // Reaccionar al mensaje
+    await conn.sendMessage(m.chat, {
+        react: {
+            text: '📜',
+            key: m.key
+        }
+    })
+    
+    // Ruta fija de la imagen
+    let pp = './media/menus/reglasclk.jpg'
+    
+    const cat = `» 𝙍𝙀𝙂𝙇𝘼𝙎 𝘾𝙇𝙆 🇧🇷`
+    
+    await conn.sendFile(m.chat, pp, 'reglasclk.jpg', cat, fkontak)
 }
-handler.help = ['owner', 'creator']
+
+handler.help = ['reglasclk', 'clk']
 handler.tags = ['info']
 handler.command = /^(reglasclk|clk)$/i
 
