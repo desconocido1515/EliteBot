@@ -1,49 +1,83 @@
 import fetch from 'node-fetch';
-import { sticker } from '../../lib/sticker.js';
 
-const handler = async (m, { conn, text, groupMetadata }) => {
-    try {
-        let who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted?.sender ? m.quoted.sender : m.sender;
-        let name = await conn.getName(who);
-        
-        let userMention = m.mentionedJid[0] || (m.quoted?.sender) || m.sender;
-        
-        // Reaccionar al mensaje
-        await conn.sendMessage(m.chat, {
-            react: {
-                text: '👺',
-                key: m.key
-            }
-        });
-        
-        const res = await fetch('https://nekos.life/api/kiss');
-        const json = await res.json();
-        const { url } = json;
-        
-        const text2 = `𝒀𝑶 @${m.sender.split("@")[0]} 𝑻𝑬 𝑬𝑺𝑻𝑶𝒀 𝑫𝑬𝑺𝑨𝑭𝑰𝑨𝑵𝑫𝑶 𝑨 𝑷𝑽𝑷
-𝑨 𝑴1014 ${text || ''} 👺
-¿𝑪𝑹𝑬𝑬𝑺 𝑷𝑶𝑫𝑬𝑹 𝑺𝑨𝑪𝑨𝑹𝑴𝑬 +4 𝑹𝑶𝑵𝑫𝑨𝑺?😂
+let handler = m => m
 
-¡𝑵𝑶 𝑪𝑹𝑬𝑶́, 𝑬𝑹𝑬𝑺 𝑴𝑼𝒀 𝑩𝑰𝑵𝑨𝑹𝑰𝑶!`.trim();
+handler.before = async function (m, { conn }) {
+    // DETECTAR RESPUESTA DE BOTONES
+    if (m.message?.buttonsResponseMessage) {
+        const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+        const sender = m.sender
+        const senderName = m.pushName || sender.split('@')[0]
         
-        await conn.sendMessage(m.chat, {
-            text: text2,
-            mentions: [userMention, m.sender]
-        }, { quoted: m });
+        console.log('Botón PVP presionado:', buttonId)
         
-        // Crear y enviar sticker
-        const stiker = await sticker(url, false, `@${m.sender.split('@')[0]} desafía a @${userMention.split('@')[0]}`, [m.sender, userMention]);
-        if (stiker) {
-            await conn.sendFile(m.chat, stiker, 'sticker.webp', null, m, true);
+        if (buttonId === 'acepto_pvp') {
+            await conn.sendMessage(m.chat, {
+                text: `🔥 @${senderName} *ACEPTÓ EL DESAFÍO!* 🔥\n\nPrepárate para la batalla... 💀`,
+                mentions: [sender]
+            })
+            await conn.sendMessage(m.chat, {
+                react: { text: '🔥', key: m.key }
+            })
+            return
         }
         
-    } catch (e) {
-        console.error('Error en comando pvpm1014:', e);
-        await conn.reply(m.chat, '❌ Error al ejecutar el comando', m);
+        if (buttonId === 'miedo_pvp') {
+            await conn.sendMessage(m.chat, {
+                text: `😨 @${senderName} *TENÍA MIEDO* y rechazó el desafío... 🫦\n\nMejor suerte para la próxima.`,
+                mentions: [sender]
+            })
+            await conn.sendMessage(m.chat, {
+                react: { text: '😭', key: m.key }
+            })
+            return
+        }
+        return
     }
-};
+    
+    // DETECTAR COMANDO .pvpm1014
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
+    
+    if (textLimpio === '.pvpm1014' || textLimpio.startsWith('.pvpm1014 ')) {
+        // Obtener usuario mencionado
+        let mencionado = m.mentionedJid[0] || (m.quoted?.sender) || null
+        
+        if (!mencionado) {
+            await conn.reply(m.chat, `⚠️ *MENCIONA A QUIEN QUIERES DESAFIAR*\n\nEjemplo: .pvpm1014 @usuario`, m, rcanal)
+            return
+        }
+        
+        const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        const nombreMencionado = await conn.getName(mencionado)
+        
+        // Reaccionar al mensaje original
+        await conn.sendMessage(m.chat, {
+            react: { text: '👺', key: m.key }
+        })
+        
+        const buttons = [
+            { buttonId: 'acepto_pvp', buttonText: { displayText: "✅ ACEPTO" }, type: 1 },
+            { buttonId: 'miedo_pvp', buttonText: { displayText: "🫦 TENGO MIEDO" }, type: 1 }
+        ]
+        
+        const texto = `👺 *${nombreUsuario}* TE ESTÁ DESAFIANDO A PVP 👺
+        
+🎮 *OPONENTE:* @${mencionado.split('@')[0]}
 
-handler.command = /^(pvpm1014)$/i;
-handler.group = true;
+¿CREES PODER SACARME +4 RONDAS? 😂
 
-export default handler;
+¡NO CREO, ERES MUY BINARIO!
+
+*¿ACEPTAS EL DESAFÍO?*`.trim()
+        
+        await conn.sendMessage(m.chat, {
+            text: texto,
+            buttons: buttons,
+            mentions: [m.sender, mencionado],
+            viewOnce: true
+        })
+        return
+    }
+}
+
+export default handler
