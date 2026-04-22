@@ -3,8 +3,9 @@
 // ==================== SIMPCARD ====================
 const handlerSimp = async (m, { conn }) => {
   try {
-    // Validar que haya una mención o respuesta
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    // Usar la misma lógica que promote
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.simp @usuario`, m, rcanal);
@@ -37,7 +38,8 @@ const handlerSimp = async (m, { conn }) => {
 // ==================== BLUR ====================
 const handlerBlur = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.blur @usuario`, m, rcanal);
@@ -69,7 +71,8 @@ const handlerBlur = async (m, { conn }) => {
 // ==================== HORNYCARD ====================
 const handlerHorny = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.hornycard @usuario`, m, rcanal);
@@ -101,7 +104,8 @@ const handlerHorny = async (m, { conn }) => {
 // ==================== ITS SO STUPID ====================
 const handlerStupid = async (m, { conn, args }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.stupid @usuario`, m, rcanal);
@@ -164,7 +168,8 @@ const handlerPixel = async (m, { conn, text }) => {
 // ==================== LOLICE ====================
 const handlerLolice = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.lolice @usuario`, m, rcanal);
