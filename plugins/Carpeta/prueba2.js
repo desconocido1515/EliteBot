@@ -23,7 +23,7 @@ const handler = async (m, { conn, args }) => {
 
     await conn.reply(m.chat, `*Espera por favor, estoy creando tu imagen* 🚀`, m, rcanal);
 
-    const url = 'https://en.ephoto360.com/create-text-effects-in-the-style-of-the-deadpool-logo-818.html';
+    const url = 'https://en.ephoto360.com/create-pornhub-style-logos-online-free-549.html';
     const res = await new Maker().Ephoto360(url, [textoPequeño, textoGrande]);
 
     await conn.sendMessage(m.chat, {
