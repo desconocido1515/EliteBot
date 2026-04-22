@@ -1,15 +1,11 @@
-import { Maker } from 'imagemaker.js';
+import axios from 'axios';
+import cheerio from 'cheerio';
 
 let handler = async (m, { conn, args }) => {
 
   const texto = args.join(' ').trim();
-
   if (!texto) {
-    return conn.reply(
-      m.chat,
-      `✦ Ingresa un texto\n\n📌 Ejemplo:\n.logominimal Kevv`,
-      m
-    );
+    return conn.reply(m.chat, `✦ Ejemplo:\n.logominimal Kevv`, m);
   }
 
   try {
@@ -17,35 +13,43 @@ let handler = async (m, { conn, args }) => {
       react: { text: '🖼️', key: m.key }
     });
 
-    await conn.reply(
-      m.chat,
-      `*Creando logo minimal...* 🚀`,
-      m
+    await conn.reply(m.chat, `*Generando logo minimal...* 🚀`, m);
+
+    // 🔥 Paso 1: obtener página
+    const { data } = await axios.get('https://en.ephoto360.com/free-minimal-logo-maker-online-445.html');
+
+    const $ = cheerio.load(data);
+
+    const token = $('input[name="token"]').attr('value');
+    const build_server = $('#build_server').attr('value');
+    const build_server_id = $('#build_server_id').attr('value');
+
+    // 🔥 Paso 2: enviar datos (simula formulario)
+    const form = new URLSearchParams();
+    form.append('text[]', texto);
+    form.append('token', token);
+    form.append('build_server', build_server);
+    form.append('build_server_id', build_server_id);
+
+    const post = await axios.post(
+      'https://en.ephoto360.com/effect/create-image',
+      form,
+      {
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        }
+      }
     );
 
-    const url = 'https://en.ephoto360.com/free-minimal-logo-maker-online-445.html';
+    const json = post.data;
 
-    let res;
-    const colores = ['1', '2', '3', '4', '5', '6'];
+    if (!json.success) throw 'Error en generación';
 
-    // 🔥 intenta con todos los colores automáticamente
-    for (let color of colores) {
-      try {
-        res = await new Maker().Ephoto360(url, [texto, color]);
-
-        if (res?.imageUrl) break;
-
-      } catch (e) {
-        console.log('Color falló:', color);
-      }
-    }
-
-    if (!res?.imageUrl) {
-      throw 'No se pudo generar la imagen';
-    }
+    // 🔥 Paso 3: obtener imagen final
+    const result = `https:${json.image}`;
 
     await conn.sendMessage(m.chat, {
-      image: { url: res.imageUrl },
+      image: { url: result },
       caption: `✔️ Logo minimal generado`
     });
 
@@ -55,11 +59,7 @@ let handler = async (m, { conn, args }) => {
 
   } catch (e) {
     console.error(e);
-    conn.reply(
-      m.chat,
-      `❌ Error al generar el logo`,
-      m
-    );
+    conn.reply(m.chat, `❌ Error real al generar logo`, m);
   }
 };
 
