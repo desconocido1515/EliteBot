@@ -27,8 +27,8 @@ const reiniciarListas = (groupId) => {
     });
 };
 
-// Función para mostrar la lista con botones
-async function mostrarLista(conn, chat, listas, mentions = [], mensajeUsuario = '') {
+// Función para mostrar la lista SIN botones (usando texto normal)
+async function mostrarLista(conn, chat, listas, mensajeUsuario = '') {
     const texto = `🕓 𝗛𝗢𝗥𝗔: ${mensajeUsuario ? `*${mensajeUsuario}*\n` : ''} 🗣️ 𝗜𝗡𝗗𝗜𝗖𝗔𝗖𝗜𝗢𝗡𝗘𝗦 :
 » Reglas y color se avisa al llenar este listado.
 
@@ -63,33 +63,28 @@ async function mostrarLista(conn, chat, listas, mentions = [], mensajeUsuario = 
 │🥷🏻 ${listas.suplente[2]}
 │🥷🏻 ${listas.suplente[3]}
 ╰─────────────╯
+
+⚔️ *COMANDOS PARA AGREGARTE:*
+▸ .esc1 - Agregar a Escuadra 1
+▸ .esc2 - Agregar a Escuadra 2
+▸ .esc3 - Agregar a Escuadra 3
+▸ .sup - Agregar a Suplentes
+
 ©EliteBotGlobal 2023`;
 
-    const buttons = [
-        { buttonId: 'escuadra1', buttonText: { displayText: "⚔️ Escuadra 1" }, type: 1 },
-        { buttonId: 'escuadra2', buttonText: { displayText: "⚔️ Escuadra 2" }, type: 1 },
-        { buttonId: 'escuadra3', buttonText: { displayText: "⚔️ Escuadra 3" }, type: 1 },
-        { buttonId: 'suplente12vs12', buttonText: { displayText: "🔄 Suplentes" }, type: 1 }
-    ];
-
-    await conn.sendMessage(chat, {
-        text: texto,
-        buttons: buttons,
-        mentions: mentions
-    });
+    await conn.sendMessage(chat, { text: texto });
 }
 
 let handler = m => m
 
 handler.before = async function (m, { conn }) {
-    // DETECTAR RESPUESTA DE BOTONES
-    if (m.message?.buttonsResponseMessage) {
-        const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
+    
+    // COMANDOS PARA AGREGARSE
+    if (textLimpio === '.esc1') {
         const groupId = m.chat
         let listas = getListasGrupo(groupId)
         const nombreUsuario = m.pushName || m.sender.split('@')[0]
-        
-        console.log('Botón 12vs12 presionado:', buttonId) // Debug
         
         // Borrar al usuario de todas las escuadras
         Object.keys(listas).forEach(key => {
@@ -99,39 +94,83 @@ handler.before = async function (m, { conn }) {
             }
         })
         
-        let squadType
-        
-        switch(buttonId) {
-            case 'escuadra1':
-                squadType = 'squad1'
-                break
-            case 'escuadra2':
-                squadType = 'squad2'
-                break
-            case 'escuadra3':
-                squadType = 'squad3'
-                break
-            case 'suplente12vs12':
-                squadType = 'suplente'
-                break
-            default:
-                return
-        }
-        
-        const libre = listas[squadType].findIndex(p => p === '➤')
+        const libre = listas.squad1.findIndex(p => p === '➤')
         if (libre !== -1) {
-            listas[squadType][libre] = `@${nombreUsuario}`
-            // Ya no envía mensaje de "agregado a..."
+            listas.squad1[libre] = `@${nombreUsuario}`
         }
         
-        const mensajeGuardado = mensajesGrupos.get(groupId)
-        await mostrarLista(conn, m.chat, listas, [], mensajeGuardado)
+        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
+        return
+    }
+    
+    if (textLimpio === '.esc2') {
+        const groupId = m.chat
+        let listas = getListasGrupo(groupId)
+        const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        
+        Object.keys(listas).forEach(key => {
+            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
+            if (index !== -1) {
+                listas[key][index] = '➤'
+            }
+        })
+        
+        const libre = listas.squad2.findIndex(p => p === '➤')
+        if (libre !== -1) {
+            listas.squad2[libre] = `@${nombreUsuario}`
+        }
+        
+        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
+        return
+    }
+    
+    if (textLimpio === '.esc3') {
+        const groupId = m.chat
+        let listas = getListasGrupo(groupId)
+        const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        
+        Object.keys(listas).forEach(key => {
+            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
+            if (index !== -1) {
+                listas[key][index] = '➤'
+            }
+        })
+        
+        const libre = listas.squad3.findIndex(p => p === '➤')
+        if (libre !== -1) {
+            listas.squad3[libre] = `@${nombreUsuario}`
+        }
+        
+        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
+        return
+    }
+    
+    if (textLimpio === '.sup') {
+        const groupId = m.chat
+        let listas = getListasGrupo(groupId)
+        const nombreUsuario = m.pushName || m.sender.split('@')[0]
+        
+        Object.keys(listas).forEach(key => {
+            const index = listas[key].findIndex(p => p.includes(`@${nombreUsuario}`))
+            if (index !== -1) {
+                listas[key][index] = '➤'
+            }
+        })
+        
+        const libre = listas.suplente.findIndex(p => p === '➤')
+        if (libre !== -1) {
+            listas.suplente[libre] = `@${nombreUsuario}`
+        }
+        
+        const mensajeGuardado = mensajesGrupos.get(groupId) || ''
+        await mostrarLista(conn, m.chat, listas, mensajeGuardado)
         return
     }
     
     // Detectar .12vs12 con o sin espacio
-    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
-    
     if (textLimpio === '.12vs12' || textLimpio === '. 12vs12' || textLimpio.startsWith('.12vs12 ') || textLimpio.startsWith('. 12vs12 ')) {
         // Extraer el mensaje (horario)
         let mensaje = ''
@@ -147,10 +186,10 @@ handler.before = async function (m, { conn }) {
         }
         
         reiniciarListas(m.chat)
-        let listas = getListasGrupo(m.chat)
         mensajesGrupos.set(m.chat, mensaje)
+        let listas = getListasGrupo(m.chat)
         
-        await mostrarLista(conn, m.chat, listas, [], mensaje)
+        await mostrarLista(conn, m.chat, listas, mensaje)
         return
     }
 }
