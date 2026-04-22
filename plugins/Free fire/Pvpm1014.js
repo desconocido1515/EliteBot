@@ -13,7 +13,7 @@ handler.before = async function (m, { conn }) {
         
         if (buttonId === 'acepto_pvp') {
             await conn.sendMessage(m.chat, {
-                text: `🔥 @${senderName} *ACEPTÓ EL DESAFÍO!* 🔥\n\nPrepárate para la batalla... 💀`,
+                text: `🔥 *@${senderName} ACEPTÓ EL DESAFÍO!* 🔥\n\nPrepárate para la batalla... 💀`,
                 mentions: [sender]
             })
             await conn.sendMessage(m.chat, {
@@ -24,7 +24,7 @@ handler.before = async function (m, { conn }) {
         
         if (buttonId === 'miedo_pvp') {
             await conn.sendMessage(m.chat, {
-                text: `😨 @${senderName} *TENÍA MIEDO* y rechazó el desafío... 🫦\n\nMejor suerte para la próxima.`,
+                text: `😨 *@${senderName} RECHAZÓ EL DESAFÍO!* 🫦\n\nMejor suerte para la próxima.`,
                 mentions: [sender]
             })
             await conn.sendMessage(m.chat, {
@@ -35,15 +35,41 @@ handler.before = async function (m, { conn }) {
         return
     }
     
-    // DETECTAR COMANDO .pvpm1014
+    // DETECTAR COMANDO .pvpm1014 (con o sin espacio)
     const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
     
-    if (textLimpio === '.pvpm1014' || textLimpio.startsWith('.pvpm1014 ')) {
-        // Obtener usuario mencionado
-        let mencionado = m.mentionedJid[0] || (m.quoted?.sender) || null
+    // Detectar .pvpm1014 y . pvpm1014 (con espacio)
+    if (textLimpio === '.pvpm1014' || textLimpio === '. pvpm1014' || textLimpio.startsWith('.pvpm1014 ') || textLimpio.startsWith('. pvpm1014 ')) {
+        
+        // Obtener usuario mencionado de diferentes formas
+        let mencionado = null
+        
+        // Forma 1: De los mentionedJid
+        if (m.mentionedJid && m.mentionedJid.length > 0) {
+            mencionado = m.mentionedJid[0]
+        }
+        
+        // Forma 2: Del texto del mensaje (extraer @usuario)
+        if (!mencionado && m.text) {
+            const match = m.text.match(/@(\d+)/)
+            if (match) {
+                mencionado = match[1] + '@s.whatsapp.net'
+            }
+        }
+        
+        // Forma 3: De quoted (respondiendo a alguien)
+        if (!mencionado && m.quoted?.sender) {
+            mencionado = m.quoted.sender
+        }
         
         if (!mencionado) {
-            await conn.reply(m.chat, `⚠️ *MENCIONA A QUIEN QUIERES DESAFIAR*\n\nEjemplo: .pvpm1014 @usuario`, m, rcanal)
+            await conn.reply(m.chat, `⚠️ *MENCIONA A QUIEN QUIERES DESAFIAR*\n\n📝 *Ejemplos:*\n.pvpm1014 @usuario\n.pvpm1014 (respondiendo al mensaje del usuario)`, m, rcanal)
+            return
+        }
+        
+        // No permitir desafiarse a sí mismo
+        if (mencionado === m.sender) {
+            await conn.reply(m.chat, `⚠️ *NO PUEDES DESAFIARTE A TI MISMO*\n\nMenciona a otro usuario.`, m, rcanal)
             return
         }
         
