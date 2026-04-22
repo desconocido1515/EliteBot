@@ -3,13 +3,7 @@
 // ==================== SIMPCARD ====================
 const handlerSimp = async (m, { conn }) => {
   try {
-    // Usar la misma lógica que promote
-    let mentionedJid = await m.mentionedJid
-    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
-    
-    if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.simp @usuario`, m, rcanal);
-    }
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Procesando tu solicitud, por favor espera un momento...`, m, rcanal);
@@ -21,7 +15,7 @@ const handlerSimp = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/simpcard', { avatar });
+    const url = `https://some-random-api.com/canvas/simpcard?avatar=${encodeURIComponent(avatar)}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
@@ -31,19 +25,14 @@ const handlerSimp = async (m, { conn }) => {
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
   } catch (e) {
     console.error(e);
-    await conn.reply(m.chat, `☑️ Ocurrió un error al generar la tarjeta. El servicio puede estar temporalmente fuera de servicio.`, m, rcanal);
+    await conn.reply(m.chat, `☑️ No se pudo generar la tarjeta SIMP. El servicio puede estar temporalmente fuera de servicio.`, m, rcanal);
   }
 };
 
 // ==================== BLUR ====================
 const handlerBlur = async (m, { conn }) => {
   try {
-    let mentionedJid = await m.mentionedJid
-    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
-    
-    if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.blur @usuario`, m, rcanal);
-    }
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Aplicando efecto blur, por favor espera...`, m, rcanal);
@@ -55,7 +44,7 @@ const handlerBlur = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/blur', { avatar });
+    const url = `https://some-random-api.com/canvas/blur?avatar=${encodeURIComponent(avatar)}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
@@ -71,12 +60,7 @@ const handlerBlur = async (m, { conn }) => {
 // ==================== HORNYCARD ====================
 const handlerHorny = async (m, { conn }) => {
   try {
-    let mentionedJid = await m.mentionedJid
-    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
-    
-    if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.hornycard @usuario`, m, rcanal);
-    }
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Generando tarjeta, por favor espera...`, m, rcanal);
@@ -88,7 +72,7 @@ const handlerHorny = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/horny', { avatar });
+    const url = `https://some-random-api.com/canvas/horny?avatar=${encodeURIComponent(avatar)}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
@@ -104,13 +88,7 @@ const handlerHorny = async (m, { conn }) => {
 // ==================== ITS SO STUPID ====================
 const handlerStupid = async (m, { conn, args }) => {
   try {
-    let mentionedJid = await m.mentionedJid
-    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
-    
-    if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.stupid @usuario`, m, rcanal);
-    }
-    
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     const text = args.slice(1).join(' ') || 'im+stupid';
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
@@ -123,12 +101,11 @@ const handlerStupid = async (m, { conn, args }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/its-so-stupid', { avatar, dog: text });
-    const nombre = await conn.getName(who);
+    const url = `https://some-random-api.com/canvas/its-so-stupid?avatar=${encodeURIComponent(avatar)}&dog=${encodeURIComponent(text)}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
-      caption: `☑️ *IMAGEN GENERADA*\n\nUsuario: @${nombre}\n\nElite Bot Global - Since 2023®`
+      caption: `☑️ *IMAGEN GENERADA*\n\nUsuario: @${who.split('@')[0]}\n\nElite Bot Global - Since 2023®`
     });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
@@ -152,7 +129,7 @@ const handlerPixel = async (m, { conn, text }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/pixelate', { avatar, comment: text || '' });
+    const url = `https://some-random-api.com/canvas/pixelate?avatar=${encodeURIComponent(avatar)}&comment=${encodeURIComponent(text || '')}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
@@ -168,12 +145,7 @@ const handlerPixel = async (m, { conn, text }) => {
 // ==================== LOLICE ====================
 const handlerLolice = async (m, { conn }) => {
   try {
-    let mentionedJid = await m.mentionedJid
-    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
-    
-    if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.lolice @usuario`, m, rcanal);
-    }
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Generando tarjeta, por favor espera...`, m, rcanal);
@@ -185,7 +157,7 @@ const handlerLolice = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    const url = global.API('https://some-random-api.com', '/canvas/lolice', { avatar });
+    const url = `https://some-random-api.com/canvas/lolice?avatar=${encodeURIComponent(avatar)}`;
     
     await conn.sendMessage(m.chat, {
       image: { url: url },
