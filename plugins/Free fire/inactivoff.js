@@ -4,11 +4,6 @@ import fetch from 'node-fetch';
 
 let handler = async (m, { conn, participants }) => {
     
-    // Verificar si es admin
-    if (!m.isAdmin && !m.isOwner) {
-        return conn.reply(m.chat, `☑️ 𝙽𝙴𝙲𝙴𝚂𝙸𝚃𝙰𝚂 𝚂𝙴𝚁 𝙰𝙳𝙼𝙸𝙽 𝙿𝙰𝚁𝙰 𝚄𝚂𝙰𝚁 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾`, m, rcanal)
-    }
-    
     // Seleccionar víctima (excluyendo al bot)
     let targets = participants.filter(u => !u.id.startsWith(conn.user.jid.split(':')[0])).map(u => u.id);
     if (!targets.length) {
@@ -51,13 +46,13 @@ let handler = async (m, { conn, participants }) => {
         mentions: [victim]
     })
     
-    // Ban después de 30 segundos
+    // Ban después de 30 segundos (solo si el bot es admin)
     setTimeout(async () => {
         try {
             await conn.groupParticipantsUpdate(m.chat, [victim], 'remove');
             await conn.reply(m.chat, `________________________\n\n*@${victim.split('@')[0]}* ELIMINADO! 🚫\n\nRAZÓN: *${textoAleatorio.split('\n')[0]}*\nLOBBY: *Limpiado de noobs* 🧹\n\n________________________`, m, rcanal)
         } catch {
-            await conn.reply(m.chat, `☑️ 𝙴𝚁𝚁𝙾𝚁: 𝙽𝙾 𝙿𝚄𝙳𝙴 𝙴𝙻𝙸𝙼𝙸𝙽𝙰𝚁 𝙰 ${nombreVictima}`, m, rcanal)
+            await conn.reply(m.chat, `☑️ 𝙴𝚁𝚁𝙾𝚁: 𝙽𝙾 𝙿𝚄𝙳𝙴 𝙴𝙻𝙸𝙼𝙸𝙽𝙰𝚁 𝙰 ${nombreVictima}\n\n💡 𝙴𝙻 𝙱𝙾𝚃 𝙽𝙴𝙲𝙴𝚂𝙸𝚃𝙰 𝚂𝙴𝚁 𝙰𝙳𝙼𝙸𝙽 𝙿𝙰𝚁𝙰 𝙴𝚇𝙿𝚄𝙻𝚂𝙰𝚁`, m, rcanal)
         }
     }, 30000);
 }
@@ -66,7 +61,5 @@ handler.help = ['ffban', 'inactivoff', 'freefiretoxic']
 handler.tags = ['games']
 handler.command = /^(ffban|inactivoff|freefiretoxic)$/i
 handler.group = true
-handler.admin = true
-handler.botAdmin = true
 
 export default handler
