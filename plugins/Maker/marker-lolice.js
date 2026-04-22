@@ -3,7 +3,12 @@
 // ==================== SIMPCARD ====================
 const handlerSimp = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
+    // Validar que haya una mención o respuesta
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.simp @usuario`, m, rcanal);
+    }
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Procesando tu solicitud, por favor espera un momento...`, m, rcanal);
@@ -24,14 +29,19 @@ const handlerSimp = async (m, { conn }) => {
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
   } catch (e) {
-    await conn.reply(m.chat, `☑️ Ocurrió un error al generar la tarjeta. Intenta nuevamente.`, m, rcanal);
+    console.error(e);
+    await conn.reply(m.chat, `☑️ Ocurrió un error al generar la tarjeta. El servicio puede estar temporalmente fuera de servicio.`, m, rcanal);
   }
 };
 
 // ==================== BLUR ====================
 const handlerBlur = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.blur @usuario`, m, rcanal);
+    }
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Aplicando efecto blur, por favor espera...`, m, rcanal);
@@ -59,7 +69,11 @@ const handlerBlur = async (m, { conn }) => {
 // ==================== HORNYCARD ====================
 const handlerHorny = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.hornycard @usuario`, m, rcanal);
+    }
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Generando tarjeta, por favor espera...`, m, rcanal);
@@ -87,8 +101,13 @@ const handlerHorny = async (m, { conn }) => {
 // ==================== ITS SO STUPID ====================
 const handlerStupid = async (m, { conn, args }) => {
   try {
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.stupid @usuario`, m, rcanal);
+    }
+    
     const text = args.slice(1).join(' ') || 'im+stupid';
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Procesando tu solicitud, por favor espera...`, m, rcanal);
@@ -145,7 +164,11 @@ const handlerPixel = async (m, { conn, text }) => {
 // ==================== LOLICE ====================
 const handlerLolice = async (m, { conn }) => {
   try {
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.lolice @usuario`, m, rcanal);
+    }
     
     await conn.sendMessage(m.chat, { react: { text: '🖼️', key: m.key } });
     await conn.reply(m.chat, `☑️ Generando tarjeta, por favor espera...`, m, rcanal);
