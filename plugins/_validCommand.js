@@ -39,7 +39,7 @@ export async function before(m, { conn }) {
 'png',
 'reglasckl', 'reglasclk', 'reglaslow', 'reglasvk', 'reglasword', 'reglaswz',
 'scrim',
-'tomP3',
+'tomp3',
 'trivia',
 'vegueta',
 'vestimencuadri', 
