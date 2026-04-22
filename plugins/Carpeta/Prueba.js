@@ -14,6 +14,9 @@ const logos = {
   imgfuturista: 'https://en.ephoto360.com/light-text-effect-futuristic-technology-style-648.html',
   imgnube: 'https://en.ephoto360.com/cloud-text-effect-139.html',
   imgangel: 'https://en.ephoto360.com/angel-wing-effect-329.html',
+
+
+  imgprueba: 'https://textpro.me/create-american-flag-3d-text-effect-online-1051.html', 
   imgcielo: 'https://en.ephoto360.com/create-a-cloud-text-effect-in-the-sky-618.html',
   imggraffiti3d: 'https://en.ephoto360.com/text-graffiti-3d-208.html',
   imgmatrix: 'https://en.ephoto360.com/matrix-text-effect-154.html',
