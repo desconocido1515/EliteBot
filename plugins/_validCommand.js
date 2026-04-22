@@ -20,6 +20,32 @@ export async function before(m, { conn }) {
 'hidetag', 'notify', 'notificar', 'noti', 'n', 'avisos', 'aviso', 
 
 
+'1vs1', '4vs4', '6vs6', '8vs8', '12vs12', '16vs16', '20vs20',
+'pvpm1014', 'pvpsmg', 'scrimduo',
+'agenda', 'agendasemanal',
+'alpes', 'bermuda', 'kalahari', 'nexterra', 'purgatorio',
+'blackpink', 'brackpink', 'kpop',
+'cat', 'neko', 'foxgirl',
+'clk', 'clktpg', 'rbclk',
+'combobr', 'combode',
+'cr7', 'messi',
+'dragonbz', 'goku', 'vegueta',
+'inactivoff', 'infipg', 'infitpg',
+'interna4vs4', 'interna6vs6',
+'listacuadrilatero', 'listapgnuestra', 'listavs',
+'mapacuadrilatero', 'mapahexagonal',
+'navidad',
+'podiocuadri',
+'png',
+'reglasckl', 'reglasclk', 'reglaslow', 'reglasvk', 'reglasword', 'reglaswz',
+'scrim',
+'tomP3',
+'trivia',
+'vegueta',
+'vestimencuadri', 
+
+
+    
     
     'chipmunk'];
   // ==================================================
