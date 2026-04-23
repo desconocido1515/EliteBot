@@ -44,11 +44,8 @@ const handler = async (m, { conn, text, usedPrefix }) => {
       react: { text: '💫', key: m.key }
     });
     
-    // Enviar mensaje de espera
-    await conn.reply(m.chat, `☑️ Enviando mensaje de ánimo...`, m, rcanal);
-    
     // Obtener imagen
-    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/animo.jpeg';
+    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg';
     
     // Enviar imagen con el mensaje de ánimo
     await conn.sendMessage(m.chat, {
