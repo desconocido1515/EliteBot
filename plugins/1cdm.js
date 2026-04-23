@@ -1,21 +1,16 @@
-import fs from 'fs'
-import path from 'path'
-
 let handler = async (m, { conn }) => {
 
   let comandos = new Set()
   let porCarpeta = {}
 
-  // 🔥 recorrer plugins cargados (comandos reales)
   for (let name in global.plugins) {
     let plugin = global.plugins[name]
     if (!plugin) continue
 
+    let lista = []
     let { command, help } = plugin
 
-    let lista = []
-
-    // COMMAND
+    // 🧠 COMMAND
     if (command) {
       if (Array.isArray(command)) lista.push(...command)
       else if (typeof command === 'string') lista.push(command)
@@ -25,21 +20,20 @@ let handler = async (m, { conn }) => {
       }
     }
 
-    // HELP (clave en tu repo)
+    // 🧠 HELP
     if (help) {
       if (Array.isArray(help)) lista.push(...help)
       else if (typeof help === 'string') lista.push(help)
     }
 
-    // limpiar
-    lista = lista
-      .filter(c => typeof c === 'string' && c.length < 20 && !c.includes(''))
+    lista = lista.filter(c => typeof c === 'string' && c.length < 20)
 
-    if (lista.length === 0) continue
+    if (!lista.length) continue
 
-    // 🧠 detectar carpeta desde path del plugin
-    let ruta = plugin?.__filename || name
-    let carpeta = ruta.split(path.sep)[1] || 'otros'
+    // 🔥 detectar carpeta desde el nombre del plugin
+    // ejemplo: "Buscadores/google.js"
+    let parts = name.split('/')
+    let carpeta = parts.length > 1 ? parts[0] : 'principal'
 
     if (!porCarpeta[carpeta]) porCarpeta[carpeta] = new Set()
 
@@ -57,19 +51,18 @@ let handler = async (m, { conn }) => {
 
   let total = comandos.size
 
-  // 📂 ORDEN POR CARPETAS
+  // 📂 POR CARPETAS
   let detalle = Object.keys(porCarpeta)
     .sort()
-    .map(carpeta => {
-      let cmds = [...porCarpeta[carpeta]]
+    .map(cat => {
+      let cmds = [...porCarpeta[cat]]
         .sort()
         .map(c => `'${c}'`)
         .join(', ')
-      return `📂 ${carpeta}\n${cmds}`
+      return `📂 ${cat}\n${cmds}`
     })
     .join('\n\n')
 
-  // 📨 MENSAJE FINAL
   let texto = `📜 Total de comandos: ${total}\n\n${listaTotal}\n\n━━━━━━━━━━━━━━\n\n${detalle}`
 
   conn.reply(m.chat, texto, m)
