@@ -1,57 +1,78 @@
+import fs from 'fs'
+import path from 'path'
+
 let handler = async (m, { conn }) => {
 
   let comandos = new Set()
+  let porCarpeta = {}
 
+  // 🔥 recorrer plugins cargados (comandos reales)
   for (let name in global.plugins) {
     let plugin = global.plugins[name]
     if (!plugin) continue
 
     let { command, help } = plugin
 
-    // 🧠 1. COMMAND
+    let lista = []
+
+    // COMMAND
     if (command) {
-
-      // ARRAY
-      if (Array.isArray(command)) {
-        command.forEach(c => typeof c === 'string' && comandos.add(c))
-      }
-
-      // STRING
-      else if (typeof command === 'string') {
-        comandos.add(command)
-      }
-
-      // REGEX
+      if (Array.isArray(command)) lista.push(...command)
+      else if (typeof command === 'string') lista.push(command)
       else if (command instanceof RegExp) {
         let match = command.toString().match(/\((.*?)\)/)
-        if (match) {
-          match[1].split('|').forEach(c => comandos.add(c))
-        }
+        if (match) lista.push(...match[1].split('|'))
       }
     }
 
-    // 🧠 2. HELP (MUY IMPORTANTE en este repo)
+    // HELP (clave en tu repo)
     if (help) {
-
-      if (Array.isArray(help)) {
-        help.forEach(c => typeof c === 'string' && comandos.add(c))
-      }
-
-      else if (typeof help === 'string') {
-        comandos.add(help)
-      }
+      if (Array.isArray(help)) lista.push(...help)
+      else if (typeof help === 'string') lista.push(help)
     }
+
+    // limpiar
+    lista = lista
+      .filter(c => typeof c === 'string' && c.length < 20 && !c.includes(''))
+
+    if (lista.length === 0) continue
+
+    // 🧠 detectar carpeta desde path del plugin
+    let ruta = plugin?.__filename || name
+    let carpeta = ruta.split(path.sep)[1] || 'otros'
+
+    if (!porCarpeta[carpeta]) porCarpeta[carpeta] = new Set()
+
+    lista.forEach(cmd => {
+      comandos.add(cmd)
+      porCarpeta[carpeta].add(cmd)
+    })
   }
 
-  let resultado = [...comandos]
-    .filter(c => c && c.length < 20 && !c.includes(' '))
+  // 🔝 TEXTO PRINCIPAL
+  let listaTotal = [...comandos]
     .sort()
     .map(c => `'${c}'`)
     .join(', ')
 
-  if (!resultado) return m.reply('❌ No se detectaron comandos')
+  let total = comandos.size
 
-  m.reply(`📜 Lista REAL de comandos:\n\n${resultado}`)
+  // 📂 ORDEN POR CARPETAS
+  let detalle = Object.keys(porCarpeta)
+    .sort()
+    .map(carpeta => {
+      let cmds = [...porCarpeta[carpeta]]
+        .sort()
+        .map(c => `'${c}'`)
+        .join(', ')
+      return `📂 ${carpeta}\n${cmds}`
+    })
+    .join('\n\n')
+
+  // 📨 MENSAJE FINAL
+  let texto = `📜 Total de comandos: ${total}\n\n${listaTotal}\n\n━━━━━━━━━━━━━━\n\n${detalle}`
+
+  conn.reply(m.chat, texto, m)
 }
 
 handler.command = ['cmdlist']
