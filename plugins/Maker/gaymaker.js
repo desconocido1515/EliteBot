@@ -3,6 +3,7 @@ import { unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { exec } from 'child_process';
+import canvafy from 'canvafy';
 
 let handler = async (m, { conn }) => {
   try {
@@ -30,12 +31,14 @@ let handler = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    // Usar la API de some-random-api.ml (la que funcionaba)
-    const apiUrl = `https://some-random-api.ml/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
+    // Generar imagen gay con canvafy (sin API externa)
+    const imageBuffer = await new canvafy.Gay()
+      .setAvatar(avatar)
+      .build();
     
     // Enviar imagen con el texto
     await conn.sendMessage(m.chat, {
-      image: { url: apiUrl },
+      image: imageBuffer,
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
