@@ -13,7 +13,7 @@ let handler = async (m, { conn }) => {
     let name = await conn.getName(who);
     
     await conn.sendMessage(m.chat, {
-      react: { text: '🖼️', key: m.key }
+      react: { text: '🏳️‍🌈', key: m.key }
     });
     
     await conn.reply(m.chat, `☑️ Procesando tu solicitud, por favor espera un momento...`, m, rcanal);
@@ -32,7 +32,7 @@ let handler = async (m, { conn }) => {
     // Enviar imagen con el texto
     await conn.sendMessage(m.chat, {
       image: { url: url },
-      caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
+      caption: `☑️ *MIREN A ESTE GAY LE GUSTA EL PENE POR EL CULO* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
     // Usar una URL de audio que SÍ funciona (de tu plugin de bienvenida)
