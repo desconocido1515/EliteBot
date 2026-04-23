@@ -3,11 +3,12 @@ import fs from 'fs';
 
 const handler = async (m, { conn }) => {
   try {
-    // Restricción: debe mencionar a alguien o responder
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    // Usar la misma lógica que promote
+    let mentionedJid = await m.mentionedJid;
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
     
     if (!who) {
-      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.gay5 @usuario`, m, rcanal);
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.gay @usuario`, m, rcanal);
     }
     
     let name = await conn.getName(who);
@@ -29,7 +30,7 @@ const handler = async (m, { conn }) => {
     // Usar la API de some-random-api para efecto gay
     const url = `https://some-random-api.com/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
     
-    // Enviar imagen con el nuevo texto
+    // Enviar imagen con el texto
     await conn.sendMessage(m.chat, {
       image: { url: url },
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
