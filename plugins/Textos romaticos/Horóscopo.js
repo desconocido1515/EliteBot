@@ -3,7 +3,7 @@
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 
 const STYLED_THUMBNAIL = 'https://raw.githubusercontent.com/IrokzDal/data/main/1776950526519.jpeg';
-const STYLED_SOURCE_URL = 'https://api-Kevin.Elite.click';
+const STYLED_SOURCE_URL = 'Elite Bot Global ';
 
 const DOCUMENT_TEMPLATE = {
   url: 'https://mmg.whatsapp.net/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc',
