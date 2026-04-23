@@ -1,9 +1,4 @@
 import fetch from 'node-fetch';
-import { unlinkSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import { exec } from 'child_process';
-import canvafy from 'canvafy';
 
 let handler = async (m, { conn }) => {
   try {
@@ -31,53 +26,23 @@ let handler = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    // Generar imagen gay con canvafy (sin API externa)
-    const imageBuffer = await new canvafy.Gay()
-      .setAvatar(avatar)
-      .build();
+    // Usar la API de some-random-api para efecto gay
+    const url = `https://some-random-api.com/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
     
     // Enviar imagen con el texto
     await conn.sendMessage(m.chat, {
-      image: imageBuffer,
+      image: { url: url },
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Descargar audio
-    const audioUrl = 'https://files.catbox.moe/2ksqaa.mp3';
-    const audioBuffer = await (await fetch(audioUrl)).buffer();
+    // Usar una URL de audio que SÍ funciona (de tu plugin de bienvenida)
+    const audioUrl = 'https://files.catbox.moe/3wjpv0.opus';
+    const audio = await (await fetch(audioUrl)).buffer();
     
-    // Guardar temporalmente
-    const tempFile = join(tmpdir(), `${Date.now()}.mp3`);
-    const outFile = join(tmpdir(), `${Date.now()}.opus`);
-    
-    const fs = await import('fs');
-    fs.writeFileSync(tempFile, audioBuffer);
-    
-    // Convertir a opus usando ffmpeg
-    exec(`ffmpeg -i "${tempFile}" -vn -c:a libopus -b:a 128k "${outFile}"`, async (err) => {
-      try { unlinkSync(tempFile) } catch {}
-      
-      if (err) {
-        console.error(err);
-        return;
-      }
-      
-      let buff = readFileSync(outFile);
-      
-      await conn.sendFile(
-        m.chat,
-        buff,
-        'audio.opus',
-        null,
-        m,
-        rcanal,
-        {
-          mimetype: 'audio/ogg; codecs=opus',
-          ptt: true
-        }
-      );
-      
-      try { unlinkSync(outFile) } catch {}
+    await conn.sendMessage(m.chat, {
+      audio: audio,
+      mimetype: 'audio/ogg; codecs=opus',
+      ptt: true
     });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
