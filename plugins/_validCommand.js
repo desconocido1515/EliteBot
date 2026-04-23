@@ -125,4 +125,4 @@ para encontrar lo que buscas.`
     global._cmdHandled = false;
   }, 1000);
 }
-*/
+
