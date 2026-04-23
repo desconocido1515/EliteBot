@@ -35,13 +35,13 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio con la URL correcta
+    // Enviar audio con el mismo formato que funciona en tu plugin de bienvenida
     const audioUrl = 'https://files.catbox.moe/2ksqaa.mp3';
     const audio = await (await fetch(audioUrl)).buffer();
     
     await conn.sendMessage(m.chat, {
       audio: audio,
-      mimetype: 'audio/mpeg',
+      mimetype: 'audio/ogg; codecs=opus',
       ptt: true
     });
     
