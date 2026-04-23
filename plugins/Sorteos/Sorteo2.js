@@ -4,7 +4,7 @@ let handler = async (m, { conn, text, participants }) => {
   if (!text || text.trim() === '') {
     return conn.reply(
       m.chat,
-      `⚠️ Ejemplo de uso:\n.sorteo2 quien pvp`,
+      `⚠️ Ejemplo de uso:\n.sorteo2 Los 2 seleccionados van para pvp`,
       m
     );
   }
