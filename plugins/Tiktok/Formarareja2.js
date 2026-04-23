@@ -2,43 +2,57 @@ let R = Math.random;
 let Fl = Math.floor;
 let toM = (a) => "@" + a.split("@")[0];
 
-function handler(m, { groupMetadata, conn }) {
-  let ps = groupMetadata.participants.map((v) => v.id);
-  let a = ps[Fl(R() * ps.length)];
-  let b;
-  do b = ps[Fl(R() * ps.length)];
-  while (b === a);
-  let c;
-  do c = ps[Fl(R() * ps.length)];
-  while (c === a || c === b);
-  let d;
-  do d = ps[Fl(R() * ps.length)];
-  while (d === a || d === b || d === c);
-  let e;
-  do e = ps[Fl(R() * ps.length)];
-  while (e === a || e === b || e === c || e === d);
-  let f;
-  do f = ps[Fl(R() * ps.length)];
-  while (f === a || f === b || f === c || f === d || f === e);
-  let g;
-  do g = ps[Fl(R() * ps.length)];
-  while (g === a || g === b || g === c || g === d || g === e || g === f);
-  let h;
-  do h = ps[Fl(R() * ps.length)];
-  while (h === a || h === b || h === c || h === d || h === e || h === f || h === g);
-  let i;
-  do i = ps[Fl(R() * ps.length)];
-  while (i === a || i === b || i === c || i === d || i === e || i === f || i === g || i === h);
-  let j;
-  do j = ps[Fl(R() * ps.length)];
-  while (j === a || j === b || j === c || j === d || j === e || j === f || j === g || j === h || j === i);
+let handler = async (m, { groupMetadata, conn }) => {
+  try {
+    let ps = groupMetadata.participants.map((v) => v.id);
+    
+    if (ps.length < 10) {
+      return conn.reply(m.chat, `☑️ Se necesitan al menos 10 participantes en el grupo para formar 5 parejas.`, m, rcanal);
+    }
+    
+    let a = ps[Fl(R() * ps.length)];
+    let b;
+    do b = ps[Fl(R() * ps.length)];
+    while (b === a);
+    
+    let c;
+    do c = ps[Fl(R() * ps.length)];
+    while (c === a || c === b);
+    
+    let d;
+    do d = ps[Fl(R() * ps.length)];
+    while (d === a || d === b || d === c);
+    
+    let e;
+    do e = ps[Fl(R() * ps.length)];
+    while (e === a || e === b || e === c || e === d);
+    
+    let f;
+    do f = ps[Fl(R() * ps.length)];
+    while (f === a || f === b || f === c || f === d || f === e);
+    
+    let g;
+    do g = ps[Fl(R() * ps.length)];
+    while (g === a || g === b || g === c || g === d || g === e || g === f);
+    
+    let h;
+    do h = ps[Fl(R() * ps.length)];
+    while (h === a || h === b || h === c || h === d || h === e || h === f || h === g);
+    
+    let i;
+    do i = ps[Fl(R() * ps.length)];
+    while (i === a || i === b || i === c || i === d || i === e || i === f || i === g || i === h);
+    
+    let j;
+    do j = ps[Fl(R() * ps.length)];
+    while (j === a || j === b || j === c || j === d || j === e || j === f || j === g || j === h || j === i);
 
-  // Reaccionar con 💏🏻
-  await conn.sendMessage(m.chat, {
-    react: { text: '💏🏻', key: m.key }
-  });
+    // Reaccionar con 💏🏻
+    await conn.sendMessage(m.chat, {
+      react: { text: '💏🏻', key: m.key }
+    });
 
-  const texto = `*_😍Las 5 mejores parejas del grupo😍_*
+    const texto = `*_😍Las 5 mejores parejas del grupo😍_*
     
 *_1.- ${toM(a)} y ${toM(b)}_*
 - Esta pareja esta destinada a estar junta 💙
@@ -55,12 +69,17 @@ function handler(m, { groupMetadata, conn }) {
 *_5.- ${toM(i)} y ${toM(j)}_*
 - Esta pareja se esta de luna de miel ✨🥵😍❤️*`;
 
-  // Enviar imagen con el texto
-  await conn.sendMessage(m.chat, {
-    image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/parejas.jpg' },
-    caption: texto,
-    mentions: [a, b, c, d, e, f, g, h, i, j]
-  });
+    // Enviar imagen con el texto
+    await conn.sendMessage(m.chat, {
+      image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/parejas.jpg' },
+      caption: texto,
+      mentions: [a, b, c, d, e, f, g, h, i, j]
+    });
+    
+  } catch (error) {
+    console.error(error);
+    await conn.reply(m.chat, `☑️ Ocurrió un error al formar las parejas.`, m, rcanal);
+  }
 }
 
 handler.help = ["formarpareja2"];
