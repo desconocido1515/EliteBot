@@ -1,72 +1,60 @@
-/*---------------------------------------------------------------------------------------
-  🍀 • By https://github.com/HACHEJOTA
------------------------------------------------------------------------------------------*/
-import util from 'util'
-import path from 'path'
+let handler = async (m, { conn, text, participants }) => {
 
-let user = a => '@' + a.split('@')[0]
-
-async function handler(m, { groupMetadata, command, conn, text, usedPrefix}) {
-  if (!text) {
-    return conn.reply(m.chat, `☑️ 𝙀𝙟𝙚𝙢𝙥𝙡𝙤 𝙙𝙚 𝙪𝙨𝙤:\n.sorteo2 𝙩𝙚𝙭𝙩𝙤`, m, rcanal)
+  // 🔥 Validación
+  if (!text || text.trim() === '') {
+    return conn.reply(
+      m.chat,
+      `⚠️ Ejemplo de uso:\n.sorteo2 quien pvp`,
+      m
+    );
   }
-  
-  let ps = groupMetadata.participants.map(v => v.id)
-  let a = ps.getRandom()
-  let b = ps.getRandom()
-  let k = Math.floor(Math.random() * 70);
-  let x = `${pickRandom(['ㅤ'])}`
-  let l = Math.floor(Math.random() * x.length);
-  let vn = ``
-  
-  let top = `*${x}🎊━━━𝙎𝙊𝙍𝙏𝙀𝙊━━━🎊*
 
-📩 𝙈𝙀𝙉𝙎𝘼𝙅𝙀: 
-*${text} ${x}*
-*_________________*
-» 𝙄𝙉𝙏𝙀𝙂𝙍𝘼𝙉𝙏𝙀𝙎 𝘼𝙇 𝘼𝙕𝘼𝙍 𝙎𝙊𝙉: 
-🥷🏻 *${user(a)}*
-🥷🏻 *${user(b)}*
-*_________________*
-⇝𝙏𝙄𝙀𝙉𝙀𝙉 𝙋𝙇𝘼𝙕𝙊 𝘿𝙀 𝘾𝙊𝙉𝙁𝙄𝙍𝙈𝘼𝙍𝙈𝙀 𝙀𝙉 𝙋𝙍𝙄𝙑𝘼𝘿𝙊, 𝙀𝙉 𝘾𝘼𝙎𝙊 𝘾𝙊𝙉𝙏𝙍𝘼𝙍𝙄𝙊́ 𝙀𝙎𝙏𝘼𝙉 𝙁𝙐𝙀𝙍𝘼 𝘿𝙀 𝙂𝙍𝙐𝙋𝙊.
-*_________________*
-`
-  
-  let txt = '';
-  let count = 0;
-  
-  for (const c of top) {
-    await new Promise(resolve => setTimeout(resolve, 15));
-    txt += c;
-    count++;
+  // 🔥 Obtener participantes (solo usuarios)
+  let users = participants
+    .map(u => u.id)
+    .filter(v => v !== conn.user.jid); // quitar bot
 
-    if (count % 10 === 0) {
-      conn.sendPresenceUpdate('composing', m.chat);
-    }
+  if (users.length < 2) {
+    return conn.reply(m.chat, '❌ No hay suficientes participantes', m);
   }
-  
-  await conn.sendMessage(m.chat, { 
-    text: txt.trim(), 
-    mentions: conn.parseMention(txt) 
-  }, { 
-    quoted: m, 
-    ephemeralExpiration: 24*60*100, 
-    disappearingMessagesInChat: 24*60*100
-  });
-  
-  conn.sendFile(m.chat, vn, 'audio.opus', null, m, true, {
-    type: 'audioMessage',
-    ptt: true
-  })
-}
 
-handler.help = handler.command = ['sorteo2']
-handler.tags = ['fun']
-handler.group = true
-handler.limit = 0
+  // 🔥 Elegir 2 al azar
+  let random1 = users[Math.floor(Math.random() * users.length)];
+  let random2;
 
-export default handler
+  do {
+    random2 = users[Math.floor(Math.random() * users.length)];
+  } while (random2 === random1);
 
-function pickRandom(list) {
-  return list[Math.floor(Math.random() * list.length)]
-}
+  let ganadores = [random1, random2];
+
+  // 🔥 Texto estilo pro
+  let texto = `🎊━━━ *SORTEO* ━━━🎊
+
+📩 *MENSAJE:*
+${text}
+
+━━━━━━━━━━━━━━━
+» *INTEGRANTES AL AZAR SON:*
+
+🥷 @${ganadores[0].split('@')[0]}
+🥷 @${ganadores[1].split('@')[0]}
+
+━━━━━━━━━━━━━━━
+⚠️ *TIENEN PLAZO DE CONFIRMARME EN PRIVADO,
+EN CASO CONTRARIO ESTÁN FUERA DEL GRUPO.*
+━━━━━━━━━━━━━━━`;
+
+  // 🔥 Enviar con imagen
+  await conn.sendMessage(m.chat, {
+    image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg' },
+    caption: texto,
+    mentions: ganadores
+  }, { quoted: m });
+};
+
+handler.command = /^sorteo2$/i;
+handler.group = true;
+handler.register = false;
+
+export default handler;
