@@ -663,6 +663,6 @@ handler.before = async function (m, { conn }) {
 
 handler.help = ['horoscopo'];
 handler.tags = ['horoscope'];
-handler.command = /^(horoscopo|horóscopo)$/i;
+handler.command = /^(horoscopo|horóscopo|menuhoroscopo|menuhoróscopo)$/i;
 
 export default handler;
