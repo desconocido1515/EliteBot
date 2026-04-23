@@ -1,8 +1,4 @@
 import fetch from 'node-fetch';
-import { unlinkSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import { exec } from 'child_process';
 
 let handler = async (m, { conn }) => {
   try {
@@ -17,7 +13,7 @@ let handler = async (m, { conn }) => {
     let name = await conn.getName(who);
     
     await conn.sendMessage(m.chat, {
-      react: { text: '🖼️', key: m.key }
+      react: { text: '👮‍♂️', key: m.key }
     });
     
     await conn.reply(m.chat, `☑️ Procesando tu solicitud, por favor espera un momento...`, m, rcanal);
@@ -39,14 +35,14 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *SE BUSCA* 👮‍♂️\n\n👤 *Usuario:* @${name}\n💰 *Recompensa:* $10,000\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio
-    const audioUrl = 'https://files.catbox.moe/2ksqaa.mp3';
+    // Usar una URL de audio (opcional)
+    const audioUrl = 'https://files.catbox.moe/3wjpv0.opus';
     const audio = await (await fetch(audioUrl)).buffer();
     
     await conn.sendMessage(m.chat, {
       audio: audio,
-      mimetype: 'audio/mpeg',
-      ptt: false
+      mimetype: 'audio/ogg; codecs=opus',
+      ptt: true
     });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
