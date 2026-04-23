@@ -33,20 +33,14 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio usando sendMessage (más confiable)
-    const fs = await import('fs');
-    const audioPath = './audios/gay.mp3';
+    // Enviar audio desde GitHub (ruta directa)
+    const audioUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/gay.mp3';
     
-    if (fs.existsSync(audioPath)) {
-      const audioBuffer = fs.readFileSync(audioPath);
-      await conn.sendMessage(m.chat, {
-        audio: audioBuffer,
-        mimetype: 'audio/mpeg',
-        ptt: true
-      });
-    } else {
-      console.log('Audio no encontrado:', audioPath);
-    }
+    await conn.sendMessage(m.chat, {
+      audio: { url: audioUrl },
+      mimetype: 'audio/mpeg',
+      ptt: true
+    });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
     
