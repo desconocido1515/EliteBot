@@ -1,4 +1,7 @@
 import fetch from 'node-fetch';
+import { unlinkSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
 
 let handler = async (m, { conn }) => {
   try {
@@ -35,14 +38,42 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio con el mismo formato que funciona en tu plugin de bienvenida
+    // Descargar audio y guardar temporalmente
     const audioUrl = 'https://files.catbox.moe/2ksqaa.mp3';
-    const audio = await (await fetch(audioUrl)).buffer();
+    const audioBuffer = await (await fetch(audioUrl)).buffer();
     
-    await conn.sendMessage(m.chat, {
-      audio: audio,
-      mimetype: 'audio/ogg; codecs=opus',
-      ptt: true
+    // Guardar temporalmente
+    const tempFile = join(tmpdir(), `${Date.now()}.mp3`);
+    const outFile = join(tmpdir(), `${Date.now()}.opus`);
+    
+    const fs = await import('fs');
+    fs.writeFileSync(tempFile, audioBuffer);
+    
+    // Convertir a opus usando ffmpeg (misma lógica que tu plugin de audio)
+    exec(`ffmpeg -i "${tempFile}" -vn -c:a libopus -b:a 128k "${outFile}"`, async (err) => {
+      try { unlinkSync(tempFile) } catch {}
+      
+      if (err) {
+        console.error(err);
+        return;
+      }
+      
+      let buff = readFileSync(outFile);
+      
+      await conn.sendFile(
+        m.chat,
+        buff,
+        'audio.opus',
+        null,
+        m,
+        rcanal,
+        {
+          mimetype: 'audio/ogg; codecs=opus',
+          ptt: true
+        }
+      );
+      
+      try { unlinkSync(outFile) } catch {}
     });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
