@@ -563,7 +563,7 @@ async function sendHoroscopoChooser(m, conn, usedPrefix) {
     mentionJids: [m.sender],
     externalTitle: '🌟 HORÓSCOPO DEL DÍA 🌟',
     bodyText: 'Selecciona tu signo zodiacal para conocer tu predicción diaria.\n\n✨ Amor, dinero, salud y más ✨',
-    footerText: 'Comprame el bot❤️ ',
+    footerText: 'Horóscopo Elite Bot Global ',
     sections,
     listTitle: 'Signos del Zodiaco',
     buttonTitle: 'Ver signos',
