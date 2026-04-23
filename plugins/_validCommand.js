@@ -30,7 +30,7 @@ export async function before(m, { conn }) {
 'combobr', 'combode',
 'cr7', 'messi',
 'dragonbz', 'goku', 'vegueta',
-'inactivoff', 'infipg', 'infitpg',
+'inactivoff', 'horoaries', 'infipg', 'infitpg',
 'interna4vs4', 'interna6vs6',
 'listacuadrilatero', 'listapgnuestra', 'listavs',
 'mapacuadrilatero', 'mapahexagonal',
