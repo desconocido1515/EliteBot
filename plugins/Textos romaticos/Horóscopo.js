@@ -303,8 +303,8 @@ async function sendHoroscopoChooser(m, conn, usedPrefix) {
   
   const rows = signosList.map((signo, index) => ({
     title: `${index + 1}. ${signo.label}`,
-    description: `Consulta el horóscopo de ${signo.label.split(' ')[1]}`,
-    id: `${usedPrefix}horoscopo ${signo.key}`
+    description: `Consulta el horóscopo de ${signo.label.split(' ')[1] || signo.label}`,
+    id: `horoscopo_${signo.key}`
   }));
 
   const sections = [
@@ -335,17 +335,11 @@ async function sendHoroscopoChooser(m, conn, usedPrefix) {
   return true;
 }
 
-let handler = async (m, { conn, text, usedPrefix }) => {
-  // Si no hay texto, mostrar el menú de selección
-  if (!text) {
-    return sendHoroscopoChooser(m, conn, usedPrefix);
-  }
-  
-  const signoKey = text.toLowerCase().trim();
+// Función para mostrar el horóscopo
+async function mostrarHoroscopo(m, conn, signoKey) {
   const signo = horoscopos[signoKey];
-  
   if (!signo) {
-    return conn.reply(m.chat, `☑️ *SIGNO NO VÁLIDO*\n\n📌 *Comandos:*\n.horoscopo aries\n.horoscopo tauro\n.horoscopo geminis\n.horoscopo cancer\n.horoscopo leo\n.horoscopo virgo\n.horoscopo libra\n.horoscopo escorpio\n.horoscopo sagitario\n.horoscopo capricornio\n.horoscopo acuario\n.horoscopo piscis`, m, rcanal);
+    return conn.reply(m.chat, `☑️ *SIGNO NO VÁLIDO*`, m, rcanal);
   }
   
   const fecha = new Date().toLocaleDateString('es-ES', {
@@ -381,6 +375,35 @@ ${signo.salud}
   
   await conn.sendMessage(m.chat, { react: { text: '🔮', key: m.key } });
   await conn.reply(m.chat, mensaje, m, rcanal);
+}
+
+// ==================== HANDLER PRINCIPAL ====================
+let handler = async (m, { conn, text, usedPrefix }) => {
+  // Si no hay texto, mostrar el menú de selección
+  if (!text) {
+    return sendHoroscopoChooser(m, conn, usedPrefix);
+  }
+  
+  const signoKey = text.toLowerCase().trim();
+  
+  if (!horoscopos[signoKey]) {
+    return conn.reply(m.chat, `☑️ *SIGNO NO VÁLIDO*\n\n📌 *Signos disponibles:*\n.horoscopo aries\n.horoscopo tauro\n.horoscopo geminis\n.horoscopo cancer\n.horoscopo leo\n.horoscopo virgo\n.horoscopo libra\n.horoscopo escorpio\n.horoscopo sagitario\n.horoscopo capricornio\n.horoscopo acuario\n.horoscopo piscis`, m, rcanal);
+  }
+  
+  await mostrarHoroscopo(m, conn, signoKey);
+};
+
+// ==================== CAPTURAR RESPUESTA DE BOTONES ====================
+handler.before = async function (m, { conn }) {
+  if (m.message?.buttonsResponseMessage) {
+    const buttonId = m.message.buttonsResponseMessage.selectedButtonId;
+    if (buttonId && buttonId.startsWith('horoscopo_')) {
+      const signoKey = buttonId.replace('horoscopo_', '');
+      await mostrarHoroscopo(m, conn, signoKey);
+      return true;
+    }
+  }
+  return false;
 };
 
 handler.help = ['horoscopo'];
