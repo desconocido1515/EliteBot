@@ -41,13 +41,12 @@ ${text}
 🥷 @${ganadores[1].split('@')[0]}
 
 ━━━━━━━━━━━━━━━
-⚠️ *TIENEN PLAZO DE CONFIRMARME EN PRIVADO,
-EN CASO CONTRARIO ESTÁN FUERA DEL GRUPO.*
+⚠️ *TIENEN PLAZO DE CONFIRMARME EN PRIVADO, EN CASO CONTRARIO ESTÁN FUERA DEL GRUPO.*
 ━━━━━━━━━━━━━━━`;
 
   // 🔥 Enviar con imagen
   await conn.sendMessage(m.chat, {
-    image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg' },
+    image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/sorteo.jpeg' },
     caption: texto,
     mentions: ganadores
   }, { quoted: m });
