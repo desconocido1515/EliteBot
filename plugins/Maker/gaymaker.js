@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 let handler = async (m, { conn }) => {
   try {
     // Usar la misma lógica de promote
@@ -33,11 +35,12 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio desde GitHub (ruta directa)
+    // Enviar audio usando la misma lógica que tu plugin de bienvenida
     const audioUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/gay.mp3';
+    const audio = await (await fetch(audioUrl)).buffer();
     
     await conn.sendMessage(m.chat, {
-      audio: { url: audioUrl },
+      audio: audio,
       mimetype: 'audio/mpeg',
       ptt: true
     });
