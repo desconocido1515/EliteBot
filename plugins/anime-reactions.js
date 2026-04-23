@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+/*import fetch from 'node-fetch'
 
 let handler = async (m, { conn, command, usedPrefix }) => {
 let mentionedJid = await m.mentionedJid
@@ -222,3 +222,5 @@ handler.command = ['angry', 'enojado', 'bath', 'bañarse', 'bite', 'morder', 'bl
 handler.group = true
 
 export default handler
+
+*/
