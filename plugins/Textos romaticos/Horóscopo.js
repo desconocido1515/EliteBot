@@ -2,7 +2,8 @@
 
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 
-const STYLED_THUMBNAIL = 'https://files.catbox.moe/kcpa4c.jpg';
+// NUEVA IMAGEN DE PORTADA
+const STYLED_THUMBNAIL = 'https://raw.githubusercontent.com/IrokzDal/data/main/1776950526519.jpeg';
 const STYLED_SOURCE_URL = 'https://api-adonix.ultraplus.click';
 
 const DOCUMENT_TEMPLATE = {
@@ -12,7 +13,7 @@ const DOCUMENT_TEMPLATE = {
   fileLength: '999999999999',
   pageCount: 0,
   mediaKey: 'MWO6fI223TY8T0i9onNcwNBBPldWfwp1j1FPKCiJFzw=',
-  fileName: 'Choso🔥',
+  fileName: 'Horóscopo Elite Bot Global',
   fileEncSha256: 'ZS8v9tio2un1yWVOOG3lwBxiP+mNgaKPY9+wl5pEoi8=',
   directPath: '/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc'
 };
@@ -26,7 +27,7 @@ const safeDomainFromUrl = (url) => {
   try {
     return new URL(url).hostname;
   } catch {
-    return 'api-adonix.ultraplus.click';
+    return 'horoscopo.elitebot.global';
   }
 };
 
@@ -136,7 +137,7 @@ async function makeFkontak() {
     const thumb2 = Buffer.from(await res.arrayBuffer());
     return {
       key: { participants: '0@s.whatsapp.net', remoteJid: 'status@broadcast', fromMe: false, id: 'Halo' },
-      message: { locationMessage: { name: 'Horóscopo', jpegThumbnail: thumb2 } },
+      message: { locationMessage: { name: 'Horóscopo Elite Bot Global', jpegThumbnail: thumb2 } },
       participant: '0@s.whatsapp.net'
     };
   } catch {
@@ -191,7 +192,7 @@ async function sendHoroscopoChooser(m, conn, usedPrefix) {
     mentionJids: [m.sender],
     externalTitle: '🌟 HORÓSCOPO DEL DÍA 🌟',
     bodyText: 'Selecciona tu signo zodiacal para conocer tu predicción diaria.\n\n✨ Amor, dinero, salud y más ✨',
-    footerText: 'Elite Bot Global - Horóscopo',
+    footerText: 'Horóscopo Elite Bot Global',
     sections,
     listTitle: 'Signos del Zodiaco',
     buttonTitle: 'Ver signos',
@@ -249,7 +250,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
   await mostrarHoroscopo(m, conn, signoKey);
 };
 
-// ==================== CAPTURAR RESPUESTA DE BOTONES (misma lógica que tourl) ====================
+// ==================== CAPTURAR RESPUESTA DE BOTONES ====================
 handler.before = async function (m, { conn }) {
   try {
     const msg = m.message || {};
