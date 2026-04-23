@@ -1,9 +1,15 @@
 import axios from 'axios';
+import fs from 'fs';
 
 const handler = async (m, { conn }) => {
   try {
-    // Misma lógica que lolice
-    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]) || m.sender;
+    // Restricción: debe mencionar a alguien o responder
+    let who = m.quoted?.sender || (m.mentionedJid && m.mentionedJid[0]);
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ Debes mencionar a un usuario o responder a su mensaje.\n\n📌 *Ejemplo:*\n.gay5 @usuario`, m, rcanal);
+    }
+    
     let name = await conn.getName(who);
     
     await conn.sendMessage(m.chat, {
@@ -23,10 +29,24 @@ const handler = async (m, { conn }) => {
     // Usar la API de some-random-api para efecto gay
     const url = `https://some-random-api.com/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
     
+    // Enviar imagen con el nuevo texto
     await conn.sendMessage(m.chat, {
       image: { url: url },
-      caption: `☑️ *IMAGEN GENERADA*\n\n🏳️‍🌈 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
+      caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
+    
+    // Enviar audio después de la imagen
+    const audioPath = './audios/gay.mp3';
+    if (fs.existsSync(audioPath)) {
+      const audioBuffer = fs.readFileSync(audioPath);
+      await conn.sendMessage(m.chat, {
+        audio: audioBuffer,
+        mimetype: 'audio/mpeg',
+        ptt: true
+      });
+    } else {
+      console.log('Audio no encontrado en:', audioPath);
+    }
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
     
@@ -36,8 +56,8 @@ const handler = async (m, { conn }) => {
   }
 };
 
-handler.help = ['gay5'];
+handler.help = ['gay'];
 handler.tags = ['maker'];
-handler.command = /^(gay5)$/i;
+handler.command = /^(gay)$/i;
 
 export default handler;
