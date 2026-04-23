@@ -3,24 +3,7 @@
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 
 const STYLED_THUMBNAIL = 'https://raw.githubusercontent.com/IrokzDal/data/main/1776950526519.jpeg';
-const STYLED_SOURCE_URL = 'Https://Elite-Bot-Global.click';
-
-const DOCUMENT_TEMPLATE = {
-  url: 'https://mmg.whatsapp.net/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc',
-  mimetype: 'application/pdf',
-  fileSha256: '+gmvvCB6ckJSuuG3ZOzHsTBgRAukejv1nnfwGSSSS/4=',
-  fileLength: '999999999999',
-  pageCount: 0,
-  mediaKey: 'MWO6fI223TY8T0i9onNcwNBBPldWfwp1j1FPKCiJFzw=',
-  fileName: ' ',
-  fileEncSha256: 'ZS8v9tio2un1yWVOOG3lwBxiP+mNgaKPY9+wl5pEoi8=',
-  directPath: '/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc'
-};
-
-const buildDocumentMessage = () => ({
-  ...DOCUMENT_TEMPLATE,
-  mediaKeyTimestamp: String(Math.floor(Date.now() / 1000))
-});
+const STYLED_SOURCE_URL = 'https://api-adonix.ultraplus.click';
 
 const safeDomainFromUrl = (url) => {
   try {
@@ -100,10 +83,7 @@ const createStyledInteractive = ({
         renderLargerThumbnail: true
       }
     },
-    header: {
-      documentMessage: buildDocumentMessage(),
-      hasMediaAttachment: true
-    },
+    // ❌ ELIMINADO: header con documentMessage (icono PDF)
     body: {
       text: bodyText || ' '
     },
@@ -506,7 +486,6 @@ const piscisSalud = [
   'Tu intuición te alertará sobre cualquier malestar.'
 ];
 
-// NÚMEROS Y COLORES ALEATORIOS
 function getRandomNumber() {
   return Math.floor(Math.random() * 9) + 1;
 }
@@ -516,7 +495,6 @@ function getRandomColor() {
   return colores[Math.floor(Math.random() * colores.length)];
 }
 
-// ==================== SIGNOS CON TODOS LOS TEXTOS ====================
 const horoscopos = {
   aries: { nombre: '♈️ Aries', fecha: '21 mar - 19 abr', predicciones: ariesPredicciones, amores: ariesAmor, dineros: ariesDinero, saluds: ariesSalud },
   tauro: { nombre: '♉️ Tauro', fecha: '20 abr - 20 may', predicciones: tauroPredicciones, amores: tauroAmor, dineros: tauroDinero, saluds: tauroSalud },
@@ -583,7 +561,6 @@ async function mostrarHoroscopo(m, conn, signoKey) {
   const signo = horoscopos[signoKey];
   if (!signo) return;
   
-  // Seleccionar textos aleatorios
   const prediccion = signo.predicciones[Math.floor(Math.random() * signo.predicciones.length)];
   const amor = signo.amores[Math.floor(Math.random() * signo.amores.length)];
   const dinero = signo.dineros[Math.floor(Math.random() * signo.dineros.length)];
@@ -615,7 +592,6 @@ async function mostrarHoroscopo(m, conn, signoKey) {
   await conn.reply(m.chat, mensaje, m, rcanal);
 }
 
-// ==================== HANDLER PRINCIPAL ====================
 let handler = async (m, { conn, text, usedPrefix }) => {
   if (!text) {
     return sendHoroscopoChooser(m, conn, usedPrefix);
@@ -629,7 +605,6 @@ let handler = async (m, { conn, text, usedPrefix }) => {
   await mostrarHoroscopo(m, conn, signoKey);
 };
 
-// ==================== CAPTURAR RESPUESTA DE BOTONES ====================
 handler.before = async function (m, { conn }) {
   try {
     const msg = m.message || {};
