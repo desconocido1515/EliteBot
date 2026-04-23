@@ -1,69 +1,107 @@
 import fetch from 'node-fetch';
-const handler = async (m, {text, usedPrefix, command}) => {
-if (!db.data.chats[m.chat].modohorny && m.isGroup) throw '⚠ 𝙇𝙊𝙎 𝘾𝙊𝙈𝘼𝙉𝘿𝙊𝙎 +18 𝙀𝙎𝙏𝘼𝙉 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊𝙎 𝙀𝙉 𝙀𝙎𝙏𝙀 𝙂𝙍𝙐𝙋𝙊, 𝙎𝙄 𝙀𝙎 𝘼𝘿𝙈𝙄𝙉 𝙔 𝘿𝙀𝙎𝙀𝘼 𝘼𝘾𝙏𝙄𝙑𝘼𝙍𝙇𝙊𝙎, 𝙐𝙎𝙀 𝙀𝙇 𝘾𝙊𝙈𝘼𝙉𝘿𝙊 .𝘰𝘯 𝘮𝘰𝘥𝘰𝘩𝘰𝘵 \n𝙍𝙀𝘾𝙐𝙀𝙍𝘿𝙀 𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝙍 .𝘰𝘧𝘧 𝘮𝘰𝘥𝘰𝘩𝘰𝘵';
-  if (!text) throw `*[❗𝐈𝐍𝐅𝐎❗] 𝙴𝙹𝙴𝙼𝙿𝙻𝙾 𝙳𝙴 𝚄𝚂𝙾 𝙳𝙴𝙻 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 ${usedPrefix + command} Con mi prima*`;
+import cheerio from 'cheerio';
+
+const handler = async (m, { conn, text = '', usedPrefix, command }) => {
+
+  // 🔥 VALIDACIÓN (YA NO USA THROW)
+  if (!text || text.trim() === '') {
+    return conn.reply(
+      m.chat,
+      `⚠️ Ejemplo de uso:\n${usedPrefix + command} naruto`,
+      m
+    );
+  }
+
   try {
     const vids_ = {
       from: m.sender,
       urls: [],
     };
-    if (!global.videoListXXX) {
-      global.videoListXXX = [];
-    }
-    if (global.videoListXXX[0]?.from == m.sender) {
-      global.videoListXXX.splice(0, global.videoListXXX.length);
-    }
+
+    // 🔥 Reset lista
+    if (!global.videoListXXX) global.videoListXXX = [];
+    global.videoListXXX = global.videoListXXX.filter(v => v.from !== m.sender);
+
     const res = await xnxxsearch(text);
     const json = res.result;
-    let cap = `*🔍 RESULTADOS DE LA BUSQUEDA:* ${text.toUpperCase()}\n\n`;
+
+    if (!json || json.length === 0) {
+      return conn.reply(m.chat, '❌ Sin resultados', m);
+    }
+
+    let cap = `🔍 RESULTADOS: ${text.toUpperCase()}\n\n`;
+
     let count = 1;
     for (const v of json) {
-      const linkXXX = v.link;
-      vids_.urls.push(linkXXX);
-      cap += `*[${count}]*\n• *🎬 Titulo:* ${v.title}\n• *🔗 Link:* ${v.link}\n• *❗ Info:* ${v.info}`;
-      cap += '\n\n' + '••••••••••••••••••••••••••••••••' + '\n\n';
+      vids_.urls.push(v.link);
+
+      cap += `*[${count}]*\n`;
+      cap += `• 🎬 Título: ${v.title}\n`;
+      cap += `• 🔗 Link: ${v.link}\n`;
+      cap += `• ℹ️ Info: ${v.info}\n`;
+      cap += `------------------------\n\n`;
+
       count++;
     }
-    m.reply(cap);
+
+    await conn.reply(m.chat, cap, m);
+
     global.videoListXXX.push(vids_);
-  } catch {
-    throw e;
+
+  } catch (e) {
+    console.error(e);
+    conn.reply(m.chat, '❌ Error al buscar', m);
   }
 };
-handler.help = ['xnxxsearch'].map((v) => v + ' <query>');
-handler.tags = ['downloader', 'premium'];
-handler.command = /^xnxxsearch|xnxxs$/i;
-export default handler;
-handler.register = false
-handler.group = true
-handler.limit = 0
 
+handler.help = ['xnxxsearch <texto>'];
+handler.tags = ['search'];
+handler.command = /^(xnxxsearch|xnxxs)$/i;
+handler.register = false;
+handler.group = true;
+
+export default handler;
+
+
+// 🔍 BUSCADOR FIX
 async function xnxxsearch(query) {
-  return new Promise((resolve, reject) => {
+  try {
     const baseurl = 'https://www.xnxx.com';
-    fetch(`${baseurl}/search/${query}/${Math.floor(Math.random() * 3) + 1}`, {method: 'get'}).then((res) => res.text()).then((res) => {
-      const $ = cheerio.load(res, {xmlMode: false});
-      const title = [];
-      const url = [];
-      const desc = [];
-      const results = [];
-      $('div.mozaique').each(function(a, b) {
-        $(b).find('div.thumb').each(function(c, d) {
-          url.push(baseurl + $(d).find('a').attr('href').replace('/THUMBNUM/', '/'));
-        });
-      });
-      $('div.mozaique').each(function(a, b) {
-        $(b).find('div.thumb-under').each(function(c, d) {
-          desc.push($(d).find('p.metadata').text());
-          $(d).find('a').each(function(e, f) {
-            title.push($(f).attr('title'));
+    const res = await fetch(`${baseurl}/search/${encodeURIComponent(query)}/${Math.floor(Math.random() * 3) + 1}`);
+    const html = await res.text();
+
+    const $ = cheerio.load(html);
+
+    const results = [];
+
+    $('div.mozaique').each((a, b) => {
+      $(b).find('div.thumb').each((i, el) => {
+        const link = baseurl + $(el).find('a').attr('href')?.replace('/THUMBNUM/', '/');
+        
+        const parent = $(el).parent();
+        const title = parent.find('a').attr('title');
+        const info = parent.find('p.metadata').text();
+
+        if (link && title) {
+          results.push({
+            title,
+            info,
+            link
           });
-        });
+        }
       });
-      for (let i = 0; i < title.length; i++) {
-        results.push({title: title[i], info: desc[i], link: url[i]});
-      }
-      resolve({code: 200, status: true, result: results});
-    }).catch((err) => reject({code: 503, status: false, result: err}));
-  });
+    });
+
+    return {
+      status: true,
+      result: results
+    };
+
+  } catch (err) {
+    console.error(err);
+    return {
+      status: false,
+      result: []
+    };
+  }
 }
