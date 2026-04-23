@@ -4,36 +4,52 @@ let handler = async (m, { conn }) => {
 
   for (let name in global.plugins) {
     let plugin = global.plugins[name]
+    if (!plugin) continue
 
-    if (!plugin || !plugin.command) continue
+    let { command, help } = plugin
 
-    let cmd = plugin.command
+    // 🧠 1. COMMAND
+    if (command) {
 
-    // 🧠 ARRAY
-    if (Array.isArray(cmd)) {
-      cmd.forEach(c => comandos.add(c))
+      // ARRAY
+      if (Array.isArray(command)) {
+        command.forEach(c => typeof c === 'string' && comandos.add(c))
+      }
+
+      // STRING
+      else if (typeof command === 'string') {
+        comandos.add(command)
+      }
+
+      // REGEX
+      else if (command instanceof RegExp) {
+        let match = command.toString().match(/\((.*?)\)/)
+        if (match) {
+          match[1].split('|').forEach(c => comandos.add(c))
+        }
+      }
     }
 
-    // 🧠 STRING
-    else if (typeof cmd === 'string') {
-      comandos.add(cmd)
-    }
+    // 🧠 2. HELP (MUY IMPORTANTE en este repo)
+    if (help) {
 
-    // 🧠 REGEX
-    else if (cmd instanceof RegExp) {
-      let match = cmd.toString().match(/\((.*?)\)/)
-      if (match) {
-        match[1].split('|').forEach(c => comandos.add(c))
+      if (Array.isArray(help)) {
+        help.forEach(c => typeof c === 'string' && comandos.add(c))
+      }
+
+      else if (typeof help === 'string') {
+        comandos.add(help)
       }
     }
   }
 
   let resultado = [...comandos]
+    .filter(c => c && c.length < 20 && !c.includes(' '))
     .sort()
     .map(c => `'${c}'`)
     .join(', ')
 
-  if (!resultado) return m.reply('❌ No se encontraron comandos')
+  if (!resultado) return m.reply('❌ No se detectaron comandos')
 
   m.reply(`📜 Lista REAL de comandos:\n\n${resultado}`)
 }
