@@ -1,28 +1,74 @@
-import fetch from 'node-fetch'; 
- import MessageType from '@whiskeysockets/baileys'; 
- const handler = async (m, {conn, text, groupMetadata}) => { 
-   try {
-    let _user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted.sender;
-  let who; 
+import fetch from 'node-fetch';
+import { sticker } from '../../lib/sticker.js';
 
-   if (m.isGroup) who = m.mentionedJid[0] ? m.mentionedJid[0] : m.sender; 
-   else who = m.sender; 
-   let name = conn.getName(who);
-     if (m.quoted?.sender) m.mentionedJid.push(m.quoted.sender); 
-     if (!m.mentionedJid.length) m.mentionedJid.push(m.sender); 
-     const res = await fetch('https://nekos.life/api/kiss'); 
-     const json = await res.json(); 
-     const {url} = json; 
-     const text2 = `💌 *⌈*  𝑨𝑵𝑰𝑴𝑶 *⌋* 💌
+const handler = async (m, { conn, text, usedPrefix }) => {
+  try {
+    // Validar mención o respuesta
+    let mentionedJid = await m.mentionedJid;
+    let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
     
-𝑫𝑬: @${m.sender.split("@")[0]} 
-𝑷𝑨𝑹𝑨: ${text}
+    if (!usuario) {
+      return conn.reply(m.chat, `☑️ ETIQUETA A LA PERSONA\n\n📌 *Ejemplo:*\n.animo @usuario`, m, rcanal);
+    }
+    
+    if (usuario === m.sender) {
+      return conn.reply(m.chat, `☑️ No puedes darte ánimo a ti mismo. Etiqueta a otra persona.`, m, rcanal);
+    }
+    
+    const nombreUsuario = m.pushName || m.sender.split('@')[0];
+    const nombreMencionado = await conn.getName(usuario);
+    
+    // Textos de ánimo aleatorios
+    const textosAnimo = [
+      `💪 *${nombreMencionado}*, tú puedes con todo. Los momentos difíciles también pasan. ¡Sigue adelante! ✨`,
+      
+      `🌟 *${nombreMencionado}*, la vida es como una montaña rusa, con subidas y bajadas. Lo importante es no rendirse. ¡Tú eres fuerte! 💪`,
+      
+      `🌸 *${nombreMencionado}*, recuerda que después de la tormenta siempre sale el sol. Todo va a mejorar. ¡Confía en ti! 💫`,
+      
+      `🎈 *${nombreMencionado}*, no estás solo/a en esto. Cuenta conmigo y con todos los que te aprecian. ¡Eres importante! ❤️`,
+      
+      `🌻 *${nombreMencionado}*, a veces necesitamos una pausa para recargar energías. Tómate tu tiempo, pero nunca abandones. 🚀`,
+      
+      `⭐ *${nombreMencionado}*, cada día es una nueva oportunidad para ser feliz. ¡Sonríe, que la vida es hermosa! 😊`,
+      
+      `💖 *${nombreMencionado}*, mereces todo lo bueno que te pasa y más. No dejes que nadie te diga lo contrario. 🌈`,
+      
+      `🦋 *${nombreMencionado}*, los cambios son difíciles, pero siempre traen cosas nuevas y mejores. ¡Ánimo! 🍀`
+    ];
+    
+    const textoAleatorio = textosAnimo[Math.floor(Math.random() * textosAnimo.length)];
+    
+    // Reaccionar al mensaje
+    await conn.sendMessage(m.chat, {
+      react: { text: '💫', key: m.key }
+    });
+    
+    // Enviar mensaje de espera
+    await conn.reply(m.chat, `☑️ Enviando mensaje de ánimo...`, m, rcanal);
+    
+    // Obtener imagen
+    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/animo.jpeg';
+    
+    // Enviar imagen con el mensaje de ánimo
+    await conn.sendMessage(m.chat, {
+      image: { url: imageUrl },
+      caption: `💌 *⌈*  𝑨𝑵𝑰𝑴𝑶 *⌋* 💌\n\n${textoAleatorio}\n\n━━━━━━━━━━━━━━━━━━━\n✨ *${nombreUsuario}* te envió este mensaje de ánimo ✨\n━━━━━━━━━━━━━━━━━━━\n\n© Elite Bot Global - Since 2023®`,
+      mentions: [usuario, m.sender]
+    });
+    
+    // Reacción final
+    await conn.sendMessage(m.chat, {
+      react: { text: '✅', key: m.key }
+    });
+    
+  } catch (error) {
+    console.error('Error en comando ánimo:', error);
+    await conn.reply(m.chat, `☑️ Ocurrió un error al enviar el mensaje de ánimo.`, m, rcanal);
+  }
+};
 
- 𝑵𝒂𝒅𝒊𝒆, 𝒓𝒆𝒄𝒖𝒆́𝒓𝒅𝒂𝒍𝒐 𝒃𝒊𝒆𝒏, 𝒏𝒂𝒅𝒊𝒆 𝒆𝒔 𝒊𝒏𝒅𝒊𝒔𝒑𝒆𝒏𝒔𝒂𝒃𝒍𝒆 𝒆𝒏 𝒏𝒖𝒆𝒔𝒕𝒓𝒂𝒔 𝒗𝒊𝒅𝒂𝒔. 𝑷𝒓𝒐𝒃𝒂𝒃𝒍𝒆𝒎𝒆𝒏𝒕𝒆 𝒆𝒏 𝒆𝒔𝒕𝒐𝒔 𝒎𝒐𝒎𝒆𝒏𝒕𝒐𝒔 𝒑𝒊𝒆𝒏𝒔𝒆𝒔 𝒒𝒖𝒆 𝒏𝒂𝒅𝒂 𝒗𝒐𝒍𝒗𝒆𝒓𝒂́ 𝒂 𝒔𝒆𝒓 𝒍𝒐 𝒎𝒊𝒔𝒎𝒐 𝒆𝒏 𝒕𝒖 𝒗𝒊𝒅𝒂. 𝑪𝒓𝒆́𝒆𝒎𝒆 𝒒𝒖𝒆, 𝒄𝒖𝒂𝒏𝒅𝒐 𝒎𝒆𝒏𝒐𝒔 𝒍𝒐 𝒆𝒔𝒑𝒆𝒓𝒆𝒔, 𝒆𝒏𝒄𝒐𝒏𝒕𝒓𝒂𝒓𝒂́𝒔 𝒂 𝒂𝒍𝒈𝒖𝒊𝒆𝒏 𝒎𝒖𝒄𝒉𝒐 𝒎𝒆𝒋𝒐𝒓 𝒒𝒖𝒆 𝒆́𝒍/𝒆𝒍𝒍𝒂.`.trim()
- conn.sendMessage(m.chat, {text: text2, mentions: [_user, m.sender]}, {quoted: m})
-const stiker = await sticker(null, url, `+${m.sender.split('@')[0]} le dio besos a ${m.mentionedJid.map((user)=>(user === m.sender)? 'alguien ': `+${user.split('@')[0]}`).join(', ')}`); 
-conn.sendFile(m.chat, stiker, null, {asSticker: true}); 
-   } catch (e) { } 
- }; 
- handler.command = /^(animo|ánimo)$/i; 
- export default handler;
+handler.command = /^(animo|ánimo)$/i;
+handler.group = true;
+
+export default handler;
