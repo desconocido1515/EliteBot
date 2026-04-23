@@ -1,10 +1,6 @@
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-
-const handler = async (m, { conn }) => {
+let handler = async (m, { conn }) => {
   try {
-    // Usar la misma lógica que promote
+    // Usar la misma lógica de promote
     let mentionedJid = await m.mentionedJid;
     let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
     
@@ -25,7 +21,7 @@ const handler = async (m, { conn }) => {
     try {
       avatar = await conn.profilePictureUrl(who, 'image');
     } catch {
-      avatar = 'https://i.ibb.co/1ZxrXKJ/avatar-contact.jpg';
+      avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
     // Usar la API de some-random-api para efecto gay
@@ -37,35 +33,14 @@ const handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio después de la imagen (ruta corregida)
-    const audioPath = 'audios/gay.mp3';
-    if (fs.existsSync(audioPath)) {
-      const audioBuffer = fs.readFileSync(audioPath);
-      await conn.sendMessage(m.chat, {
-        audio: audioBuffer,
-        mimetype: 'audio/mpeg',
-        ptt: true
-      });
-    } else {
-      console.log('Audio no encontrado en:', audioPath);
-      // Intentar con ruta alternativa
-      const audioPath2 = './audios/gay.mp3';
-      if (fs.existsSync(audioPath2)) {
-        const audioBuffer = fs.readFileSync(audioPath2);
-        await conn.sendMessage(m.chat, {
-          audio: audioBuffer,
-          mimetype: 'audio/mpeg',
-          ptt: true
-        });
-      } else {
-        console.log('Audio no encontrado en ninguna ruta');
-      }
-    }
+    // Enviar audio desde la carpeta audios (tu estructura original)
+    let vn = './audios/gay.mp3';
+    await conn.sendFile(m.chat, vn, 'error.mp3', null, m, true, { type: 'audioMessage', ptt: true });
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
     
   } catch (error) {
-    console.error('Error al obtener la imagen:', error);
+    console.error('Error:', error);
     await conn.reply(m.chat, `☑️ No se pudo generar la imagen. El servicio puede estar temporalmente fuera de servicio.`, m, rcanal);
   }
 };
