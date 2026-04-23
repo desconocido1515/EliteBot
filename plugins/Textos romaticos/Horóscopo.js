@@ -1,80 +1,52 @@
-// plugins/aztro.js
+// plugins/horoscopo_opastro.js
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
-import fetch from 'node-fetch';
+const execAsync = promisify(exec);
 
-const handler = async (m, { conn, text, command }) => {
-  // Extraer el signo del comando (ej: "aztroaries" -> "aries")
-  let signo = '';
-  
-  if (command === 'aztro') {
-    // Si es .aztro aries
-    signo = text.toLowerCase().trim();
-    if (!signo) {
-      return conn.reply(m.chat, `☑️ *EJEMPLO:*\n.aztro aries\n.aztrogeminis\n.horocancer`, m, rcanal);
+let handler = async (m, { conn, text, command }) => {
+    // Configurar según tu comando
+    let signo = '';
+    if (command === 'horoscopo') {
+        signo = text.toLowerCase().trim();
+        if (!signo) {
+            return conn.reply(m.chat, `☑️ Usa: .horoscopo aries`, m, rcanal);
+        }
+    } else {
+        signo = command.replace('horo', '').toLowerCase();
     }
-  } else {
-    // Si es .aztroaries, .aztrogeminis, etc.
-    signo = command.replace('aztro', '').toLowerCase();
-  }
-  
-  // Lista de signos válidos
-  const signosValidos = [
-    'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-    'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
-  ];
-  
-  if (!signosValidos.includes(signo)) {
-    return conn.reply(m.chat, `☑️ *SIGNOS DISPONIBLES:*\n.aztro aries\n.aztro taurus\n.aztro gemini\n.aztro cancer\n.aztro leo\n.aztro virgo\n.aztro libra\n.aztro scorpio\n.aztro sagittarius\n.aztro capricorn\n.aztro aquarius\n.aztro pisces`, m, rcanal);
-  }
-  
-  try {
-    // Reaccionar
-    await conn.sendMessage(m.chat, {
-      react: { text: '🔮', key: m.key }
-    });
-    
-    // Llamar a la API Aztro (POST)
-    const url = `https://aztro.sameerkumar.website/?sign=${signo}&day=today`;
-    const response = await fetch(url, { method: 'POST' });
-    const data = await response.json();
-    
-    // Formatear respuesta
-    const nombreSigno = {
-      aries: '♈️ Aries', taurus: '♉️ Tauro', gemini: '♊️ Géminis',
-      cancer: '♋️ Cáncer', leo: '♌️ Leo', virgo: '♍️ Virgo',
-      libra: '♎️ Libra', scorpio: '♏️ Escorpio', sagittarius: '♐️ Sagitario',
-      capricorn: '♑️ Capricornio', aquarius: '♒️ Acuario', pisces: '♓️ Piscis'
+
+    // Mapeo de nombres al inglés que OpAstro entiende
+    const mapaSignos = {
+        aries: 'ARIES', tauro: 'TAURUS', geminis: 'GEMINI', cancer: 'CANCER',
+        leo: 'LEO', virgo: 'VIRGO', libra: 'LIBRA', escorpio: 'SCORPIO',
+        sagitario: 'SAGITTARIUS', capricornio: 'CAPRICORN', acuario: 'AQUARIUS', piscis: 'PISCES'
     };
-    
-    const mensaje = `
-*${nombreSigno[signo]}*
 
-📅 *Fecha:* ${data.current_date}
-🎨 *Color:* ${data.color}
-🔢 *Número de la suerte:* ${data.lucky_number}
-⏰ *Hora de la suerte:* ${data.lucky_time}
-😊 *Estado de ánimo:* ${data.mood}
-💕 *Compatibilidad:* ${data.compatibility}
+    const signoPython = mapaSignos[signo];
+    if (!signoPython) {
+        return conn.reply(m.chat, `☑️ Signo inválido. Ejemplo: .horoscopo aries`, m, rcanal);
+    }
 
-📖 *Descripción:*
-${data.description}
+    await conn.sendMessage(m.chat, { react: { text: '🔮', key: m.key } });
+    await conn.reply(m.chat, `☑️ Consultando astros para ${signo.toUpperCase()}...`, m, rcanal);
 
-🔮 *${data.date_range}*
-    `;
-    
-    await conn.reply(m.chat, mensaje, m, rcanal);
-    
-  } catch (error) {
-    console.error('Error en Aztro API:', error);
-    await conn.reply(m.chat, `☑️ Error al conectar con la API. Intenta más tarde.`, m, rcanal);
-  }
+    const fecha = new Date().toISOString().split('T')[0];
+    const comando = `opastro horoscope --period daily --sign ${signoPython} --target-date ${fecha}`;
+
+    try {
+        const { stdout, stderr } = await execAsync(comando);
+        if (stderr) console.error('Error OpAstro:', stderr);
+        
+        const mensaje = `☑️ *Horóscopo de ${signo.toUpperCase()}*\n📅 Fecha: ${fecha}\n✨ ${stdout.trim() || 'No prediction generated.'}`;
+        await conn.reply(m.chat, mensaje, m, rcanal);
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+
+    } catch (error) {
+        console.error('Error al ejecutar OpAstro:', error);
+        await conn.reply(m.chat, `☑️ Error generando el horóscopo.`, m, rcanal);
+    }
 };
 
-// Comandos disponibles
-handler.command = [
-  'aztro', 'aztroaries', 'aztrotaurus', 'aztrogemini', 'aztrocancer',
-  'aztroleo', 'aztrovirgo', 'aztrolibra', 'aztroscorpio', 'aztrosagittarius',
-  'aztrocapricorn', 'aztroaquarius', 'aztropisces'
-];
-
+handler.command = ['horoscopo', 'horoaries', 'horotauro', 'horogeminis', 'horocancer', 'horoleo', 'horovirgo', 'horolibra', 'horoescorpio', 'horosagitario', 'horocapricornio', 'horoacuario', 'horopiscis'];
 export default handler;
