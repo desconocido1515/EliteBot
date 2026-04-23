@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { exec } from 'child_process';
 
 let handler = async (m, { conn }) => {
   try {
@@ -29,16 +30,16 @@ let handler = async (m, { conn }) => {
       avatar = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
     }
     
-    // Usar la API de some-random-api para efecto gay
-    const url = `https://some-random-api.com/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
+    // Usar la API de some-random-api.ml (la que funcionaba)
+    const apiUrl = `https://some-random-api.ml/canvas/gay?avatar=${encodeURIComponent(avatar)}`;
     
     // Enviar imagen con el texto
     await conn.sendMessage(m.chat, {
-      image: { url: url },
+      image: { url: apiUrl },
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Descargar audio y guardar temporalmente
+    // Descargar audio
     const audioUrl = 'https://files.catbox.moe/2ksqaa.mp3';
     const audioBuffer = await (await fetch(audioUrl)).buffer();
     
@@ -49,7 +50,7 @@ let handler = async (m, { conn }) => {
     const fs = await import('fs');
     fs.writeFileSync(tempFile, audioBuffer);
     
-    // Convertir a opus usando ffmpeg (misma lógica que tu plugin de audio)
+    // Convertir a opus usando ffmpeg
     exec(`ffmpeg -i "${tempFile}" -vn -c:a libopus -b:a 128k "${outFile}"`, async (err) => {
       try { unlinkSync(tempFile) } catch {}
       
