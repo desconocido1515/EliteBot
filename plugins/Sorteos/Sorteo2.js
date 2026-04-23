@@ -5,7 +5,8 @@ let handler = async (m, { conn, text, participants }) => {
     return conn.reply(
       m.chat,
       `⚠️ Ejemplo de uso:\n.sorteo2 Los 2 seleccionados van para pvp`,
-      m
+      m,
+      rcanal
     );
   }
 
@@ -15,7 +16,7 @@ let handler = async (m, { conn, text, participants }) => {
     .filter(v => v !== conn.user.jid); // quitar bot
 
   if (users.length < 2) {
-    return conn.reply(m.chat, '❌ No hay suficientes participantes', m);
+    return conn.reply(m.chat, '❌ No hay suficientes participantes', m, rcanal);
   }
 
   // 🔥 Elegir 2 al azar
