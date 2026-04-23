@@ -1,4 +1,4 @@
-/*import fetch from 'node-fetch';
+import fetch from 'node-fetch';
 
 export async function before(m, { conn }) {
   if (global._cmdHandled) return;
@@ -29,7 +29,7 @@ export async function before(m, { conn }) {
 'clk', 'clktpg', 'rbclk',
 'combobr', 'combode',
 'cr7', 'messi',
-'dragonbz', 'goku', 'vegueta',
+'dragonbz', 'goku', 'vegueta','menuhoroscopo', 'menuhoróscopo', 'horóscopo', 'horoscopo', 
 'inactivoff', 'horoaries', 'infipg', 'infitpg',
 'interna4vs4', 'interna6vs6',
 'listacuadrilatero', 'listapgnuestra', 'listavs',
@@ -125,4 +125,4 @@ para encontrar lo que buscas.`
     global._cmdHandled = false;
   }, 1000);
 }
-*/
+
