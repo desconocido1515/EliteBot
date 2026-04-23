@@ -35,13 +35,13 @@ let handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio usando la misma lógica que tu plugin de bienvenida
-    const audioUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/gay.mp3';
+    // Usar una URL de audio que SÍ funciona (de tu plugin de bienvenida)
+    const audioUrl = 'https://files.catbox.moe/kgykxt.ogg';
     const audio = await (await fetch(audioUrl)).buffer();
     
     await conn.sendMessage(m.chat, {
       audio: audio,
-      mimetype: 'audio/mpeg',
+      mimetype: 'audio/ogg; codecs=opus',
       ptt: true
     });
     
