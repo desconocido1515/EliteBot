@@ -5,7 +5,9 @@ import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 const STYLED_THUMBNAIL = 'https://raw.githubusercontent.com/IrokzDal/data/main/1776950526519.jpeg';
 const STYLED_SOURCE_URL = 'https://api-adonix.ultraplus.click';
 
-// DOCUMENTO CON NOMBRE VACÍO (no se verá texto)
+// Carácter invisible (espacio de ancho cero)
+const INVISIBLE_CHAR = '\u200B';
+
 const DOCUMENT_TEMPLATE = {
   url: 'https://mmg.whatsapp.net/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc',
   mimetype: 'application/pdf',
@@ -13,7 +15,7 @@ const DOCUMENT_TEMPLATE = {
   fileLength: '999999999999',
   pageCount: 0,
   mediaKey: 'MWO6fI223TY8T0i9onNcwNBBPldWfwp1j1FPKCiJFzw=',
-  fileName: ' ',
+  fileName: INVISIBLE_CHAR,
   fileEncSha256: 'ZS8v9tio2un1yWVOOG3lwBxiP+mNgaKPY9+wl5pEoi8=',
   directPath: '/v/t62.7119-24/539012045_745537058346694_1512031191239726227_n.enc'
 };
@@ -152,7 +154,7 @@ let handler = async (m, { conn }) => {
   const interactiveMessage = createStyledInteractive({
     mentionJids: [m.sender],
     externalTitle: '🌟 PRUEBA DE PORTADA 🌟',
-    bodyText: 'Esta es una prueba para ver si la imagen de portada se muestra correctamente.\n\nSi ves la imagen arriba, la portada funciona.\nSi ves "Choso" o "PDF", el documento sigue visible.',
+    bodyText: 'Esta es una prueba con carácter invisible.\n\nSi ves la imagen y NO ves "Choso" ni "PDF", el truco funcionó.',
     footerText: 'Elite Bot Global - Test',
     sections: null,
     buttons: []
