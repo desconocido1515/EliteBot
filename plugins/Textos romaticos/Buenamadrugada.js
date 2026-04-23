@@ -3,16 +3,16 @@ import { sticker } from '../../lib/sticker.js';
 
 const handler = async (m, { conn, text, usedPrefix }) => {
   try {
-    // Validar mención o respuesta
+    // Validar mención o respuesta (funciona de las dos maneras)
     let mentionedJid = await m.mentionedJid;
     let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
     
     if (!usuario) {
-      return conn.reply(m.chat, `☑️ ETIQUETA A LA PERSONA\n\n📌 *Ejemplo:*\n.buenamadrugada @usuario`, m, rcanal);
+      return conn.reply(m.chat, `☑️ ETIQUETA O RESPONDE AL MENSAJE DE LA PERSONA\n\n📌 *Ejemplos:*\n.buenamadrugada @usuario\n(Responde al mensaje de alguien con .buenamadrugada)`, m, rcanal);
     }
     
     if (usuario === m.sender) {
-      return conn.reply(m.chat, `☑️ No puedes desearte buena madrugada a ti mismo. Etiqueta a otra persona.`, m, rcanal);
+      return conn.reply(m.chat, `☑️ No puedes desearte buena madrugada a ti mismo. Etiqueta o responde a otra persona.`, m, rcanal);
     }
     
     const nombreUsuario = m.pushName || m.sender.split('@')[0];
@@ -43,7 +43,7 @@ const handler = async (m, { conn, text, usedPrefix }) => {
     });
     
     // Obtener imagen
-    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg';
+    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/noche.jpg';
     
     // Enviar imagen con el mensaje
     await conn.sendMessage(m.chat, {
