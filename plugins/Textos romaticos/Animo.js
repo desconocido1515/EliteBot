@@ -45,7 +45,7 @@ const handler = async (m, { conn, text, usedPrefix }) => {
     });
     
     // Obtener imagen
-    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/icono.jpg';
+    const imageUrl = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/animo.jpeg';
     
     // Enviar imagen con el mensaje de ánimo
     await conn.sendMessage(m.chat, {
