@@ -8,7 +8,7 @@ const imagenes = {
   buenasnoches: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/noche.jpg',
   buenosdias: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/dias.jpg',
   buenastardes: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/tardes.jpg',
-  carta1: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/carta1.jpg',
+  carta1: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/carta2.jpg',
   carta2: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/carta2.jpg',
   carta3: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/carta3.jpg',
   confesion: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/confesion.jpg'
