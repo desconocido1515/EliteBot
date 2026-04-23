@@ -54,13 +54,14 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   let text = args.join(' ').trim();
   if (!text && !quotedText) {
-    return m.reply(
+    return conn.reply(m.chat,
       `✏️ *Crea una imagen tipo sticker con un mensaje personalizado*\n\n` +
       `📌 *Ejemplo:*\n` +
       `• ${usedPrefix + command} [color] [texto]\n` +
-      `• .opnion2 morado Elite Bot\n\n` +
+      `• .opinion2 morado Elite Bot\n\n` +
       `🎨 *Colores disponibles:*\n` +
-      `${Object.keys(colors).map(c => `- ${c}`).join('\n')}`
+      `${Object.keys(colors).map(c => `- ${c}`).join('\n')}`,
+      m, rcanal
     )
   }
 
@@ -114,7 +115,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   } catch (e) {
     console.error('❌ Error en qc2:', e);
-    await m.reply('❌ Ocurrió un error al generar la imagen.');
+    await conn.reply(m.chat, '❌ Ocurrió un error al generar la imagen.', m, rcanal);
   }
 }
 
