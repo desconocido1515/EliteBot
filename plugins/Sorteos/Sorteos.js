@@ -10,6 +10,9 @@ import path from 'path'
 
 let user = a => '@' + a.split('@')[0]
 
+// URL de la imagen (cámbiala por una válida)
+const IMAGEN_URL = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/sorteo.jpeg'
+
 // ==================== SORTEO (1 participante) ====================
 async function handlerSorteo(m, { groupMetadata, command, conn, text, usedPrefix }) {
   if (!text) {
@@ -42,7 +45,14 @@ async function handlerSorteo(m, { groupMetadata, command, conn, text, usedPrefix
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
+  
+  // Enviar imagen con el texto
+  await conn.sendMessage(m.chat, {
+    image: { url: IMAGEN_URL },
+    caption: txt.trim(),
+    mentions: conn.parseMention(txt)
+  }, { quoted: m });
+  
   conn.sendFile(m.chat, vn, '🏆ACERQUESE A RECLAMAR SU PREMIO🏅', null, m, true, {
     type: 'audioMessage',
     ptt: true
@@ -83,11 +93,9 @@ async function handlerSorteo2(m, { groupMetadata, command, conn, text, usedPrefi
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
   
-  // Enviar imagen (la URL que tenías)
   await conn.sendMessage(m.chat, {
-    image: { url: 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/sorteo.jpeg' },
+    image: { url: IMAGEN_URL },
     caption: txt.trim(),
     mentions: conn.parseMention(txt)
   }, { quoted: m });
@@ -134,7 +142,13 @@ async function handlerSorteo3(m, { groupMetadata, command, conn, text, usedPrefi
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
+  
+  await conn.sendMessage(m.chat, {
+    image: { url: IMAGEN_URL },
+    caption: txt.trim(),
+    mentions: conn.parseMention(txt)
+  }, { quoted: m });
+  
   conn.sendFile(m.chat, vn, '🏆ACERQUESE A RECLAMAR SU PREMIO🏅', null, m, true, {
     type: 'audioMessage',
     ptt: true
@@ -179,7 +193,13 @@ async function handlerSorteo4(m, { groupMetadata, command, conn, text, usedPrefi
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
+  
+  await conn.sendMessage(m.chat, {
+    image: { url: IMAGEN_URL },
+    caption: txt.trim(),
+    mentions: conn.parseMention(txt)
+  }, { quoted: m });
+  
   conn.sendFile(m.chat, vn, '🏆ACERQUESE A RECLAMAR SU PREMIO🏅', null, m, true, {
     type: 'audioMessage',
     ptt: true
@@ -226,7 +246,13 @@ async function handlerSorteo5(m, { groupMetadata, command, conn, text, usedPrefi
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
+  
+  await conn.sendMessage(m.chat, {
+    image: { url: IMAGEN_URL },
+    caption: txt.trim(),
+    mentions: conn.parseMention(txt)
+  }, { quoted: m });
+  
   conn.sendFile(m.chat, vn, '🏆ACERQUESE A RECLAMAR SU PREMIO🏅', null, m, true, {
     type: 'audioMessage',
     ptt: true
@@ -275,7 +301,13 @@ async function handlerSorteo6(m, { groupMetadata, command, conn, text, usedPrefi
       conn.sendPresenceUpdate('composing', m.chat);
     }
   }
-  await conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, { quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100 });
+  
+  await conn.sendMessage(m.chat, {
+    image: { url: IMAGEN_URL },
+    caption: txt.trim(),
+    mentions: conn.parseMention(txt)
+  }, { quoted: m });
+  
   conn.sendFile(m.chat, vn, '🏆ACERQUESE A RECLAMAR SU PREMIO🏅', null, m, true, {
     type: 'audioMessage',
     ptt: true
@@ -314,4 +346,4 @@ export default handler
 
 function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)]
-                      }
+}
