@@ -1,5 +1,6 @@
 import axios from 'axios';
 import fs from 'fs';
+import path from 'path';
 
 const handler = async (m, { conn }) => {
   try {
@@ -36,8 +37,8 @@ const handler = async (m, { conn }) => {
       caption: `☑️ *MIREN A ESTE GAY JAJAJAJA* 👬🏻 🏳️‍🌈\n\n👤 *Usuario:* @${name}\n\nElite Bot Global - Since 2023®`
     });
     
-    // Enviar audio después de la imagen
-    const audioPath = './audios/gay.mp3';
+    // Enviar audio después de la imagen (ruta corregida)
+    const audioPath = 'audios/gay.mp3';
     if (fs.existsSync(audioPath)) {
       const audioBuffer = fs.readFileSync(audioPath);
       await conn.sendMessage(m.chat, {
@@ -47,6 +48,18 @@ const handler = async (m, { conn }) => {
       });
     } else {
       console.log('Audio no encontrado en:', audioPath);
+      // Intentar con ruta alternativa
+      const audioPath2 = './audios/gay.mp3';
+      if (fs.existsSync(audioPath2)) {
+        const audioBuffer = fs.readFileSync(audioPath2);
+        await conn.sendMessage(m.chat, {
+          audio: audioBuffer,
+          mimetype: 'audio/mpeg',
+          ptt: true
+        });
+      } else {
+        console.log('Audio no encontrado en ninguna ruta');
+      }
     }
     
     await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
