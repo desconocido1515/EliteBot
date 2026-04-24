@@ -42,11 +42,19 @@ const handlerNombre = async (m, { conn, text }) => {
   }
   
   try {
+    // Intentar con updateProfileName (nombre del bot)
     await conn.updateProfileName(text)
-    return conn.reply(m.chat, `☑️ *NOMBRE CAMBIADO CON ÉXITO*`, m, rcanal)
+    return conn.reply(m.chat, `☑️ *NOMBRE CAMBIADO CON ÉXITO*\n\n📌 Nuevo nombre: ${text}`, m, rcanal)
   } catch (e) {
-    console.log(e)
-    return conn.reply(m.chat, `☑️ Ocurrió un error al cambiar el nombre.`, m, rcanal)
+    console.log('Error con updateProfileName:', e)
+    try {
+      // Alternativa: updateName
+      await conn.updateName(text)
+      return conn.reply(m.chat, `☑️ *NOMBRE CAMBIADO CON ÉXITO*\n\n📌 Nuevo nombre: ${text}`, m, rcanal)
+    } catch (e2) {
+      console.log('Error con updateName:', e2)
+      return conn.reply(m.chat, `☑️ Ocurrió un error al cambiar el nombre. Verifica que el método sea correcto.`, m, rcanal)
+    }
   }
 }
 
@@ -58,7 +66,7 @@ const handlerBio = async (m, { conn, text }) => {
   
   try {
     await conn.updateProfileStatus(text)
-    return conn.reply(m.chat, `☑️ *BIOGRAFÍA CAMBIADA CON ÉXITO* ✅`, m, rcanal)
+    return conn.reply(m.chat, `☑️ *BIOGRAFÍA CAMBIADA CON ÉXITO* ✅\n\n📌 Nueva bio: ${text}`, m, rcanal)
   } catch (e) {
     console.log(e)
     return conn.reply(m.chat, `☑️ Error al cambiar la biografía del bot.`, m, rcanal)
