@@ -5,7 +5,7 @@ let listasGrupos = new Map();
 let mensajesGrupos = new Map();
 let parejasConfirmadas = new Map();
 
-// --- FUNCIONES AUXILIARES --- (se mantienen igual)
+// --- FUNCIONES AUXILIARES ---
 const getListasGrupo = (groupId) => {
     if (!listasGrupos.has(groupId)) {
         listasGrupos.set(groupId, { aceptar: ['➤'], rechazar: ['➤'] });
@@ -22,7 +22,7 @@ let handler = async (m, { conn }) => {
     const msgText = m.text?.toLowerCase();
     const groupId = m.chat;
 
-    // Detectar respuesta de botones (se mantiene igual)
+    // Detectar respuesta de botones
     const response = m.message?.buttonsResponseMessage?.selectedButtonId || 
                     m.message?.interactiveResponseMessage?.nativeFlowResponseButtonResponse?.id || 
                     msgText || '';
@@ -107,25 +107,22 @@ let handler = async (m, { conn }) => {
         return;
     }
 
-    // --- COMANDO .SERNOVIOS ---
+    // --- COMANDO .SERNOVIOS (con lógica de promote) ---
     if (msgText?.startsWith('.sernovios')) {
-        const mentionedJid = m.mentionedJid?.[0];
-        if (!mentionedJid) {
-            await conn.sendMessage(m.chat, { 
-                text: "❌ *Menciona a alguien*\nEjemplo: .sernovios @usuario" 
-            });
-            return;
+        // Usar la misma lógica que promote para obtener la mención
+        let mentionedJid = await m.mentionedJid;
+        let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
+        
+        if (!usuario) {
+            return conn.reply(m.chat, `☑️ *DEBES MENCIONAR O RESPONDER A UN USUARIO*\n\n📌 *Ejemplo:*\n.sernovios @usuario\n\n📌 *O responde al mensaje de la persona*`, m, rcanal);
         }
 
-        if (mentionedJid === m.sender) {
-            await conn.sendMessage(m.chat, { 
-                text: "🤡 *Auto-amor*\nNo puedes ser tu propio novio, eso es deprimente." 
-            });
-            return;
+        if (usuario === m.sender) {
+            return conn.reply(m.chat, `☑️ No puedes ser tu propio novio/a. Menciona a otra persona.`, m, rcanal);
         }
 
         const parejas = parejasConfirmadas.get(groupId) || [];
-        if (parejas.some(par => par.includes(m.sender) || par.includes(mentionedJid))) {
+        if (parejas.some(par => par.includes(m.sender) || par.includes(usuario))) {
             await conn.sendMessage(m.chat, { 
                 text: "⚡ *Infiel detectado*\nYa tienes pareja, ¿o te gusta el drama? 👀" 
             });
@@ -133,9 +130,9 @@ let handler = async (m, { conn }) => {
         }
 
         const nombreRemitente = await conn.getName(m.sender);
-        const nombreMencionado = await conn.getName(mentionedJid);
+        const nombreMencionado = await conn.getName(usuario);
 
-        mensajesGrupos.set(groupId, { proponente: m.sender, propuesto: mentionedJid });
+        mensajesGrupos.set(groupId, { proponente: m.sender, propuesto: usuario });
 
         const buttons = [
             { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "Aceptar", id: "aceptar" }) },
@@ -145,7 +142,7 @@ let handler = async (m, { conn }) => {
         const mensaje = generateWAMessageFromContent(m.chat, {
             viewOnceMessage: {
                 message: {
-                    messageContextInfo: { deviceListMetadata: {}, mentionedJid: [mentionedJid] },
+                    messageContextInfo: { deviceListMetadata: {}, mentionedJid: [usuario] },
                     interactiveMessage: proto.Message.InteractiveMessage.create({
                         body: { 
                             text: `💘 *¡DECLARACIÓN!*\n» ${nombreRemitente} quiere ser tu novio/a.\n» Si aceptas, serás suyo/a... si no, igual. 😏` 
