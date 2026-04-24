@@ -37,7 +37,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   global.db.data.users[jid].globalBanReason = text || 'Sin especificar'
   global.db.data.users[jid].globalBanDate = Date.now()
   
-  let nombre = await conn.getName(jid).catch(() => numero)
+  let nombre = numero
+  try {
+    const name = await conn.getName(jid)
+    if (name) nombre = name
+  } catch (e) {
+    nombre = numero
+  }
   
   let mensaje = `☑️ *USUARIO BANEADO GLOBALMENTE*\n\n📌 *Usuario:* ${nombre}\n📌 *Número:* ${numero}\n📌 *Razón:* ${text}\n\n🔒 El usuario ha sido baneado y no podrá usar ningún comando del bot en ningún grupo.`
   
@@ -75,7 +81,13 @@ let handlerUnban = async (m, { conn, text }) => {
   global.db.data.users[jid].globalBanReason = null
   global.db.data.users[jid].globalBanDate = null
   
-  let nombre = await conn.getName(jid).catch(() => numero)
+  let nombre = numero
+  try {
+    const name = await conn.getName(jid)
+    if (name) nombre = name
+  } catch (e) {
+    nombre = numero
+  }
   
   await conn.reply(m.chat, `☑️ *USUARIO DESBANEADO GLOBALMENTE*\n\n📌 *Usuario:* ${nombre}\n📌 *Número:* ${numero}\n✅ Ahora puede usar los comandos del bot nuevamente.`, m, rcanal)
 }
