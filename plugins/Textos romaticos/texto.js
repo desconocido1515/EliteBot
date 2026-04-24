@@ -1,4 +1,4 @@
-//import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import fs from 'fs';
 import path from 'path';
 
@@ -21,33 +21,38 @@ const colores = {
   lavanda: ['#E6E6FA', '#F3E5F5'],
   menta: ['#98FF98', '#D0F0C0'],
   esmeralda: ['#50C878', '#A8E6A2'],
-  carbón: ['#333333', '#999999'],
+  carbon: ['#333333', '#999999'],
   azulmarino: ['#001F3F', '#003366'],
   ocre: ['#CC7722', '#FFD39B'],
   salmon: ['#FA8072', '#FFE4E1'],
   perla: ['#F8F6F0', '#EDEAE0'],
   tierra: ['#A0522D', '#D2B48C'],
-  púrpura: ['#800080', '#D8BFD8'],
+  purpura: ['#800080', '#D8BFD8'],
   acero: ['#4682B4', '#B0C4DE']
 };
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
   const text = args.join(' ').trim();
+  
   if (!text) {
-    return m.reply(
-      `✏️ Usa el comando así:\n\n*.${command} [color opcional] tu mensaje*\n\nEjemplo:\n*.${command} azul Hola grupo*\n\nColores disponibles:\n` +
-      Object.keys(colores).sort().join(', ')
-    );
+    return conn.reply(m.chat,
+      `✏️ Usa el comando así:\n\n*.${command} [color opcional] tu mensaje*\n\n📌 *Ejemplo:*\n*.${command} azul Hola grupo*\n\n🎨 *Colores disponibles:*\n` +
+      Object.keys(colores).sort().join(', '), m, rcanal);
   }
 
   const [colorElegido, ...contenidoArr] = text.split(' ');
   const coloresGrad = colores[colorElegido.toLowerCase()] || colores['azul'];
   const contenido = colores[colorElegido.toLowerCase()] ? contenidoArr.join(' ') : text;
   const displayName = m.pushName || 'Usuario';
+  
   let avatarUrl = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
   try {
     avatarUrl = await conn.profilePictureUrl(m.sender, 'image');
   } catch {}
+
+  // Reacción al inicio
+  await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } });
+  await conn.reply(m.chat, `☑️ Generando imagen, por favor espera...`, m, rcanal);
 
   if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
 
@@ -61,13 +66,17 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   draw.fillRect(0, 0, 1080, 1080);
 
   // Avatar circular
-  const avatar = await loadImage(avatarUrl);
-  draw.save();
-  draw.beginPath();
-  draw.arc(100, 100, 80, 0, Math.PI * 2);
-  draw.clip();
-  draw.drawImage(avatar, 20, 20, 160, 160);
-  draw.restore();
+  try {
+    const avatar = await loadImage(avatarUrl);
+    draw.save();
+    draw.beginPath();
+    draw.arc(100, 100, 80, 0, Math.PI * 2);
+    draw.clip();
+    draw.drawImage(avatar, 20, 20, 160, 160);
+    draw.restore();
+  } catch (e) {
+    console.error('Error cargando avatar:', e);
+  }
 
   // Nombre del usuario
   draw.font = 'bold 42px Sans-serif';
@@ -102,20 +111,26 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   });
 
   // Logo
-  const logo = await loadImage('https://files.catbox.moe/9o4ugy.jpg');
-  draw.drawImage(logo, canvas.width - 180, canvas.height - 180, 140, 140);
+  try {
+    const logo = await loadImage('https://files.catbox.moe/9o4ugy.jpg');
+    draw.drawImage(logo, canvas.width - 180, canvas.height - 180, 140, 140);
+  } catch (e) {
+    console.error('Error cargando logo:', e);
+  }
 
   // Guardar y enviar
   const filePath = `./tmp/texto-${Date.now()}.png`;
   const out = fs.createWriteStream(filePath);
   const stream = canvas.createPNGStream();
   stream.pipe(out);
+  
   out.on('finish', async () => {
     await conn.sendMessage(m.chat, {
       image: { url: filePath },
-      caption: `🖼 *Imagen generada por EliteBot*\n\nColor: *${colorElegido.toLowerCase() || 'azul'}*\nAutor: *${displayName}*`
-    }, { quoted: m });
+      caption: `☑️ *IMAGEN GENERADA*\n\n🎨 *Color:* ${colorElegido.toLowerCase() || 'azul'}\n👤 *Autor:* ${displayName}\n\nElite Bot Global - Since 2023®`
+    });
     fs.unlinkSync(filePath);
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
   });
 };
 
