@@ -1,8 +1,5 @@
 import { spawn } from 'child_process';
-import { join } from 'path';
 import fs from 'fs';
-
-const __dirname = global.__dirname;
 
 const colores = {
   rojo: ['#F44336', '#FFCDD2'],
@@ -45,12 +42,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   const [colorElegido, ...contenidoArr] = text.split(' ');
   const coloresGrad = colores[colorElegido.toLowerCase()] || colores['azul'];
   const contenido = colores[colorElegido.toLowerCase()] ? contenidoArr.join(' ') : text;
-  const displayName = m.pushName || 'Usuario';
-  
-  let avatarUrl = 'https://telegra.ph/file/24fa902ead26340f3df2c.png';
-  try {
-    avatarUrl = await conn.profilePictureUrl(m.sender, 'image');
-  } catch {}
+  const displayName = m.pushName || m.sender.split('@')[0];
 
   // Reacción al inicio
   await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } });
@@ -58,61 +50,39 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
   
-  // Descargar avatar temporalmente
-  const avatarPath = `./tmp/avatar-${Date.now()}.jpg`;
-  const avatarBuffer = await (await fetch(avatarUrl)).buffer();
-  fs.writeFileSync(avatarPath, avatarBuffer);
-  
-  // Plantilla base (creamos un gradiente con ImageMagick)
   const bgPath = `./tmp/bg-${Date.now()}.png`;
   const outputPath = `./tmp/texto-${Date.now()}.png`;
   
   // Crear gradiente como fondo
   await new Promise((resolve, reject) => {
-    const args = [
+    const argsConv = [
       '-size', '1080x1080',
       'gradient:' + coloresGrad[0] + '-' + coloresGrad[1],
       bgPath
     ];
-    const proc = spawn('convert', args);
+    const proc = spawn('convert', argsConv);
     proc.on('error', reject);
     proc.on('close', resolve);
   });
   
+  // Escapar texto para ImageMagick
+  const textoEscapado = contenido.replace(/[!@#$%^&*()]/g, '\\$&');
+  const nombreEscapado = displayName.replace(/[!@#$%^&*()]/g, '\\$&');
+  
   // Construir comando de ImageMagick
   const convertArgs = [
     bgPath,
-    // Avatar circular (opcional, si tienes avatar)
-    '(',
-    avatarPath,
-    '-resize', '160x160',
-    '-alpha', 'set',
-    '-background', 'none',
-    '-gravity', 'center',
-    '-extent', '160x160',
-    ')',
-    '-geometry', '+20+20',
-    '-compose', 'over',
-    '-composite',
-    // Texto del usuario
+    // Texto del usuario (nombre)
     '-font', 'Sans-serif',
-    '-pointsize', '42',
+    '-pointsize', '50',
     '-fill', 'white',
-    '-annotate', '+220+100', displayName,
-    // Texto principal
+    '-annotate', '+50+100', nombreEscapado,
+    // Texto principal centrado
     '-font', 'Sans-serif',
-    '-pointsize', '58',
+    '-pointsize', '60',
     '-fill', 'white',
     '-gravity', 'center',
-    '-annotate', '0', contenido,
-    // Logo
-    '(',
-    'https://files.catbox.moe/9o4ugy.jpg',
-    '-resize', '140x140',
-    ')',
-    '-geometry', '+940+940',
-    '-compose', 'over',
-    '-composite',
+    '-annotate', '0', textoEscapado,
     outputPath
   ];
   
@@ -125,12 +95,11 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   // Enviar imagen
   await conn.sendMessage(m.chat, {
     image: { url: outputPath },
-    caption: `☑️ *IMAGEN GENERADA*\n\n🎨 *Color:* ${colorElegido.toLowerCase() || 'azul'}\n👤 *Autor:* ${displayName}\n\nElite Bot Global - Since 2023®`
+    caption: `☑️ *IMAGEN GENERADA*\n\n🎨 *Color:* ${colorElegido.toLowerCase() || 'azul'}\n👤 *Autor:* ${displayName}\n📝 *Texto:* ${contenido.substring(0, 50)}${contenido.length > 50 ? '...' : ''}\n\nElite Bot Global - Since 2023®`
   });
   
   // Limpiar archivos temporales
   try {
-    fs.unlinkSync(avatarPath);
     fs.unlinkSync(bgPath);
     fs.unlinkSync(outputPath);
   } catch (e) {}
