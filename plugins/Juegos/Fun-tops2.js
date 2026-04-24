@@ -1,3 +1,5 @@
+
+
 import util from 'util'
 import path from 'path' 
 
@@ -9,6 +11,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
     // Función para obtener N participantes únicos aleatorios
     const obtenerUnicos = (cantidad) => {
         if (participantes.length < cantidad) return null
+        // Mezclar array y tomar los primeros 'cantidad'
         let shuffled = [...participantes]
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -17,34 +20,15 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
         return shuffled.slice(0, cantidad)
     }
     
-    // Función para obtener el nombre del contacto (si tiene nombre guardado)
-    const obtenerNombre = async (jid) => {
-        try {
-            const name = await conn.getName(jid)
-            return name || jid.split('@')[0]
-        } catch (e) {
-            return jid.split('@')[0]
-        }
-    }
-    
     // Función para extraer número del JID
     const num = (jid) => jid.split('@')[0]
-    
-    // Función para enviar mensaje con rcanal
-    const enviar = (texto, mentions = []) => {
-        conn.reply(m.chat, texto, m, rcanal, { mentions })
-    }
-    
-    // Función para generar menciones con nombre real
-    const generarMencion = (jid) => {
-        // Devolvemos el JID para la mención, el bot se encarga de mostrar el nombre
-        return jid
-    }
     
     // Validación genérica
     const validarParticipantes = (necesarios, comandoNombre) => {
         if (participantes.length < necesarios) {
-            enviar(`⚠️ *${comandoNombre}*\n\n❌ *Hola humano, no hay suficientes integrantes.*\n✅ *Activa este grupo* con al menos ${necesarios} participantes.`)
+            conn.sendMessage(m.chat, { 
+                text: `⚠️ *${comandoNombre}*\n\n❌ *Hola humano, no hay suficientes integrantes.*\n✅ *Activa este grupo* con al menos ${necesarios} participantes.` 
+            }, { quoted: m })
             return false
         }
         return true
@@ -69,7 +53,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- ☠️ @${num(i)}_* ☠️
 *_10.- ☠️ @${num(j)}_* ☠️`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP COMPE (10 únicos) ==========
@@ -91,7 +75,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🇧🇷 @${num(i)}_* 🇧🇷
 *_10.- 🇧🇷 @${num(j)}_* 🇧🇷`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== CLASIFICATORIA (3 únicos) ==========
@@ -109,7 +93,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 ¡𝑳𝑳𝑬𝑽𝑬𝑵 𝑯𝑨𝑩𝑰𝑳𝑰𝑫𝑨𝑫𝑬𝑺 𝒀 𝑴𝑨𝑺𝑪𝑶𝑻𝑨, 𝑽𝑨𝑴𝑶𝑺 𝑨 𝑷𝑹𝑬𝑵𝑫𝑬𝑹 𝑭𝑶𝑭𝑶𝑮𝑶 𝑬𝑵 𝑩𝑹!`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== DUELO (3 únicos) ==========
@@ -127,7 +111,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 ¡𝑳𝑳𝑬𝑽𝑬𝑵 𝑯𝑨𝑩𝑰𝑳𝑰𝑫𝑨𝑫𝑬𝑺 𝒀 𝑴𝑨𝑺𝑪𝑶𝑻𝑨, 𝑽𝑨𝑴𝑶𝑺 𝑨 𝑷𝑹𝑬𝑵𝑫𝑬𝑹 𝑭𝑶𝑭𝑶𝑮𝑶 𝑬𝑵 𝑫𝑬!`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== DUO (1 único) ==========
@@ -143,7 +127,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 ¡𝑺𝑬𝑹𝑬 𝑻𝑼 𝑫𝑼́𝑶 𝑫𝑰𝑵𝑨́𝑴𝑰𝑪𝑶 𝑴𝑨𝑺 𝑶𝑻𝑨𝑲𝑼!`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== COMPE (10 únicos) ==========
@@ -168,7 +152,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 𝑸𝑼𝑰𝑬𝑵 𝑵𝑶 𝑪𝑶𝑵𝑭𝑰𝑹𝑴𝑬 𝑫𝑬 𝑳𝑶𝑺 𝑴𝑬𝑵𝑪𝑰𝑶𝑵𝑨𝑫𝑶𝑺  𝑴𝑬𝑪𝑶 𝒀 𝑮𝑨𝒀.🏳️‍🌈`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP UMP (10 únicos) ==========
@@ -190,7 +174,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 👹 @${num(i)}_* 👹
 *_10.- 👹 @${num(j)}_* 👹`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP FIELES (10 únicos) ==========
@@ -212,7 +196,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 👩🏻‍❤️‍👨🏻 @${num(i)}_* 👩🏻‍❤️‍👨🏻
 *_10.- 👩🏻‍❤️‍👨🏻 @${num(j)}_* 👩🏻‍❤️‍👨🏻`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP MAPA (10 únicos) ==========
@@ -234,7 +218,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 💀 @${num(i)}_* 💀
 *_10.- 💀 @${num(j)}_* 💀`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP JUGADORES (10 únicos) ==========
@@ -256,7 +240,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🎮 @${num(i)}_* 🎮
 *_10.- 🎮 @${num(j)}_* 🎮`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP INFIELES (10 únicos) ==========
@@ -278,7 +262,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🫣 @${num(i)}_* 🫣
 *_10.- 🫣 @${num(j)}_* 🫣`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP BINARIOS (10 únicos) ==========
@@ -300,7 +284,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🍌 @${num(i)}_* 🍌
 *_10.- 🍌 @${num(j)}_* 🍌`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP ALCOHOLICOS (10 únicos) ==========
@@ -322,7 +306,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🍻 @${num(i)}_* 🍺
 *_10.- 🍻 @${num(j)}_* 🍺`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP SIDOSOS (10 únicos) ==========
@@ -344,7 +328,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 *_9.- 🦠 @${num(i)}_* 🦠
 *_10.- 🦠 @${num(j)}_* 🦠`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP CACHUDOS (10 únicos) ==========
@@ -368,7 +352,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 *_EL PRIMERO EL MAS CACHUD@_*🤪`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP CHICHONAS (10 únicos) ==========
@@ -392,7 +376,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 *_LA 5 ESTA COGIBLE_*🤫`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP CULONAS (10 únicos) ==========
@@ -416,7 +400,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 *_LA PRIMERA ESTA COGIBLE_*🥵`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
     
     // ========== TOP FEOS (10 únicos) ==========
@@ -440,7 +424,7 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
 
 *_EL 1 Y 10 LOS MAS FE@S_*🤢`
         
-        enviar(texto, seleccion)
+        conn.sendMessage(m.chat, { text: texto, mentions: seleccion }, { quoted: m })
     }
    
 }
