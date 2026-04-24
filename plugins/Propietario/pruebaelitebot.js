@@ -9,6 +9,39 @@ function msToDate(ms) {
   return [d, ' *Días*\n ', h, ' *Horas*\n ', m, ' *Minutos*\n ', s, ' *Segundos* '].map(v => v.toString().padStart(2, 0)).join('')
 }
 
+// ==================== SISTEMA DE EXPIRACIÓN AUTOMÁTICA ====================
+async function verificarGruposExpirados(conn) {
+  try {
+    const ahora = Date.now()
+    const chats = global.db.data.chats || {}
+    
+    for (let id in chats) {
+      const chat = chats[id]
+      if (chat.expired && chat.expired > 0 && chat.expired <= ahora) {
+        console.log(`⏰ Grupo ${id} expiró, saliendo...`)
+        try {
+          await conn.groupLeave(id)
+        } catch (e) {
+          console.log(`❌ Error al salir del grupo ${id}:`, e)
+        }
+        chat.expired = false
+      }
+    }
+  } catch (e) {
+    console.error('Error en verificación de grupos:', e)
+  }
+}
+
+let verificadorIniciado = false
+function iniciarVerificador(conn) {
+  if (verificadorIniciado) return
+  verificadorIniciado = true
+  setInterval(() => {
+    verificarGruposExpirados(conn)
+  }, 60000)
+  console.log('✅ Sistema de expiración de grupos activado')
+}
+
 // ==================== 1. INFO - VER TIEMPO RESTANTE ====================
 let handlerInfo = async (m, { conn, args, usedPrefix, command }) => {
   if (global.db.data.chats[m.chat].expired < 1) {
@@ -99,6 +132,9 @@ let handlerMinutos = async (m, { conn, args, usedPrefix, command }) => {
 
 // ==================== HANDLER PRINCIPAL UNIFICADO ====================
 let handler = async (m, { conn, args, usedPrefix, command }) => {
+  // Iniciar el verificador automático
+  iniciarVerificador(conn)
+  
   if (command === 'info') {
     return handlerInfo(m, { conn, args, usedPrefix, command })
   }
@@ -108,7 +144,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
   if (command === 'tiempod' || command === 'addexpired') {
     return handlerDias(m, { conn, args, usedPrefix, command })
   }
-  if (command === 'tiempoh' || command === 'addexpired') {
+  if (command === 'tiempoh') {
     return handlerHoras(m, { conn, args, usedPrefix, command })
   }
   if (command === 'demo' || command === 'tiempo') {
