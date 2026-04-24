@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+/*import fetch from 'node-fetch';
 
 export async function before(m, { conn }) {
   if (global._cmdHandled) return;
@@ -126,3 +126,4 @@ para encontrar lo que buscas.`
   }, 1000);
 }
 
+*/
