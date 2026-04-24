@@ -92,6 +92,6 @@ handler.before = async (m, { conn }) => {
 
 handler.help = ['trivia']
 handler.tags = ['game']
-handler.command = /^(trivia|opcion|opción)$/i
+handler.command = /^(opcion|opción)$/i
 
 export default handler
