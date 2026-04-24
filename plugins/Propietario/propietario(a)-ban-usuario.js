@@ -1,86 +1,90 @@
 import fs from 'fs'
 import path from 'path'
 
-let handler = async (m, { conn }) => {
-  let who = m.mentionedJid?.[0] || m.quoted?.sender || null
-  let command = (m.text || '').trim().split(/\s+/)[0].toLowerCase()
-
-  if (command !== 'listbanuser' && !who) {
-    throw `✳️ *Uso correcto:*\n\n${command} @usuario\n\no responde al mensaje del usuario.`
-  }
-
-  switch (command) {
-    case 'banuser':
-    case 'bloqueado':
-    case 'bloquear': {
-      if (!global.db.data.users[who]) global.db.data.users[who] = {}
-
-      // No banear al bot
-      if (who === conn.user.jid) {
-        return m.reply('🤖 No puedo banearme a mí mismo.')
-      }
-
-      // No banear owners
-      let whoNumber = who.split('@')[0].split(':')[0].replace(/[^0-9]/g, '')
-      let ownerNumbers = global.owner
-        .map(v => Array.isArray(v) ? v[0] : v)
-        .map(v => String(v).split(':')[0].replace(/[^0-9]/g, ''))
-
-      if (ownerNumbers.includes(whoNumber)) {
-        return m.reply('👑 No puedes banear a un owner del bot.')
-      }
-
-      global.db.data.users[who].banned = true
-      saveDatabase()
-
-      await conn.sendMessage(m.chat, {
-        text: `> *INFORMACIÓN 📢*\n\n@${who.split('@')[0].split(':')[0]} fuiste baneado en mi base de datos, no podrás usar mis comandos. ❌\n\n*Motivo :* Toxicidad hacia Elite Bot.`,
-        mentions: [who]
-      }, { quoted: m })
-
-      break
-    }
-
-    case 'unbanuser':
-    case 'desbloquear': {
-      if (!global.db.data.users[who]) global.db.data.users[who] = {}
-
-      global.db.data.users[who].banned = false
-      saveDatabase()
-
-      await conn.sendMessage(m.chat, {
-        text: `> *INFORMACIÓN 📢*\n\nEl usuario @${who.split('@')[0].split(':')[0]} fue desbaneado en mi base de datos, ahora podrá usar mis comandos. ✅`,
-        mentions: [who]
-      }, { quoted: m })
-
-      break
-    }
-
-    case 'listbanuser': {
+let handler = async (m, { conn, command }) => {
+  try {
+    // Obtener el comando real (sin el punto)
+    const cmd = command || (m.text || '').trim().toLowerCase().replace(/^\./, '')
+    
+    // Verificar si el comando es listbanuser (no necesita mención)
+    if (cmd === 'listbanuser') {
       let users = global.db.data.users || {}
       let bannedUsers = Object.entries(users).filter(([jid, user]) => user?.banned)
-
+      
       if (!bannedUsers.length) {
-        return m.reply(`*LISTA DE TÓXICOS*\n\nNo hay usuarios baneados actualmente.`)
+        return conn.reply(m.chat, `☑️ *LISTA DE USUARIOS BANEADOS*\n\nNo hay usuarios baneados actualmente.`, m, rcanal)
       }
-
-      let txt = `*LISTA DE TÓXICOS*\n\n`
+      
+      let txt = `☑️ *LISTA DE USUARIOS BANEADOS*\n\n`
       let mentions = []
-
+      
       for (let i = 0; i < bannedUsers.length; i++) {
         let jid = bannedUsers[i][0]
         let num = jid.split('@')[0].split(':')[0]
         txt += `${i + 1}. @${num}\n`
         mentions.push(jid)
       }
-
-      await conn.sendMessage(m.chat, {
-        text: txt.trim(),
-        mentions
-      }, { quoted: m })
-
-      break
+      
+      await conn.sendMessage(m.chat, { text: txt.trim(), mentions }, { quoted: m })
+      return
     }
+    
+    // Para los demás comandos, se necesita mención o respuesta
+    let who = m.mentionedJid?.[0] || m.quoted?.sender || null
+    
+    if (!who) {
+      return conn.reply(m.chat, `☑️ *USO CORRECTO*\n\n.${cmd} @usuario\n\nO responde al mensaje del usuario.`, m, rcanal)
+    }
+    
+    // No banear al bot
+    if (who === conn.user.jid) {
+      return conn.reply(m.chat, `☑️ No puedo banearme a mí mismo.`, m, rcanal)
+    }
+    
+    // No banear owners
+    let whoNumber = who.split('@')[0].split(':')[0].replace(/[^0-9]/g, '')
+    let ownerNumbers = global.owner
+      .map(v => Array.isArray(v) ? v[0] : v)
+      .map(v => String(v).split(':')[0].replace(/[^0-9]/g, ''))
+    
+    if (ownerNumbers.includes(whoNumber)) {
+      return conn.reply(m.chat, `☑️ No puedes banear a un owner del bot.`, m, rcanal)
+    }
+    
+    switch (cmd) {
+      case 'banuser':
+      case 'bloqueado':
+      case 'bloquear': {
+        if (!global.db.data.users[who]) global.db.data.users[who] = {}
+        
+        global.db.data.users[who].banned = true
+        saveDatabase()
+        
+        await conn.sendMessage(m.chat, {
+          text: `☑️ *USUARIO BANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue baneado en mi base de datos, no podrá usar mis comandos. ❌\n\n*Motivo:* Toxicidad hacia Elite Bot.`,
+          mentions: [who]
+        }, { quoted: m })
+        break
+      }
+      
+      case 'unbanuser':
+      case 'desbloquear': {
+        if (!global.db.data.users[who]) global.db.data.users[who] = {}
+        
+        global.db.data.users[who].banned = false
+        saveDatabase()
+        
+        await conn.sendMessage(m.chat, {
+          text: `☑️ *USUARIO DESBANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue desbaneado en mi base de datos, ahora podrá usar mis comandos. ✅`,
+          mentions: [who]
+        }, { quoted: m })
+        break
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error:', error)
+    await conn.reply(m.chat, `☑️ Ocurrió un error al ejecutar el comando.`, m, rcanal)
   }
 }
 
@@ -89,7 +93,7 @@ let handler = async (m, { conn }) => {
 // ========================================
 function saveDatabase() {
   try {
-    const dbFile = path.join('./', 'database.json') // ajusta según la ruta de tu DB
+    const dbFile = path.join('./', 'database.json')
     fs.writeFileSync(dbFile, JSON.stringify(global.db.data, null, 2))
     console.log('✅ Base de datos guardada correctamente')
   } catch (err) {
@@ -106,11 +110,7 @@ handler.help = [
   'listbanuser'
 ]
 handler.tags = ['owner']
-
-// ✅ Punto o sin punto
-handler.customPrefix = /^\.?(banuser|bloqueado|bloquear|unbanuser|desbloquear|listbanuser)(\s|$)/i
-handler.command = new RegExp
-
+handler.command = /^(banuser|bloqueado|bloquear|unbanuser|desbloquear|listbanuser)$/i
 handler.rowner = true
 
 export default handler
