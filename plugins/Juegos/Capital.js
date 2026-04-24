@@ -4,31 +4,75 @@ let timeout = 15000
 let poin = 1000
 
 let handler = async (m, { conn, usedPrefix }) => {
-    conn.tekateki = conn.tekateki ? conn.tekateki : {}
+    conn.capitales = conn.capitales ? conn.capitales : {}
     let id = m.chat
-    if (id in conn.tekateki) {
-        conn.reply(m.chat, 'Todavia hay un juego sin terminar!', conn.tekateki[id][0])
-        throw false
+    if (id in conn.capitales) {
+        await conn.reply(m.chat, '❌ Todavía hay un juego sin terminar en este chat', m, rcanal)
+        return
     }
-    let tekateki = JSON.parse(fs.readFileSync("./src/game/capitales.json"))
-    let json = tekateki[Math.floor(Math.random() * tekateki.length)]
-    let _clue = json.response
-    let clue = _clue.replace(/[A-Za-z]/g, '_')
+    
+    let capitales = JSON.parse(fs.readFileSync("./src/game/capitales.json"))
+    let json = capitales[Math.floor(Math.random() * capitales.length)]
+    let respuesta = json.response.toLowerCase()
+    
     let caption = `
-ⷮ *Pais:* ${json.pais}
+ⷮ *🌍 ADIVINA LA CAPITAL* 🌍
 
-*Tiempo:* ${(timeout / 1000).toFixed(2)} segundos
+📌 *País:* ${json.pais}
 
-*Responde con el nombre de la ciudad* 🪄
-`.trim()
-    conn.tekateki[id] = [
-       await conn.reply(m.chat, caption, m),
-        json, poin,
-        setTimeout(async () => {
-            if (conn.tekateki[id]) await conn.reply(m.chat, `Se acabó el tiempo!, intenta descubrir la capital de otro pais.`, conn.tekateki[id][0])
-            delete conn.tekateki[id]
+⏱️ *Tiempo:* ${(timeout / 1000).toFixed(2)} segundos
+
+✨ *Responde a este mensaje con el nombre de la capital* ✨
+    `.trim()
+    
+    let msg = await conn.reply(m.chat, caption, m, rcanal)
+    
+    conn.capitales[id] = {
+        id: id,
+        msg: msg,
+        respuesta: respuesta,
+        pais: json.pais,
+        timeout: setTimeout(() => {
+            if (conn.capitales[id]) {
+                conn.reply(m.chat, `⏰ *Se acabó el tiempo!*\n\n📌 *País:* ${json.pais}\n📌 *Capital:* ${json.response.toUpperCase()}`, m, rcanal)
+                delete conn.capitales[id]
+            }
         }, timeout)
-    ]
+    }
+}
+
+handler.before = async (m, { conn }) => {
+    if (!m.quoted) return
+    if (!conn.capitales) conn.capitales = {}
+    
+    let id = m.chat
+    let game = conn.capitales[id]
+    if (!game) return
+    
+    // Verificar si el mensaje respondido es el del juego
+    if (m.quoted.id !== game.msg.key.id) return
+    
+    // Verificar si ya pasó el tiempo
+    if (!game.timeout) return
+    
+    let userAnswer = m.text.toLowerCase().trim()
+    let isCorrect = userAnswer === game.respuesta
+    
+    if (isCorrect) {
+        // Respuesta correcta
+        clearTimeout(game.timeout)
+        delete conn.capitales[id]
+        
+        let poinUser = global.db.data.users[m.sender].exp || 0
+        global.db.data.users[m.sender].exp = (poinUser || 0) + poin
+        
+        await conn.reply(m.chat, `✅ *RESPUESTA CORRECTA!*\n\n🌍 *País:* ${game.pais}\n🏙️ *Capital:* ${game.respuesta.toUpperCase()}\n🏆 +${poin} XP`, m, rcanal)
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+    } else {
+        // Respuesta incorrecta
+        await conn.reply(m.chat, `❌ *RESPUESTA INCORRECTA*\n\n📌 Sigue intentando!`, m, rcanal)
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    }
 }
 
 handler.help = ['capitalde']
