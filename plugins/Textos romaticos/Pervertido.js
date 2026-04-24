@@ -39,7 +39,6 @@ let handler = async (m, { conn, text, command }) => {
     // Reacción según el comando
     const emoji = command === 'pervertida' ? '💋' : '🔥';
     await conn.sendMessage(m.chat, { react: { text: emoji, key: m.key } });
-    await conn.reply(m.chat, `☑️ Procesando tu confesión...`, m, rcanal);
     
     // Obtener imagen de la API
     const res = await fetch('https://nekos.life/api/v2/img/lewd');
