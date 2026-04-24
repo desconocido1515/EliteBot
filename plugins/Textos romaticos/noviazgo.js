@@ -4,35 +4,54 @@ const { generateWAMessageFromContent, proto } = pkg;
 let mensajesGrupos = new Map();
 let parejasConfirmadas = new Map();
 
-// --- HANDLER PRINCIPAL ---
+// Función para crear mensaje interactivo (misma que tourl)
+const createInteractiveMessage = (text, footer, buttons, mentions = []) => {
+    const nativeButtons = buttons.map(btn => ({
+        name: "quick_reply",
+        buttonParamsJson: JSON.stringify({
+            display_text: btn.displayText,
+            id: btn.id
+        })
+    }));
+
+    return {
+        viewOnceMessage: {
+            message: {
+                messageContextInfo: { deviceListMetadata: {}, mentionedJid: mentions },
+                interactiveMessage: proto.Message.InteractiveMessage.create({
+                    body: { text: text },
+                    footer: { text: footer },
+                    nativeFlowMessage: { buttons: nativeButtons }
+                })
+            }
+        }
+    };
+};
+
+// Función para enviar mensaje interactivo
+const sendInteractiveMessage = async (conn, chatId, text, footer, buttons, mentions, quoted) => {
+    const msg = generateWAMessageFromContent(chatId, createInteractiveMessage(text, footer, buttons, mentions), { userJid: conn.user.jid, quoted });
+    await conn.relayMessage(chatId, msg.message, { messageId: msg.key.id });
+};
+
 let handler = async (m, { conn }) => {
     const groupId = m.chat;
     
     // ==================== DETECTAR RESPUESTA DE BOTONES ====================
     let response = null;
     
-    // Forma 1: buttonsResponseMessage
     if (m.message?.buttonsResponseMessage) {
         response = m.message.buttonsResponseMessage.selectedButtonId;
-        console.log('Botón detectado:', response);
     }
     
-    // Forma 2: interactiveResponseMessage
     if (!response && m.message?.interactiveResponseMessage?.nativeFlowResponseMessage) {
         try {
             const params = JSON.parse(m.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson || '{}');
             response = params.id;
-            console.log('Interactive detectado:', response);
         } catch {}
     }
     
-    // Forma 3: listResponseMessage
-    if (!response && m.message?.listResponseMessage?.singleSelectReply) {
-        response = m.message.listResponseMessage.singleSelectReply.selectedRowId;
-        console.log('Lista detectada:', response);
-    }
-    
-    // ==================== COMANDO TERMINAR ====================
+    // ==================== TERMINAR ====================
     if (response === 'terminar') {
         const parejas = parejasConfirmadas.get(groupId) || [];
         const pareja = parejas.find(p => p[0] === m.sender || p[1] === m.sender);
@@ -46,7 +65,7 @@ let handler = async (m, { conn }) => {
         return;
     }
     
-    // ==================== COMANDO PAREJAS ====================
+    // ==================== PAREJAS ====================
     if (response === 'parejas') {
         const parejas = parejasConfirmadas.get(groupId) || [];
         if (parejas.length === 0) {
@@ -86,7 +105,18 @@ let handler = async (m, { conn }) => {
             const nombre1 = await conn.getName(tag);
             const nombre2 = await conn.getName(proponente);
             
-            await conn.reply(m.chat, `🎉 *¡NOVIOS!*\n\n» ${nombre2} y ${nombre1} ahora son pareja.\n» Si rompen, el grupo los funa. 🔫\n\n💌 Usa *terminar* cuando te aburras\n💑 Usa *parejas* para ver la lista`, m, rcanal);
+            const buttons = [
+                { displayText: "💔 TERMINAR", id: "terminar" },
+                { displayText: "💑 VER PAREJAS", id: "parejas" }
+            ];
+            
+            await sendInteractiveMessage(conn, m.chat, 
+                `🎉 *¡NOVIOS!*\n\n» ${nombre2} y ${nombre1} ahora son pareja.\n» Si rompen, el grupo los funa. 🔫`,
+                "💌 GESTIÓN DE PAREJAS",
+                buttons,
+                [proponente, tag],
+                m
+            );
         } else {
             await conn.reply(m.chat, `💔 *RECHAZADO/A*\n\n» ${await conn.getName(tag)} dijo NO.\n» A llorar al rincón, ${await conn.getName(proponente)}. 😢`, m, rcanal);
         }
@@ -99,7 +129,6 @@ let handler = async (m, { conn }) => {
     const msgText = m.text?.toLowerCase() || '';
     
     if (msgText === '.sernovios' || msgText.startsWith('.sernovios ')) {
-        // Usar la lógica de promote para obtener la mención
         let mentionedJid = await m.mentionedJid;
         let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
         
@@ -122,15 +151,17 @@ let handler = async (m, { conn }) => {
         mensajesGrupos.set(groupId, { proponente: m.sender, propuesto: usuario });
         
         const buttons = [
-            { buttonId: 'aceptar', buttonText: { displayText: "✅ ACEPTAR" }, type: 1 },
-            { buttonId: 'rechazar', buttonText: { displayText: "❌ RECHAZAR" }, type: 1 }
+            { displayText: "✅ ACEPTAR", id: "aceptar" },
+            { displayText: "❌ RECHAZAR", id: "rechazar" }
         ];
         
-        await conn.sendMessage(m.chat, {
-            text: `💘 *¡DECLARACIÓN!*\n\n» ${nombreRemitente} quiere ser tu novio/a.\n» Si aceptas, serás suyo/a... si no, igual. 😏`,
-            buttons: buttons,
-            mentions: [usuario]
-        });
+        await sendInteractiveMessage(conn, m.chat,
+            `💘 *¡DECLARACIÓN!*\n\n» ${nombreRemitente} quiere ser tu novio/a.\n» Si aceptas, serás suyo/a... si no, igual. 😏`,
+            "💌 RESPONDE CON UN BOTÓN",
+            buttons,
+            [usuario],
+            m
+        );
         return;
     }
 };
