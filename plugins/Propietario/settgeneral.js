@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from 'file-type'
 
 // ==================== CAMBIAR FOTO DEL BOT ====================
-const handlerFoto = async (m, { conn, command, isOwner }) => {
+let handlerFoto = async (m, { conn, command, isOwner }) => {
   if (!isOwner) return conn.reply(m.chat, `☑️ Solo el owner puede usar este comando.`, m, rcanal)
 
   const q = m.quoted || m
@@ -12,9 +12,7 @@ const handlerFoto = async (m, { conn, command, isOwner }) => {
   }
 
   try {
-    await conn.sendMessage(m.chat, {
-      react: { text: '🕓', key: m.key }
-    })
+    await conn.sendMessage(m.chat, { react: { text: '🕓', key: m.key } })
 
     const img = await q.download()
     if (!img) throw 'No se pudo descargar la imagen'
@@ -24,10 +22,7 @@ const handlerFoto = async (m, { conn, command, isOwner }) => {
     await conn.updateProfilePicture(botJid, img)
 
     await conn.reply(m.chat, `☑️ Foto de perfil del BOT actualizada correctamente.`, m, rcanal)
-
-    await conn.sendMessage(m.chat, {
-      react: { text: '✅', key: m.key }
-    })
+    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
   } catch (e) {
     console.error(e)
@@ -35,38 +30,24 @@ const handlerFoto = async (m, { conn, command, isOwner }) => {
   }
 }
 
-// ==================== CAMBIAR NOMBRE DEL BOT ====================
-const handlerNombre = async (m, { conn, text }) => {
-  if (!text) {
-    return conn.reply(m.chat, `☑️ *QUE NOMBRE DESEAS PONERME?*`, m, rcanal)
-  }
-  
+// ==================== CAMBIAR NOMBRE DEL BOT (exactamente como funciona) ====================
+let handlerNombre = async (m, { conn, text }) => {
+  if (!text) return conn.reply(m.chat, `☑️ *Que Nombre Deseas Ponerme?*`, m, rcanal)
   try {
-    // Intentar con updateProfileName (nombre del bot)
     await conn.updateProfileName(text)
-    return conn.reply(m.chat, `☑️ *NOMBRE CAMBIADO CON ÉXITO*\n\n📌 Nuevo nombre: ${text}`, m, rcanal)
+    return conn.reply(m.chat, `☑️ *Nombre Cambiado Con Éxito*`, m, rcanal)
   } catch (e) {
-    console.log('Error con updateProfileName:', e)
-    try {
-      // Alternativa: updateName
-      await conn.updateName(text)
-      return conn.reply(m.chat, `☑️ *NOMBRE CAMBIADO CON ÉXITO*\n\n📌 Nuevo nombre: ${text}`, m, rcanal)
-    } catch (e2) {
-      console.log('Error con updateName:', e2)
-      return conn.reply(m.chat, `☑️ Ocurrió un error al cambiar el nombre. Verifica que el método sea correcto.`, m, rcanal)
-    }
+    console.log(e)
+    return conn.reply(m.chat, `☑️ Ocurrió Un Error`, m, rcanal)
   }
 }
 
 // ==================== CAMBIAR BIO DEL BOT ====================
-const handlerBio = async (m, { conn, text }) => {
-  if (!text) {
-    return conn.reply(m.chat, `☑️ *INGRESE UN TEXTO PARA LA BIOGRAFÍA*`, m, rcanal)
-  }
-  
+let handlerBio = async (m, { conn, text }) => {
+  if (!text) return conn.reply(m.chat, `☑️ *Ingrese Un Texto Para La Biografía*`, m, rcanal)
   try {
     await conn.updateProfileStatus(text)
-    return conn.reply(m.chat, `☑️ *BIOGRAFÍA CAMBIADA CON ÉXITO* ✅\n\n📌 Nueva bio: ${text}`, m, rcanal)
+    return conn.reply(m.chat, `☑️ *Biografía Cambiada Con Éxito* ✅`, m, rcanal)
   } catch (e) {
     console.log(e)
     return conn.reply(m.chat, `☑️ Error al cambiar la biografía del bot.`, m, rcanal)
