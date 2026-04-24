@@ -1,58 +1,89 @@
 var handler = async (m, { conn, text, usedPrefix, command }) => {
 
 let poin = 500
-let reseqv = `🥌ᴘɪᴇᴅʀᴀ 📄ᴘᴀᴘᴇʟ o ✂️ᴛɪᴊᴇʀᴀ
+let reseqv = `☑️ *JUEGO: PIEDRA, PAPEL O TIJERA*
 
-• ᴘᴜᴇᴅᴇ ᴜsᴀʀ ᴇsᴛᴏs ᴄᴏᴍᴀɴᴅᴏ:
-🥌 .ppt piedra
-📄 .ppt papel
-✂️ .ppt tijera
+📌 *Instrucciones:*
+• Puedes usar estos comandos:
+  🥌 .ppt piedra
+  📄 .ppt papel
+  ✂️ .ppt tijera
 
-• ᴜsᴇ ᴇɴ ᴍɪɴᴜsᴄᴜʟᴀs
-*Ejemplo:* .ppt papel`
-if (!text) throw reseqv
+• Usa en minúsculas
+📌 *Ejemplo:* .ppt papel`
+
+if (!text) return conn.reply(m.chat, reseqv, m, rcanal)
+
+// Validar que el texto sea válido
+let opciones = ['piedra', 'papel', 'tijera']
+if (!opciones.includes(text.toLowerCase())) {
+    return conn.reply(m.chat, `☑️ *Opción no válida*\n\nUsa: piedra, papel o tijera`, m, rcanal)
+}
+
 var astro = Math.random()
 
 if (astro < 0.34) {
-astro = 'piedra'
+    astro = 'piedra'
 } else if (astro > 0.34 && astro < 0.67) {
-astro = 'tijera'
+    astro = 'tijera'
 } else {
-astro = 'papel'
+    astro = 'papel'
 }
+
+let resultado = ''
+let ganancia = 0
 
 if (text == astro) {
-global.db.data.users[m.sender].exp += 100
-m.reply(`🔰 𝗘𝗠𝗣𝗔𝗧𝗘 🔰\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
+    resultado = '🔰 *EMPATE* 🔰'
+    ganancia = 100
+    global.db.data.users[m.sender].exp += ganancia
 } else if (text == 'piedra') {
-if (astro == 'tijera') {
-global.db.data.users[m.sender].exp += 300
-m.reply(`🎊 𝗚𝗔𝗡𝗔𝗦𝗧𝗘 🎊\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-} else {
-global.db.data.users[m.sender].exp -= 300
-m.reply(`❌ 𝗣𝗘𝗥𝗗𝗜𝗦𝗧𝗘 ❌\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-}
+    if (astro == 'tijera') {
+        resultado = '🎊 *GANASTE* 🎊'
+        ganancia = 300
+        global.db.data.users[m.sender].exp += ganancia
+    } else {
+        resultado = '❌ *PERDISTE* ❌'
+        ganancia = -300
+        global.db.data.users[m.sender].exp += ganancia
+    }
 } else if (text == 'tijera') {
-if (astro == 'papel') {
-global.db.data.users[m.sender].exp += 500
-m.reply(` 🎊 𝗚𝗔𝗡𝗔𝗦𝗧𝗘 🎊\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-} else {
-global.db.data.users[m.sender].exp -= 150
-m.reply(`❌ 𝗣𝗘𝗥𝗗𝗜𝗦𝗧𝗘 ❌\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-}
+    if (astro == 'papel') {
+        resultado = '🎊 *GANASTE* 🎊'
+        ganancia = 500
+        global.db.data.users[m.sender].exp += ganancia
+    } else {
+        resultado = '❌ *PERDISTE* ❌'
+        ganancia = -150
+        global.db.data.users[m.sender].exp += ganancia
+    }
 } else if (text == 'papel') {
-if (astro == 'piedra') {
-global.db.data.users[m.sender].exp += 600
-m.reply(`🎊 𝗚𝗔𝗡𝗔𝗦𝗧𝗘 🎊\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-} else {
-global.db.data.users[m.sender].exp -= 300
-m.reply(`❌ 𝗣𝗘𝗥𝗗𝗜𝗦𝗧𝗘 ❌\n\n👤 𝗧𝗨 : ${text}\n🔰 𝗘𝗟𝗜𝗧𝗘 𝗕𝗢𝗧 : ${astro}`)
-}
-} else {
-throw reseqv
+    if (astro == 'piedra') {
+        resultado = '🎊 *GANASTE* 🎊'
+        ganancia = 600
+        global.db.data.users[m.sender].exp += ganancia
+    } else {
+        resultado = '❌ *PERDISTE* ❌'
+        ganancia = -300
+        global.db.data.users[m.sender].exp += ganancia
+    }
 }
 
+let mensaje = `
+━━━━━━━━━━━━━━━
+${resultado}
+━━━━━━━━━━━━━━━
+👤 *TU:* ${text}
+🤖 *BOT:* ${astro}
+━━━━━━━━━━━━━━━
+💰 *${ganancia >= 0 ? '+' : ''}${ganancia} XP*
+📊 *XP Total:* ${global.db.data.users[m.sender].exp}
+━━━━━━━━━━━━━━━
+`
+
+await conn.reply(m.chat, mensaje, m, rcanal)
 }
+
 handler.help = ['ppt']
 handler.tags = ['juegos']
 handler.command = ['ppt'] 
