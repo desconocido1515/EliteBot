@@ -17,12 +17,28 @@ function handler(m, { groupMetadata, command, usedPrefix, conn }) {
         return shuffled.slice(0, cantidad)
     }
     
+    // Función para obtener el nombre del contacto (si tiene nombre guardado)
+    const obtenerNombre = async (jid) => {
+        try {
+            const name = await conn.getName(jid)
+            return name || jid.split('@')[0]
+        } catch (e) {
+            return jid.split('@')[0]
+        }
+    }
+    
     // Función para extraer número del JID
     const num = (jid) => jid.split('@')[0]
     
     // Función para enviar mensaje con rcanal
     const enviar = (texto, mentions = []) => {
         conn.reply(m.chat, texto, m, rcanal, { mentions })
+    }
+    
+    // Función para generar menciones con nombre real
+    const generarMencion = (jid) => {
+        // Devolvemos el JID para la mención, el bot se encarga de mostrar el nombre
+        return jid
     }
     
     // Validación genérica
