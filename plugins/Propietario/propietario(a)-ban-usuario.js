@@ -18,7 +18,7 @@ let handlerBefore = async function (m, { conn }) {
 }
 
 // ==================== HANDLER PRINCIPAL ====================
-let handler = async (m, { conn, command }) => {
+let handler = async (m, { conn, command, usedPrefix }) => {
   try {
     // Obtener el comando real (sin el punto)
     const cmd = command || (m.text || '').trim().toLowerCase().replace(/^\./, '')
@@ -46,8 +46,9 @@ let handler = async (m, { conn, command }) => {
       return
     }
     
-    // Para los demás comandos, se necesita mención o respuesta
-    let who = m.mentionedJid?.[0] || m.quoted?.sender || null
+    // Usar la misma lógica de promote para obtener la mención
+    let mentionedJid = await m.mentionedJid
+    let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
     
     if (!who) {
       return conn.reply(m.chat, `☑️ *USO CORRECTO*\n\n.${cmd} @usuario\n\nO responde al mensaje del usuario.`, m, rcanal)
@@ -58,13 +59,21 @@ let handler = async (m, { conn, command }) => {
       return conn.reply(m.chat, `☑️ No puedo banearme a mí mismo.`, m, rcanal)
     }
     
-    // No banear owners
+    // No banear owners (usando global.owner)
     let whoNumber = who.split('@')[0].split(':')[0].replace(/[^0-9]/g, '')
-    let ownerNumbers = global.owner
-      .map(v => Array.isArray(v) ? v[0] : v)
-      .map(v => String(v).split(':')[0].replace(/[^0-9]/g, ''))
+    let isOwner = false
+    if (global.owner) {
+      for (let owner of global.owner) {
+        let ownerNum = Array.isArray(owner) ? owner[0] : owner
+        ownerNum = String(ownerNum).split(':')[0].replace(/[^0-9]/g, '')
+        if (ownerNum === whoNumber) {
+          isOwner = true
+          break
+        }
+      }
+    }
     
-    if (ownerNumbers.includes(whoNumber)) {
+    if (isOwner) {
       return conn.reply(m.chat, `☑️ No puedes banear a un owner del bot.`, m, rcanal)
     }
     
@@ -95,7 +104,7 @@ let handler = async (m, { conn, command }) => {
     
   } catch (error) {
     console.error('Error:', error)
-    await conn.reply(m.chat, `☑️ Ocurrió un error al ejecutar el comando.`, m, rcanal)
+    await conn.reply(m.chat, `☑️ Ocurrió un error al ejecutar el comando.\n\n${error.message}`, m, rcanal)
   }
 }
 
