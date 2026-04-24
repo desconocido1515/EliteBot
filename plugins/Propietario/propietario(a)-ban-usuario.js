@@ -1,6 +1,23 @@
 import fs from 'fs'
 import path from 'path'
 
+// ==================== RESTRICCIÓN PARA USUARIOS BANEADOS ====================
+let handlerBefore = async function (m, { conn }) {
+  // Verificar si el usuario está baneado
+  if (global.db.data.users[m.sender]?.banned) {
+    // No bloquear comandos específicos
+    const allowedCommands = ['unbanuser', 'desbloquear', 'listbanuser', 'banuser', 'bloqueado', 'bloquear']
+    const cmd = (m.text || '').trim().toLowerCase().split(' ')[0].replace(/^\./g, '')
+    if (allowedCommands.includes(cmd)) return false
+    
+    // Enviar mensaje de restricción
+    await conn.reply(m.chat, `☑️ *ESTAS BANEADO*\nNo puedes usar mis comandos.`, m, rcanal)
+    return true
+  }
+  return false
+}
+
+// ==================== HANDLER PRINCIPAL ====================
 let handler = async (m, { conn, command }) => {
   try {
     // Obtener el comando real (sin el punto)
@@ -60,10 +77,7 @@ let handler = async (m, { conn, command }) => {
         global.db.data.users[who].banned = true
         saveDatabase()
         
-        await conn.sendMessage(m.chat, {
-          text: `☑️ *USUARIO BANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue baneado en mi base de datos, no podrá usar mis comandos. ❌\n\n*Motivo:* Toxicidad hacia Elite Bot.`,
-          mentions: [who]
-        }, { quoted: m })
+        await conn.reply(m.chat, `☑️ *USUARIO BANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue baneado en mi base de datos, no podrá usar mis comandos. ❌\n\n*Motivo:* Toxicidad hacia Elite Bot.`, m, rcanal)
         break
       }
       
@@ -74,10 +88,7 @@ let handler = async (m, { conn, command }) => {
         global.db.data.users[who].banned = false
         saveDatabase()
         
-        await conn.sendMessage(m.chat, {
-          text: `☑️ *USUARIO DESBANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue desbaneado en mi base de datos, ahora podrá usar mis comandos. ✅`,
-          mentions: [who]
-        }, { quoted: m })
+        await conn.reply(m.chat, `☑️ *USUARIO DESBANEADO*\n\n@${who.split('@')[0].split(':')[0]} fue desbaneado en mi base de datos, ahora podrá usar mis comandos. ✅`, m, rcanal)
         break
       }
     }
@@ -113,4 +124,5 @@ handler.tags = ['owner']
 handler.command = /^(banuser|bloqueado|bloquear|unbanuser|desbloquear|listbanuser)$/i
 handler.rowner = true
 
+export { handlerBefore as before }
 export default handler
