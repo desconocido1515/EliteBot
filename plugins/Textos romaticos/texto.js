@@ -1,6 +1,8 @@
-import { createCanvas, loadImage } from 'canvas';
+import { spawn } from 'child_process';
+import { join } from 'path';
 import fs from 'fs';
-import path from 'path';
+
+const __dirname = global.__dirname;
 
 const colores = {
   rojo: ['#F44336', '#FFCDD2'],
@@ -55,83 +57,85 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   await conn.reply(m.chat, `☑️ Generando imagen, por favor espera...`, m, rcanal);
 
   if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
-
-  const canvas = createCanvas(1080, 1080);
-  const draw = canvas.getContext('2d');
-
-  const grad = draw.createLinearGradient(0, 0, 1080, 1080);
-  grad.addColorStop(0, coloresGrad[0]);
-  grad.addColorStop(1, coloresGrad[1]);
-  draw.fillStyle = grad;
-  draw.fillRect(0, 0, 1080, 1080);
-
-  // Avatar circular
-  try {
-    const avatar = await loadImage(avatarUrl);
-    draw.save();
-    draw.beginPath();
-    draw.arc(100, 100, 80, 0, Math.PI * 2);
-    draw.clip();
-    draw.drawImage(avatar, 20, 20, 160, 160);
-    draw.restore();
-  } catch (e) {
-    console.error('Error cargando avatar:', e);
-  }
-
-  // Nombre del usuario
-  draw.font = 'bold 42px Sans-serif';
-  draw.fillStyle = '#ffffff';
-  draw.shadowColor = 'rgba(0,0,0,0.4)';
-  draw.shadowOffsetX = 2;
-  draw.shadowOffsetY = 2;
-  draw.shadowBlur = 4;
-  draw.fillText(displayName, 220, 100);
-
-  // Texto central
-  draw.font = 'bold 58px Sans-serif';
-  draw.fillStyle = '#ffffff';
-  draw.textAlign = 'center';
-
-  const words = contenido.split(' ');
-  let line = '', lines = [];
-  for (const word of words) {
-    const testLine = line + word + ' ';
-    if (draw.measureText(testLine).width > 900) {
-      lines.push(line.trim());
-      line = word + ' ';
-    } else {
-      line = testLine;
-    }
-  }
-  if (line.trim()) lines.push(line.trim());
-
-  const startY = 540 - (lines.length * 40);
-  lines.forEach((l, i) => {
-    draw.fillText(l, 540, startY + (i * 75));
-  });
-
-  // Logo
-  try {
-    const logo = await loadImage('https://files.catbox.moe/9o4ugy.jpg');
-    draw.drawImage(logo, canvas.width - 180, canvas.height - 180, 140, 140);
-  } catch (e) {
-    console.error('Error cargando logo:', e);
-  }
-
-  // Guardar y enviar
-  const filePath = `./tmp/texto-${Date.now()}.png`;
-  const out = fs.createWriteStream(filePath);
-  const stream = canvas.createPNGStream();
-  stream.pipe(out);
   
-  out.on('finish', async () => {
-    await conn.sendMessage(m.chat, {
-      image: { url: filePath },
-      caption: `☑️ *IMAGEN GENERADA*\n\n🎨 *Color:* ${colorElegido.toLowerCase() || 'azul'}\n👤 *Autor:* ${displayName}\n\nElite Bot Global - Since 2023®`
-    });
-    fs.unlinkSync(filePath);
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+  // Descargar avatar temporalmente
+  const avatarPath = `./tmp/avatar-${Date.now()}.jpg`;
+  const avatarBuffer = await (await fetch(avatarUrl)).buffer();
+  fs.writeFileSync(avatarPath, avatarBuffer);
+  
+  // Plantilla base (creamos un gradiente con ImageMagick)
+  const bgPath = `./tmp/bg-${Date.now()}.png`;
+  const outputPath = `./tmp/texto-${Date.now()}.png`;
+  
+  // Crear gradiente como fondo
+  await new Promise((resolve, reject) => {
+    const args = [
+      '-size', '1080x1080',
+      'gradient:' + coloresGrad[0] + '-' + coloresGrad[1],
+      bgPath
+    ];
+    const proc = spawn('convert', args);
+    proc.on('error', reject);
+    proc.on('close', resolve);
   });
+  
+  // Construir comando de ImageMagick
+  const convertArgs = [
+    bgPath,
+    // Avatar circular (opcional, si tienes avatar)
+    '(',
+    avatarPath,
+    '-resize', '160x160',
+    '-alpha', 'set',
+    '-background', 'none',
+    '-gravity', 'center',
+    '-extent', '160x160',
+    ')',
+    '-geometry', '+20+20',
+    '-compose', 'over',
+    '-composite',
+    // Texto del usuario
+    '-font', 'Sans-serif',
+    '-pointsize', '42',
+    '-fill', 'white',
+    '-annotate', '+220+100', displayName,
+    // Texto principal
+    '-font', 'Sans-serif',
+    '-pointsize', '58',
+    '-fill', 'white',
+    '-gravity', 'center',
+    '-annotate', '0', contenido,
+    // Logo
+    '(',
+    'https://files.catbox.moe/9o4ugy.jpg',
+    '-resize', '140x140',
+    ')',
+    '-geometry', '+940+940',
+    '-compose', 'over',
+    '-composite',
+    outputPath
+  ];
+  
+  await new Promise((resolve, reject) => {
+    const proc = spawn('convert', convertArgs);
+    proc.on('error', reject);
+    proc.on('close', resolve);
+  });
+  
+  // Enviar imagen
+  await conn.sendMessage(m.chat, {
+    image: { url: outputPath },
+    caption: `☑️ *IMAGEN GENERADA*\n\n🎨 *Color:* ${colorElegido.toLowerCase() || 'azul'}\n👤 *Autor:* ${displayName}\n\nElite Bot Global - Since 2023®`
+  });
+  
+  // Limpiar archivos temporales
+  try {
+    fs.unlinkSync(avatarPath);
+    fs.unlinkSync(bgPath);
+    fs.unlinkSync(outputPath);
+  } catch (e) {}
+  
+  await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
 };
 
 handler.command = ['texto'];
