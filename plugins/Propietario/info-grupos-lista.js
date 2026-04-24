@@ -1,53 +1,55 @@
-const handler = async (m, { conn }) => {
-  let txt = '';
-try {    
-  const groups = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats);
-  const totalGroups = groups.length;
-  for (let i = 0; i < groups.length; i++) {
-    const [jid, chat] = groups[i];
-    const groupMetadata = ((conn.chats[jid] || {}).metadata || (await conn.groupMetadata(jid).catch((_) => null))) || {};
-    const participants = groupMetadata.participants || [];
-    const bot = participants.find((u) => conn.decodeJid(u.id) === conn.user.jid) || {};
-    const isBotAdmin = bot?.admin || false;
-    const isParticipant = participants.some((u) => conn.decodeJid(u.id) === conn.user.jid);
-    const participantStatus = isParticipant ? '👤 Participante' : '❌ Ex participante';
-    const totalParticipants = participants.length;
-    txt += `*◉ Grupo ${i + 1}*
-    *➤ Nombre:* ${await conn.getName(jid)}
-    *➤ ID:* ${jid}
-    *➤ Admin:* ${isBotAdmin ? '✔ Sí' : '❌ No'}
-    *➤ Estado:* ${participantStatus}
-    *➤ Total de Participantes:* ${totalParticipants}
-    *➤ Link:* ${isBotAdmin ? `https://chat.whatsapp.com/${await conn.groupInviteCode(jid) || '--- (Error) ---'}` : '--- (No admin) ---'}\n\n`;
-  }
-  m.reply(`*Lista de grupos del Bot* 🤖\n\n*—◉ Total de grupos:* ${totalGroups}\n\n${txt}`.trim());
-} catch {
-  const groups = Object.entries(conn.chats).filter(([jid, chat]) => jid.endsWith('@g.us') && chat.isChats);
-  const totalGroups = groups.length;
-  for (let i = 0; i < groups.length; i++) {
-    const [jid, chat] = groups[i];
-    const groupMetadata = ((conn.chats[jid] || {}).metadata || (await conn.groupMetadata(jid).catch((_) => null))) || {};
-    const participants = groupMetadata.participants || [];
-    const bot = participants.find((u) => conn.decodeJid(u.id) === conn.user.jid) || {};
-    const isBotAdmin = bot?.admin || false;
-    const isParticipant = participants.some((u) => conn.decodeJid(u.id) === conn.user.jid);
-    const participantStatus = isParticipant ? '👤 Participante' : '❌ Ex participante';
-    const totalParticipants = participants.length;    
-    txt += `*◉ Grupo ${i + 1}*
-    *➤ Nombre:* ${await conn.getName(jid)}
-    *➤ ID:* ${jid}
-    *➤ Admin:* ${isBotAdmin ? '✔ Sí' : '❌ No'}
-    *➤ Estado:* ${participantStatus}
-    *➤ Total de Participantes:* ${totalParticipants}
-    *➤ Link:* ${isBotAdmin ? '--- (Error) ---' : '--- (No admin) ---'}\n\n`;
-  }
-  m.reply(`*Lista de grupos del Bot* 👾\n\n*—◉ Total de grupos:* ${totalGroups}\n\n${txt}`.trim());
- }    
-};
-handler.help = ['groups', 'grouplist'];
-handler.tags = ['owner'];
-handler.command = ['listgroup', 'gruposlista', 'grouplist', 'listagrupos']
-handler.rowner = true;
-handler.private = true
+import PhoneNumber from 'awesome-phonenumber'
 
-export default handler;
+let handler = async (m, { conn, isOwner, isRowner }) => {
+  try {
+    // Obtener grupos donde está el BOT
+    const grupos = []
+    
+    try {
+      const participating = await conn.groupFetchAllParticipating()
+      
+      for (let id in participating) {
+        const meta = participating[id]
+        // Verificar que el bot esté en el grupo
+        const botJid = conn.user.jid
+        const botEnGrupo = meta.participants?.some(p => p.id === botJid)
+        
+        if (botEnGrupo) {
+          grupos.push({
+            subject: meta.subject || 'Sin nombre',
+            participants: meta.participants?.length || 0
+          })
+        }
+      }
+    } catch (e) {
+      console.log('Error:', e)
+    }
+    
+    if (grupos.length === 0) {
+      return conn.reply(m.chat, `☑️ 𝙴𝙻 𝙱𝙾𝚃 𝙽𝙾 𝙴𝚂𝚃𝙰́ 𝙴𝙽 𝙽𝙸𝙽𝙶𝚄́𝙽 𝙶𝚁𝚄𝙿𝙾`, m, rcanal)
+    }
+    
+    let txt = `☑️ *𝙻𝙸𝚂𝚃𝙰 𝙳𝙴 𝙶𝚁𝚄𝙿𝙾𝚂 𝙳𝙾𝙽𝙳𝙴 𝙴𝚂𝚃𝙰́ 𝙴𝙻 𝙱𝙾𝚃* 📋\n\n`
+    txt += `📦 𝚃𝚘𝚝𝚊𝚕 𝚍𝚎 𝚐𝚛𝚞𝚙𝚘𝚜: *${grupos.length}*\n\n`
+    
+    for (let i = 0; i < grupos.length; i++) {
+      const g = grupos[i]
+      txt += `🏷️ *${i + 1}. Nombre:* ${g.subject}\n`
+      txt += `👥 *Miembros:* ${g.participants}\n\n`
+    }
+    
+    await conn.reply(m.chat, txt.trim(), m, rcanal)
+    
+  } catch (error) {
+    console.error('Error:', error)
+    await conn.reply(m.chat, `☑️ 𝙴𝚁𝚁𝙾𝚁 𝙰𝙻 𝙾𝙱𝚃𝙴𝙽𝙴𝚁 𝙻𝙰 𝙻𝙸𝚂𝚃𝙰`, m, rcanal)
+  }
+}
+
+handler.help = ['groups', 'grouplist']
+handler.tags = ['info']
+handler.command = /^(groups|grouplist|listadegrupo|gruposlista|listagrupos|listadegrupos|grupolista|listagrupo)$/i
+handler.rowner = true
+handler.exp = 30
+
+export default handler
