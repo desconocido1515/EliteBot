@@ -1,172 +1,191 @@
-import pkg from '@whiskeysockets/baileys';
-const { generateWAMessageFromContent, proto } = pkg;
+// plugins/sernovios.js
 
 let mensajesGrupos = new Map();
 let parejasConfirmadas = new Map();
 
-// Función para crear mensaje interactivo (misma que tourl)
-const createInteractiveMessage = (text, footer, buttons, mentions = []) => {
-    const nativeButtons = buttons.map(btn => ({
-        name: "quick_reply",
-        buttonParamsJson: JSON.stringify({
-            display_text: btn.displayText,
-            id: btn.id
-        })
-    }));
-
-    return {
-        viewOnceMessage: {
-            message: {
-                messageContextInfo: { deviceListMetadata: {}, mentionedJid: mentions },
-                interactiveMessage: proto.Message.InteractiveMessage.create({
-                    body: { text: text },
-                    footer: { text: footer },
-                    nativeFlowMessage: { buttons: nativeButtons }
-                })
-            }
-        }
-    };
-};
-
-// Función para enviar mensaje interactivo
-const sendInteractiveMessage = async (conn, chatId, text, footer, buttons, mentions, quoted) => {
-    const msg = generateWAMessageFromContent(chatId, createInteractiveMessage(text, footer, buttons, mentions), { userJid: conn.user.jid, quoted });
-    await conn.relayMessage(chatId, msg.message, { messageId: msg.key.id });
-};
-
-let handler = async (m, { conn }) => {
-    const groupId = m.chat;
+// Función para mostrar el mensaje de declaración
+async function mostrarDeclaracion(conn, chat, proponente, propuesto, nombreRemitente, nombreMencionado) {
+    const texto = `💘 *¡DECLARACIÓN!* 💘
     
-    // ==================== DETECTAR RESPUESTA DE BOTONES ====================
-    let response = null;
+💑 *${nombreRemitente}* quiere ser tu novio/a.
+
+💌 Si aceptas, serás suyo/a... si no, igual. 😏
+
+*¿ACEPTAS EL DESAFÍO DEL AMOR?*`;
+
+    const buttons = [
+        { buttonId: 'aceptar', buttonText: { displayText: "✅ ACEPTAR" }, type: 1 },
+        { buttonId: 'rechazar', buttonText: { displayText: "❌ RECHAZAR" }, type: 1 }
+    ];
+
+    await conn.sendMessage(chat, {
+        text: texto,
+        buttons: buttons,
+        mentions: [propuesto],
+        viewOnce: true
+    });
+}
+
+// Función para mostrar mensaje de parejas
+async function mostrarParejas(conn, chat, parejas) {
+    if (parejas.length === 0) {
+        await conn.reply(chat, `💔 *NO HAY PAREJAS*\n\nEn este grupo solo hay solteros desesperados. 😂`, null, rcanal);
+        return;
+    }
     
+    let lista = "💑 *PAREJAS DEL GRUPO* 💑\n\n";
+    for (const [p1, p2] of parejas) {
+        lista += `▸ ${await conn.getName(p1)} 💕 ${await conn.getName(p2)}\n`;
+    }
+    
+    const buttons = [
+        { buttonId: 'terminar', buttonText: { displayText: "💔 TERMINAR" }, type: 1 }
+    ];
+    
+    await conn.sendMessage(chat, {
+        text: lista,
+        buttons: buttons,
+        viewOnce: true
+    });
+}
+
+let handler = m => m
+
+handler.before = async function (m, { conn }) {
+    // DETECTAR RESPUESTA DE BOTONES
     if (m.message?.buttonsResponseMessage) {
-        response = m.message.buttonsResponseMessage.selectedButtonId;
-    }
-    
-    if (!response && m.message?.interactiveResponseMessage?.nativeFlowResponseMessage) {
-        try {
-            const params = JSON.parse(m.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson || '{}');
-            response = params.id;
-        } catch {}
-    }
-    
-    // ==================== TERMINAR ====================
-    if (response === 'terminar') {
-        const parejas = parejasConfirmadas.get(groupId) || [];
-        const pareja = parejas.find(p => p[0] === m.sender || p[1] === m.sender);
+        const buttonId = m.message.buttonsResponseMessage.selectedButtonId
+        const groupId = m.chat
         
-        if (pareja) {
-            parejasConfirmadas.set(groupId, parejas.filter(p => p[0] !== m.sender && p[1] !== m.sender));
-            await conn.reply(m.chat, `💔 *¡SE ACABÓ!*\n\nAdiós, espero no verte... aunque sé que volverás 😈\nGracias por los recuerdos (y los dramas).`, m, rcanal);
-        } else {
-            await conn.reply(m.chat, `❌ *¿Terminar qué?*\nNi novio/a tienes, mi ciela. 😂`, m, rcanal);
-        }
-        return;
-    }
-    
-    // ==================== PAREJAS ====================
-    if (response === 'parejas') {
-        const parejas = parejasConfirmadas.get(groupId) || [];
-        if (parejas.length === 0) {
-            await conn.reply(m.chat, `💔 *No hay parejas*\nEn este grupo solo hay solteros desesperados. 😂`, m, rcanal);
-            return;
-        }
+        console.log('Botón parejas presionado:', buttonId)
         
-        let lista = "💑 *Parejas del grupo:*\n";
-        for (const [p1, p2] of parejas) {
-            lista += `» ${await conn.getName(p1)} 💕 ${await conn.getName(p2)}\n`;
-        }
-        await conn.reply(m.chat, lista.trim(), m, rcanal);
-        return;
-    }
-    
-    // ==================== ACEPTAR / RECHAZAR ====================
-    if (response === 'aceptar' || response === 'rechazar') {
-        const tag = m.sender;
-        const mensajeGuardado = mensajesGrupos.get(groupId);
-        const proponente = mensajeGuardado?.proponente;
-        const propuesto = mensajeGuardado?.propuesto;
-        
-        if (!proponente || tag !== propuesto) {
-            await conn.reply(m.chat, `🚫 *Oops*\nEsta declaración no es para ti, sapito. 🐸`, m, rcanal);
-            return;
-        }
-        
-        if (proponente === tag) {
-            await conn.reply(m.chat, response === 'aceptar' ? `🤡 *¿Auto-aceptarse?*\nNo seas triste, sal a conocer gente.` : `💢 *¿Auto-rechazo?*\nAl menos date una oportunidad.`, m, rcanal);
-            return;
-        }
-        
-        if (response === 'aceptar') {
+        // ==================== ACEPTAR ====================
+        if (buttonId === 'aceptar') {
+            const tag = m.sender;
+            const mensajeGuardado = mensajesGrupos.get(groupId);
+            const proponente = mensajeGuardado?.proponente;
+            const propuesto = mensajeGuardado?.propuesto;
+            
+            if (!proponente || tag !== propuesto) {
+                await conn.reply(m.chat, `🚫 *Oops*\nEsta declaración no es para ti, sapito. 🐸`, m, rcanal);
+                return;
+            }
+            
+            if (proponente === tag) {
+                await conn.reply(m.chat, `🤡 *¿Auto-aceptarse?*\nNo seas triste, sal a conocer gente.`, m, rcanal);
+                return;
+            }
+            
             if (!parejasConfirmadas.has(groupId)) parejasConfirmadas.set(groupId, []);
             parejasConfirmadas.get(groupId).push([proponente, tag]);
             
             const nombre1 = await conn.getName(tag);
             const nombre2 = await conn.getName(proponente);
             
+            const texto = `🎉 *¡NOVIOS!* 🎉
+            
+💕 *${nombre2}* y *${nombre1}* ahora son pareja.
+
+💀 Si rompen, el grupo los funa. 🔫
+
+💔 Usa *terminar* cuando te aburras
+💑 Usa *parejas* para ver la lista`;
+            
             const buttons = [
-                { displayText: "💔 TERMINAR", id: "terminar" },
-                { displayText: "💑 VER PAREJAS", id: "parejas" }
+                { buttonId: 'terminar', buttonText: { displayText: "💔 TERMINAR" }, type: 1 },
+                { buttonId: 'parejas', buttonText: { displayText: "💑 VER PAREJAS" }, type: 1 }
             ];
             
-            await sendInteractiveMessage(conn, m.chat, 
-                `🎉 *¡NOVIOS!*\n\n» ${nombre2} y ${nombre1} ahora son pareja.\n» Si rompen, el grupo los funa. 🔫`,
-                "💌 GESTIÓN DE PAREJAS",
-                buttons,
-                [proponente, tag],
-                m
-            );
-        } else {
-            await conn.reply(m.chat, `💔 *RECHAZADO/A*\n\n» ${await conn.getName(tag)} dijo NO.\n» A llorar al rincón, ${await conn.getName(proponente)}. 😢`, m, rcanal);
+            await conn.sendMessage(m.chat, {
+                text: texto,
+                buttons: buttons,
+                mentions: [proponente, tag],
+                viewOnce: true
+            });
+            
+            mensajesGrupos.delete(groupId);
+            return;
         }
         
-        mensajesGrupos.delete(groupId);
+        // ==================== RECHAZAR ====================
+        if (buttonId === 'rechazar') {
+            const tag = m.sender;
+            const mensajeGuardado = mensajesGrupos.get(groupId);
+            const proponente = mensajeGuardado?.proponente;
+            const propuesto = mensajeGuardado?.propuesto;
+            
+            if (!proponente || tag !== propuesto) {
+                await conn.reply(m.chat, `🚫 *Oops*\nEsta declaración no es para ti, sapito. 🐸`, m, rcanal);
+                return;
+            }
+            
+            if (proponente === tag) {
+                await conn.reply(m.chat, `💢 *¿Auto-rechazo?*\nAl menos date una oportunidad.`, m, rcanal);
+                return;
+            }
+            
+            await conn.reply(m.chat, `💔 *RECHAZADO/A* 💔\n\n» ${await conn.getName(tag)} dijo NO.\n» A llorar al rincón, ${await conn.getName(proponente)}. 😢`, m, rcanal);
+            
+            mensajesGrupos.delete(groupId);
+            return;
+        }
+        
+        // ==================== TERMINAR ====================
+        if (buttonId === 'terminar') {
+            const parejas = parejasConfirmadas.get(groupId) || [];
+            const pareja = parejas.find(p => p[0] === m.sender || p[1] === m.sender);
+            
+            if (pareja) {
+                parejasConfirmadas.set(groupId, parejas.filter(p => p[0] !== m.sender && p[1] !== m.sender));
+                await conn.reply(m.chat, `💔 *¡SE ACABÓ!* 💔\n\nAdiós, espero no verte... aunque sé que volverás 😈\nGracias por los recuerdos (y los dramas).`, m, rcanal);
+            } else {
+                await conn.reply(m.chat, `❌ *¿Terminar qué?*\nNi novio/a tienes, mi ciela. 😂`, m, rcanal);
+            }
+            return;
+        }
+        
+        // ==================== VER PAREJAS ====================
+        if (buttonId === 'parejas') {
+            const parejas = parejasConfirmadas.get(groupId) || [];
+            await mostrarParejas(conn, m.chat, parejas);
+            return;
+        }
+        
         return;
     }
     
-    // ==================== COMANDO .SERNOVIOS ====================
-    const msgText = m.text?.toLowerCase() || '';
+    // DETECTAR COMANDO .sernovios (con o sin espacio)
+    const textLimpio = m.text ? m.text.toLowerCase().trim() : ''
     
-    if (msgText === '.sernovios' || msgText.startsWith('.sernovios ')) {
+    if (textLimpio === '.sernovios' || textLimpio === '. sernovios' || textLimpio.startsWith('.sernovios ') || textLimpio.startsWith('. sernovios ')) {
+        // Obtener el usuario mencionado (misma lógica que promote)
         let mentionedJid = await m.mentionedJid;
         let usuario = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null;
         
         if (!usuario) {
-            return conn.reply(m.chat, `☑️ *DEBES MENCIONAR O RESPONDER A UN USUARIO*\n\n📌 *Ejemplo:*\n.sernovios @usuario\n\n📌 *O responde al mensaje de la persona*`, m, rcanal);
+            await conn.reply(m.chat, `☑️ *DEBES MENCIONAR O RESPONDER A UN USUARIO*\n\n📌 *Ejemplo:*\n.sernovios @usuario\n\n📌 *O responde al mensaje de la persona*`, m, rcanal);
+            return;
         }
         
         if (usuario === m.sender) {
-            return conn.reply(m.chat, `☑️ No puedes ser tu propio novio/a. Menciona a otra persona.`, m, rcanal);
+            await conn.reply(m.chat, `☑️ No puedes ser tu propio novio/a. Menciona a otra persona.`, m, rcanal);
+            return;
         }
         
-        const parejas = parejasConfirmadas.get(groupId) || [];
+        const parejas = parejasConfirmadas.get(m.chat) || [];
         if (parejas.some(par => par.includes(m.sender) || par.includes(usuario))) {
-            return conn.reply(m.chat, `⚡ *Infiel detectado*\nYa tienes pareja, ¿o te gusta el drama? 👀`, m, rcanal);
+            await conn.reply(m.chat, `⚡ *Infiel detectado*\nYa tienes pareja, ¿o te gusta el drama? 👀`, m, rcanal);
+            return;
         }
         
-        const nombreRemitente = await conn.getName(m.sender);
+        const nombreRemitente = m.pushName || m.sender.split('@')[0];
         const nombreMencionado = await conn.getName(usuario);
         
-        mensajesGrupos.set(groupId, { proponente: m.sender, propuesto: usuario });
+        mensajesGrupos.set(m.chat, { proponente: m.sender, propuesto: usuario });
         
-        const buttons = [
-            { displayText: "✅ ACEPTAR", id: "aceptar" },
-            { displayText: "❌ RECHAZAR", id: "rechazar" }
-        ];
-        
-        await sendInteractiveMessage(conn, m.chat,
-            `💘 *¡DECLARACIÓN!*\n\n» ${nombreRemitente} quiere ser tu novio/a.\n» Si aceptas, serás suyo/a... si no, igual. 😏`,
-            "💌 RESPONDE CON UN BOTÓN",
-            buttons,
-            [usuario],
-            m
-        );
+        await mostrarDeclaracion(conn, m.chat, m.sender, usuario, nombreRemitente, nombreMencionado);
         return;
     }
-};
-
-handler.command = /^(sernovios)$/i;
-handler.group = true;
+}
 
 export default handler;
