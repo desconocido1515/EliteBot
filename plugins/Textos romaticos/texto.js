@@ -30,6 +30,11 @@ const colores = {
   acero: ['#4682B4', '#B0C4DE']
 };
 
+// Detectar qué programa de imagen está disponible (misma lógica que levelup)
+const isGm = global.support?.gm || false;
+const isMagick = global.support?.magick || false;
+const imageCmd = isGm ? 'gm' : (isMagick ? 'magick' : null);
+
 const handler = async (m, { conn, args, usedPrefix, command }) => {
   const text = args.join(' ').trim();
   
@@ -37,6 +42,10 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     return conn.reply(m.chat,
       `✏️ Usa el comando así:\n\n*.${command} [color opcional] tu mensaje*\n\n📌 *Ejemplo:*\n*.${command} azul Hola grupo*\n\n🎨 *Colores disponibles:*\n` +
       Object.keys(colores).sort().join(', '), m, rcanal);
+  }
+
+  if (!imageCmd) {
+    return conn.reply(m.chat, `☑️ No hay soporte de imágenes en este servidor.`, m, rcanal);
   }
 
   const [colorElegido, ...contenidoArr] = text.split(' ');
@@ -50,44 +59,26 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
 
   if (!fs.existsSync('./tmp')) fs.mkdirSync('./tmp');
   
-  const bgPath = `./tmp/bg-${Date.now()}.png`;
   const outputPath = `./tmp/texto-${Date.now()}.png`;
   
-  // Crear gradiente como fondo
-  await new Promise((resolve, reject) => {
-    const argsConv = [
-      '-size', '1080x1080',
-      'gradient:' + coloresGrad[0] + '-' + coloresGrad[1],
-      bgPath
-    ];
-    const proc = spawn('convert', argsConv);
-    proc.on('error', reject);
-    proc.on('close', resolve);
-  });
-  
-  // Escapar texto para ImageMagick
-  const textoEscapado = contenido.replace(/[!@#$%^&*()]/g, '\\$&');
-  const nombreEscapado = displayName.replace(/[!@#$%^&*()]/g, '\\$&');
-  
-  // Construir comando de ImageMagick
+  // Crear gradiente y texto con GraphicsMagick
   const convertArgs = [
-    bgPath,
-    // Texto del usuario (nombre)
-    '-font', 'Sans-serif',
-    '-pointsize', '50',
-    '-fill', 'white',
-    '-annotate', '+50+100', nombreEscapado,
-    // Texto principal centrado
+    'convert',
+    '-size', '1080x1080',
+    'gradient:' + coloresGrad[0] + '-' + coloresGrad[1],
     '-font', 'Sans-serif',
     '-pointsize', '60',
     '-fill', 'white',
     '-gravity', 'center',
-    '-annotate', '0', textoEscapado,
+    '-annotate', '0', contenido,
+    '-pointsize', '40',
+    '-gravity', 'northwest',
+    '-annotate', '+20+20', displayName,
     outputPath
   ];
   
   await new Promise((resolve, reject) => {
-    const proc = spawn('convert', convertArgs);
+    const proc = spawn(imageCmd, convertArgs);
     proc.on('error', reject);
     proc.on('close', resolve);
   });
@@ -100,7 +91,6 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   
   // Limpiar archivos temporales
   try {
-    fs.unlinkSync(bgPath);
     fs.unlinkSync(outputPath);
   } catch (e) {}
   
