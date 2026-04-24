@@ -2,7 +2,7 @@
 
 let handler = async (m, { conn, text}) => {
     let piropo = pickRandom(global.piropo)
-    let mensaje = `╭┄〔 *${wm || 'Elite Bot'}* 〕┄⊱\n┊\nდ *"${piropo}"*\n┊\n*╰━━━⊰ 𓃠 ${vs || 'EBG'} ⊱━━━━დ*`
+    let mensaje = `╭┄〔 *Elite Bot Global* 〕┄⊱\n┊\nდ *"${piropo}"*\n┊\n*╰━━━⊰ 𓃠 EBG ⊱━━━━დ*`
     
     await conn.reply(m.chat, mensaje, m, rcanal)
 }
