@@ -1,4 +1,4 @@
-  let WAMessageStubType = (await import('@whiskeysockets/baileys')).default
+let WAMessageStubType = (await import('@whiskeysockets/baileys')).default
 import chalk from 'chalk'
 import fs from 'fs'
 import axios from 'axios'
@@ -21,121 +21,121 @@ const usuario = await resolveLidToRealJid(m?.sender, conn, m?.chat)
 const groupAdmins = participants.filter(p => p.admin)
 
 const getThumbnail = async () => {
-const res = await axios.get("https://files.catbox.moe/e6br3k.jpg", { responseType: "arraybuffer" })
-return Buffer.from(res.data, "binary")
+  const res = await axios.get("https://files.catbox.moe/e6br3k.jpg", { responseType: "arraybuffer" })
+  return Buffer.from(res.data, "binary")
 }
 
 const thumbnail = await getThumbnail()
 
 const shadow_xyz = {
-key: {
-fromMe: false,
-participant: "0@s.whatsapp.net",
-remoteJid: "status@broadcast"
-},
-message: {
-productMessage: {
-product: {
-productImage: {
-mimetype: "image/jpeg",
-jpegThumbnail: thumbnail
-},
-title: "",
-description: "",
-currencyCode: "",
-priceAmount1000: 5000,
-retailerId: "ShadowCore",
-productImageCount: 1
-},
-businessOwnerJid: "51900922660@s.whatsapp.net"
-}
-}
+  key: {
+    fromMe: false,
+    participant: "0@s.whatsapp.net",
+    remoteJid: "status@broadcast"
+  },
+  message: {
+    productMessage: {
+      product: {
+        productImage: {
+          mimetype: "image/jpeg",
+          jpegThumbnail: thumbnail
+        },
+        title: "",
+        description: "",
+        currencyCode: "",
+        priceAmount1000: 5000,
+        retailerId: "ShadowCore",
+        productImageCount: 1
+      },
+      businessOwnerJid: "51900922660@s.whatsapp.net"
+    }
+  }
 }
 
 const rcanal = {
 contextInfo: {
-isForwarded: true,
-forwardedNewsletterMessageInfo: {
-newsletterJid: channelRD.id,
-serverMessageId: '（つ  / ♡. ㅤ•゜・。... 🄶🄾🄹🄾 🄱🄾🅃 - 🄼🄳💫⃤꙰ ꒱ ',
-newsletterName: channelRD.name
-},
-externalAdReply: {
-title: "",
-body: textbot,
-mediaUrl: null,
-description: null,
-previewType: "PHOTO",
-thumbnail: await (await fetch(icono)).buffer(),
-sourceUrl: redes,
-mediaType: 1,
-renderLargerThumbnail: false
-},
-mentionedJid: []
+  isForwarded: true,
+  forwardedNewsletterMessageInfo: {
+    newsletterJid: channelRD.id,
+    serverMessageId: '（つ  / ♡. ㅤ•*゜・。... 🄶🄾🄹🄾 🄱🄾🅃 - 🄼🄳💫⃤꙰ ꒱* ',
+    newsletterName: channelRD.name
+  },
+  externalAdReply: {
+    title: "",
+    body: textbot,
+    mediaUrl: null,
+    description: null,
+    previewType: "PHOTO",
+    thumbnail: await (await fetch(icono)).buffer(),
+    sourceUrl: redes,
+    mediaType: 1,
+    renderLargerThumbnail: false
+  },
+  mentionedJid: []
 }}
 
 const pp = await conn.profilePictureUrl(m.chat, 'image').catch(_ => null) || 'https://files.catbox.moe/5biv5v.jpg'
 
 /* ================== TEXTOS CORREGIDOS ================== */
 
-const nombre = *\INFORMACION`✅*
+const nombre = `*\`INFORMACION\`✅*
 
-✦ SE CAMBIÓ EL NOMBRE DEL GRUPO A :
-${m.messageStubParameters[0]}
+✦ *SE CAMBIÓ EL NOMBRE DEL GRUPO A :*
+*${m.messageStubParameters[0]}*
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const foto = *\INFORMACION`✅*
+const foto = `*\`INFORMACION\`✅*
 
-✦ SE CAMBIÓ LA IMAGEN DEL GRUPO
+✦ *SE CAMBIÓ LA IMAGEN DEL GRUPO*
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const edit = *\INFORMACION`✅*
+const edit = `*\`INFORMACION\`✅*
 
-✦ SE ACTUALIZARON LOS PERMISOS DEL GRUPO
+✦ *SE ACTUALIZARON LOS PERMISOS DEL GRUPO*
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const newlink = *\INFORMACION`✅*
+const newlink = `*\`INFORMACION\`✅*
 
-✦ SE RESTABLECIÓ EL ENLACE DEL GRUPO
+✦ *SE RESTABLECIÓ EL ENLACE DEL GRUPO*
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const status = *\INFORMACION`✅*
+const status = `*\`INFORMACION\`✅*
 
-✦ EL GRUPO HA SIDO ${m.messageStubParameters[0] == 'on' ? 'CERRADO' : 'ABIERTO'}
+✦ *EL GRUPO HA SIDO* *${m.messageStubParameters[0] == 'on' ? 'CERRADO' : 'ABIERTO'}*
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const admingp = *\NUEVO ADMINISTRADOR`✅*
+const admingp = `*\`NUEVO ADMINISTRADOR\`✅*
 
-✦ AHORA ES ADMINISTRADOR : @${users.split('@')[0]}
+✦ *AHORA ES ADMINISTRADOR :* @${users.split('@')[0]}
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const noadmingp = *\INFORMACION`✅*
+const noadmingp = `*\`INFORMACION\`✅*
 
-✦ YA NO ES ADMINISTRADOR : @${users.split('@')[0]}
+✦ *YA NO ES ADMINISTRADOR :* @${users.split('@')[0]}
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
-const desc = *\INFORMACION`✅*
+const desc = `*\`INFORMACION\`✅*
 
-✦ SE CAMBIO LA DESCRIPCIÓN DEL GRUPO A : ${m.messageStubParameters[0]}
+✦ *SE CAMBIO LA DESCRIPCIÓN DEL GRUPO A :* ${m.messageStubParameters[0]}
 
-» ACCIÓN HECHA POR : @${usuario.split('@')[0]}`
+» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
 
 /* ======================================================= */
 
 if (chat.detect && m.messageStubType == 2) {
 const uniqid = (m.isGroup ? m.chat : m.sender).split('@')[0]
-const sessionPath = ./${sessions}/
+const sessionPath = `./${sessions}/`
 for (const file of await fs.promises.readdir(sessionPath)) {
 if (file.includes(uniqid)) {
 await fs.promises.unlink(path.join(sessionPath, file))
-console.log(${chalk.yellow.bold('✎ Delete!')} ${chalk.greenBright('${file}')}\n${chalk.redBright('Que provoca el "undefined" en el chat.')})
+console.log(`${chalk.yellow.bold('✎ Delete!')} ${chalk.greenBright(`'${file}'`)}\n${chalk.redBright('Que provoca el "undefined" en el chat.')}`)
 }}}
 
 if (chat.detect && m.messageStubType == 21) {
@@ -190,7 +190,7 @@ async function resolveLidToRealJid(lid, conn, groupChatId, maxRetries = 3, retry
 const inputJid = lid.toString()
 
 if (!inputJid.endsWith("@lid") || !groupChatId?.endsWith("@g.us")) {
-return inputJid.includes("@") ? inputJid : ${inputJid}@s.whatsapp.net
+return inputJid.includes("@") ? inputJid : `${inputJid}@s.whatsapp.net`
 }
 
 if (lidCache.has(inputJid)) return lidCache.get(inputJid)
