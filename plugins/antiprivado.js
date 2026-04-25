@@ -3,7 +3,7 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
   if (m.isGroup) return false;
   if (!m.message) return true;
 
-  const chat = global.db.data.chats[m.chat] = global.db.data.chats[m.chat] || {}; // asegurar existencia
+  const chat = global.db.data.chats[m.chat];
   const bot = global.db.data.settings[conn.user.jid] || {};
 
   const palabrasClave = ['PIEDRA', 'PAPEL', 'TIJERA', 'serbot', 'jadibot'];
@@ -14,14 +14,15 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
   const creador = '+5804242773183';
   if (m.sender.includes(creador.replace('+', ''))) return true;
 
-  // 🚫 Si ya se le envió antes, no hacer nada
-  if (chat.antiPrivateSent) return true;
+  // 🚫 EVITAR DUPLICADO
+  if (global._antiprivado[m.sender]) return true;
 
   if (bot.antiPrivate && !isOwner && !isROwner) {
     const prefixRegex = /^[!/#$.]/; 
     if (prefixRegex.test(m.text)) {
-      const grupoURL = 'https://chat.whatsapp.com/ETHW7aP7kOICrR2RBrfE6N'; 
-      const nombreUsuario = await conn.getName(m.sender);
+
+      // MARCAR COMO YA ENVIADO
+      global._antiprivado[m.sender] = true;
 
       const now = new Date();
       const week = now.toLocaleDateString('es-EC', { weekday: 'long' });
@@ -35,7 +36,6 @@ https://sites.google.com/view/elitebotglobal?usp=sharing
 
  © 2023 EliteBotGlobal // ProyectoX`;
       
-      // 📁 Ruta local
       let videoPath = './media/tienda.mp4';
 
       await conn.sendFile(
@@ -47,9 +47,6 @@ https://sites.google.com/view/elitebotglobal?usp=sharing
         false,
         { mentions: [m.sender], gifPlayback: true }
       );
-
-      // ✅ Marcar como ya enviado
-      chat.antiPrivateSent = true;
 
       await conn.updateBlockStatus(m.chat, 'block');
     }
