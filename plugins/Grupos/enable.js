@@ -18,24 +18,24 @@ if (!comandoReal) {
     const estadoAntiLink = chat.antiLink ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     const estadoModoAdmin = chat.modoadmin ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     
-    return conn.reply(m.chat, `✅ \`𝖮𝖭\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖠𝖼𝗍𝗂𝗏𝖺𝖽𝗈
-❌ \`𝖮𝖥𝖥\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
+    return conn.reply(m.chat, `✅ `𝖮𝖭` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖠𝖼𝗍𝗂𝗏𝖺𝖽𝗈
+❌ `𝖮𝖥𝖥` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
 
 
-> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
-> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
+> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: `.on welcome`
+> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: `.off welcome`
 
 
-🔏 \`SISTEMA ELITE BOT\`
+🔏 `ESTADO DEL GRUPO`
 ╭┈┈┈┈┈┈┈┈⊰
-┊ 💥 *welcome*: ${estadoWelcome === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *welcome*
-┊ 💥 *nsfw*: ${estadoNsfw === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *nsfw*
-┊ 💥 *economy*: ${estadoEconomy === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *economy*
-┊ 💥 *rpg*: ${estadoRpg === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *rpg*
-┊ 💥 *detect*: ${estadoDetect === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *detect*
-┊ 💥 *antilink*: ${estadoAntiLink === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *antilink*
-┊ 💥 *modoadmin*: ${estadoModoAdmin === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *modoadmin*
-┊ 💥 *jadibot*: 🌍 = *jadibot* (${estadoJadibot})
+┊ 💥 *welcome*:  = ${estadoWelcome}
+┊ 💥 *nsfw*:  = ${estadoNsfw}
+┊ 💥 *economy*: = ${estadoEconomy}
+┊ 💥 *rpg*:  = ${estadoRpg}
+┊ 💥 *detect*:  = ${estadoDetect}
+┊ 💥 *antilink*:  = ${estadoAntiLink}
+┊ 💥 *modoadmin*:  = ${estadoModoAdmin}
+┊ 💥 *jadibot*:  = ${estadoJadibot}
 ╰┈┈┈┈┈┈┈┈┈┈┈⊰`, m, rcanal)
 }
 
