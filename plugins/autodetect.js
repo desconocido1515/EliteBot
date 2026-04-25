@@ -2,7 +2,7 @@ import chalk from 'chalk';
 let WAMessageStubType = (await import("@whiskeysockets/baileys")).default;
 import { readdirSync, unlinkSync, existsSync, promises as fs, rmSync } from 'fs';
 import path from 'path';
-import './_allfake.js.';
+//import './_allfake.js.';
 
 let handler = m => m;
 handler.before = async function (m, { conn, participants, groupMetadata, isBotAdmin }) {
