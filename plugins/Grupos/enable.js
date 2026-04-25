@@ -19,11 +19,11 @@ if (!comandoReal) {
     const estadoModoAdmin = chat.modoadmin ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     
     return conn.reply(m.chat, `✅ \`𝖮𝖭\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖠𝖼𝗍𝗂𝗏𝖺𝖽𝗈
-❌ `\𝖮𝖥𝖥\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
+❌ \`𝖮𝖥𝖥\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
 
 
- 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
- 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
+ > 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
+ > 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
 
 
 🔏 \`ESTADO DEL GRUPO\`
