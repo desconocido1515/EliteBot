@@ -18,40 +18,25 @@ if (!comandoReal) {
     const estadoAntiLink = chat.antiLink ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     const estadoModoAdmin = chat.modoadmin ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     
-    return conn.reply(m.chat, `╭━━━ 𝙎𝙄𝙎𝙏𝙀𝙈𝘼 𝙀𝙇𝙄𝙏𝙀 ━━⬣
-┃
-┃ ✨ *COMANDOS DISPONIBLES* ✨
-┃
-┃ 🟢 *welcome* - Bienvenidas
-┃    └▸ Estado: ${estadoWelcome}
-┃
-┃ 🔞 *nsfw* - Contenido +18
-┃    └▸ Estado: ${estadoNsfw}
-┃
-┃ 💰 *economy* - Sistema económico
-┃    └▸ Estado: ${estadoEconomy}
-┃
-┃ 🎮 *rpg* - Sistema RPG
-┃    └▸ Estado: ${estadoRpg}
-┃
-┃ 📢 *detect* - Alertas de grupo
-┃    └▸ Estado: ${estadoDetect}
-┃
-┃ 🔗 *antilink* - Anti enlaces
-┃    └▸ Estado: ${estadoAntiLink}
-┃
-┃ 👑 *modoadmin* - Solo admins
-┃    └▸ Estado: ${estadoModoAdmin}
-┃
-┃ 🤖 *jadibot* - Sub bots (🌍 GLOBAL)
-┃    └▸ Estado: ${estadoJadibot}
-┃
-┃
-┃ 📌 *Cómo usar:*
-┃ ▸ ${usedPrefix}on welcome  → Activar
-┃ ▸ ${usedPrefix}off welcome → Desactivar
-┃
-╰━━━━━━━━━━━━━━━━━━━━━━⬣`, m, rcanal)
+    return conn.reply(m.chat, `✅ \`𝖮𝖭\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖠𝖼𝗍𝗂𝗏𝖺𝖽𝗈
+❌ \`𝖮𝖥𝖥\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
+
+
+> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
+> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
+
+
+🔏 \`SISTEMA ELITE BOT\`
+╭┈┈┈┈┈┈┈┈⊰
+┊ 💥 *welcome*: ${estadoWelcome === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *welcome*
+┊ 💥 *nsfw*: ${estadoNsfw === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *nsfw*
+┊ 💥 *economy*: ${estadoEconomy === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *economy*
+┊ 💥 *rpg*: ${estadoRpg === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *rpg*
+┊ 💥 *detect*: ${estadoDetect === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *detect*
+┊ 💥 *antilink*: ${estadoAntiLink === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *antilink*
+┊ 💥 *modoadmin*: ${estadoModoAdmin === '𝗔𝗰𝘁𝗶𝘃𝗮𝗱𝗼' ? '✅' : '❌'} = *modoadmin*
+┊ 💥 *jadibot*: 🌍 = *jadibot* (${estadoJadibot})
+╰┈┈┈┈┈┈┈┈┈┈┈⊰`, m, rcanal)
 }
 
 // ==================== CONFIGURACIÓN GLOBAL JADIBOT ====================
