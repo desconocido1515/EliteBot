@@ -3,117 +3,151 @@ const primaryBot = global.db.data.chats[m.chat].primaryBot
 if (primaryBot && conn.user.jid !== primaryBot) throw !1
 const chat = global.db.data.chats[m.chat]
 let type = command.toLowerCase()
-let isEnable = chat[type] !== undefined ? chat[type] : false
-if (args[0] === 'on' || args[0] === 'enable') {
-if (isEnable) return conn.reply(m.chat, `🥭 *${type}* ya estaba *activado*.`, m, rcanal)
-isEnable = true
-} else if (args[0] === 'off' || args[0] === 'disable') {
-if (!isEnable) return conn.reply(m.chat, `🥭 *${type}* ya estaba *desactivado*.`, m, rcanal)
-isEnable = false
+
+// Extraer acción (on/off) y el comando real
+let action = args[0]?.toLowerCase()
+let comandoReal = args[1]?.toLowerCase() || type
+
+// Si el primer argumento es on/off/enable/disable, usamos esa acción
+if (action === 'on' || action === 'enable' || action === 'activar') {
+    action = 'on'
+} else if (action === 'off' || action === 'disable' || action === 'desactivar') {
+    action = 'off'
 } else {
-return conn.reply(m.chat, `╭━━━〔 ⚙️ ᴘᴀɴᴇʟ ᴅᴇ ᴄᴏɴᴛʀᴏʟ 〕━━⬣  
+    // Si no hay acción válida, mostrar ayuda
+    action = null
+    comandoReal = type
+}
+
+let isEnable = chat[comandoReal] !== undefined ? chat[comandoReal] : false
+
+// Si no hay acción, mostrar panel de control
+if (!action) {
+    return conn.reply(m.chat, `╭━━━〔 ⚙️ ᴘᴀɴᴇʟ ᴅᴇ ᴄᴏɴᴛʀᴏʟ 〕━━⬣  
 ┃ ❣ *Un administrador puede gestionar el comando:*  
-┃ ╰➤ *${command}*  
+┃ ╰➤ *${usedPrefix}on ${comandoReal}* o *${usedPrefix}off ${comandoReal}*  
 ┃  
-┃ ღ Opciones disponibles: 💫
-┃ 𖥔 _Activar_ » *${usedPrefix}${command} enable*  
-┃ 𖥔 _Desactivar_ » *${usedPrefix}${command} disable*  
+┃ ღ Comandos disponibles: 💫
+┃ 𖥔 _welcome_ - Bienvenidas
+┃ 𖥔 _nsfw_ - Contenido +18
+┃ 𖥔 _economy_ - Sistema económico
+┃ 𖥔 _rpg_ - Sistema RPG
+┃ 𖥔 _detect_ - Alertas de grupo
+┃ 𖥔 _antilink_ - Anti enlaces
+┃ 𖥔 _modoadmin_ - Solo admins
+┃ 𖥔 _jadibot_ - Sub bots
 ┃  
-┃ ☙ Estado actual:  
+┃ ☙ Estado actual de *${comandoReal}*:  
 ┃ ╰➤ *${isEnable ? '✓ Activado' : '✗ Desactivado'}*  
 ╰━━━━━━━━━━━━━━━━━━━━━━⬣`, m, rcanal)
 }
-switch (type) {
-case 'welcome': case 'bienvenida': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
+
+// Validar acción
+if (action === 'on') {
+    if (isEnable) return conn.reply(m.chat, `☑️ *${comandoReal}* ya estaba *activado*.`, m, rcanal)
+    isEnable = true
+} else if (action === 'off') {
+    if (!isEnable) return conn.reply(m.chat, `☑️ *${comandoReal}* ya estaba *desactivado*.`, m, rcanal)
+    isEnable = false
 }
-chat.welcome = isEnable
-break
+
+// Validar permisos según el comando
+switch (comandoReal) {
+case 'welcome': case 'bienvenida': {
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.welcome = isEnable
+    break
 }
 case 'modoadmin': case 'onlyadmin': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
-}
-chat.modoadmin = isEnable
-break
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.modoadmin = isEnable
+    break
 }
 case 'detect': case 'alertas': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
-}
-chat.detect = isEnable
-break
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.detect = isEnable
+    break
 }
 case 'antilink': case 'antienlace': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
-}
-chat.antiLink = isEnable
-break
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.antiLink = isEnable
+    break
 }
 case 'nsfw': case 'modohorny': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
-}
-chat.nsfw = isEnable
-break
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.nsfw = isEnable
+    break
 }
 case 'economy': case 'economia': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
-}
-chat.economy = isEnable
-break
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.economy = isEnable
+    break
 }
 case 'rpg': case 'gacha': {
-if (!m.isGroup) {
-if (!isOwner) {
-global.dfail('group', m, conn)
-throw false
-}} else if (!isAdmin) {
-global.dfail('admin', m, conn)
-throw false
+    if (!m.isGroup) {
+        if (!isOwner) {
+            return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+        }
+    } else if (!isAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    }
+    chat.gacha = isEnable
+    break
 }
-chat.gacha = isEnable
-break
-}}
-chat[type] = isEnable
-conn.reply(m.chat, `🕸️ Has *${isEnable ? 'activado' : 'desactivado'}* el *${type}* para este grupo.`, m, rcanal)
+case 'jadibot': case 'serbot': {
+    // Solo owner puede usar este comando
+    if (!isOwner) {
+        return conn.reply(m.chat, `☑️ *COMANDO RESTRINGIDO*\n\nEste comando solo puede ser usado por el *OWNER* del bot.`, m, rcanal)
+    }
+    chat.jadibot = isEnable
+    break
 }
-handler.help = ['welcome', 'bienvenida', 'modoadmin', 'onlyadmin', 'nsfw', 'modohorny', 'economy', 'economia', 'rpg', 'gacha', 'detect', 'alertas', 'antilink', 'antienlace', 'antilinks', 'antienlaces']
+default:
+    return conn.reply(m.chat, `☑️ Comando *${comandoReal}* no reconocido.`, m, rcanal)
+}
+
+chat[comandoReal] = isEnable
+conn.reply(m.chat, `✅ Has *${isEnable ? 'activado' : 'desactivado'}* *${comandoReal}* para este grupo.`, m, rcanal)
+}
+
+handler.help = ['on', 'off']
 handler.tags = ['nable']
-handler.command = ['welcome', 'bienvenida', 'modoadmin', 'onlyadmin', 'nsfw', 'modohorny', 'economy', 'economia', 'rpg', 'gacha', 'detect', 'alertas', 'antilink', 'antienlace']
-handler.group = true
+handler.command = ['on', 'off']
 
 export default handler
