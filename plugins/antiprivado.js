@@ -1,4 +1,4 @@
-/*export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }) {
+export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }) {
   if (m.isBaileys && m.fromMe) return true;
   if (m.isGroup) return false;
   if (!m.message) return true;
@@ -29,4 +29,4 @@
 
   return false;
 }
-*/
+
