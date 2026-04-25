@@ -18,7 +18,7 @@ let crm4 = "IF9hdXRvcmVzcG9uZGVyLmpzIGluZm8tYm90Lmpz"
 let drm1 = ""
 let drm2 = ""
 let rtx = "*❀ SER BOT • MODE QR*\n\n✰ Con otro celular o en la PC escanea este QR para convertirte en un *Sub-Bot* Temporal.\n\n\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n\n\`2\` » Toque dispositivos vinculados\n\n\`3\` » Escanee este codigo QR para iniciar sesion con el bot\n\n✧ ¡Este código QR expira en 45 segundos!."
-let rtx2 = "*❀ SER BOT • MODE CODE*\n\n✰ Usa este Código para convertirte en un *Sub-Bot* Temporal.\n\n\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n\n\`2\` » Toque dispositivos vinculados\n\n\`3\` » Selecciona Vincular con el número de teléfono\n\n\`4\` » Escriba el Código para iniciar sesion con el bot\n\n✧ No es recomendable usar tu cuenta principal."
+let rtx2 = "¡𝗛𝗼𝗹𝗮 𝗵𝘂𝗺𝗮𝗻𝗼! 👋🏻\n\nIntroduzca el código de 8 dígitos en vincular dispositivos.\n\n> EliteBotGlobal // Proyecto X\n\n Tiempo : 1 minuto\n⬇️ Click en copiar código ⬇️"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const kanekiAIJBOptions = {}
@@ -85,9 +85,10 @@ setInterval(checkSubBots, 600000); // 10 minutos
 // ========== FIN NUEVO SISTEMA DE REINICIO ==========
 
 let handler = async (m, { conn, args, usedPrefix, command, isOwner }) => {
-if (!globalThis.db.data.settings[conn.user.jid].jadibotmd) return m.reply(`ꕥ El Comando *${command}* está desactivado temporalmente.`)
+if (!globalThis.db.data.settings[conn.user.jid].jadibotmd) return m.reply(`¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘛𝘦 𝘪𝘯𝘧𝘰𝘳𝘮𝘰 𝘲𝘶𝘦 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰 𝘴𝘰𝘭𝘰 𝘱𝘶𝘦𝘥𝘦 𝘶𝘵𝘪𝘭𝘪𝘻𝘢𝘳 𝘮𝘪 𝘤𝘳𝘦𝘢𝘥𝘰𝘳 𝘒𝘦𝘷𝘪𝘯.`)
 let time = global.db.data.users[m.sender].Subs + 120000
-if (new Date - global.db.data.users[m.sender].Subs < 120000) return conn.reply(m.chat, `ꕥ Debes esperar ${msToTime(time - new Date())} para volver a vincular un *Sub-Bot.*`, m)
+if (new Date - global.db.data.users[m.sender].Subs < 10000) return conn.reply(m.chat, `Debes esperar ${msToTime(time - new Date())} para volver a usar nuevamente el comando .code`, m)
 let socklimit = global.conns.filter(sock => sock?.user).length
 if (socklimit >= 80) {
 return m.reply(`ꕥ No se han encontrado espacios para *Sub-Bots* disponibles.`)
@@ -133,7 +134,7 @@ fs.mkdirSync(pathkanekiAIJadiBot, { recursive: true })}
 try {
 args[0] && args[0] != undefined ? fs.writeFileSync(pathCreds, JSON.stringify(JSON.parse(Buffer.from(args[0], "base64").toString("utf-8")), null, '\t')) : ""
 } catch {
-conn.reply(m.chat, `ꕥ Use correctamente el comando » ${usedPrefix + command}`, m)
+conn.reply(m.chat, `Use correctamente el comando » ${usedPrefix + command}`, m)
 return
 }
 const comb = Buffer.from(crm1 + crm2 + crm3 + crm4, "base64")
