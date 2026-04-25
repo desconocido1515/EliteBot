@@ -7,21 +7,15 @@ let handler = async (m, { conn, usedPrefix, command, isROwner }) => {
             await conn.reply(m.chat, `☑️ *REINICIANDO BOT* ☑️\n\n⏳ Espera hasta que el bot se reinicie completamente.\n📌 *El proceso puede tomar unos segundos.*`, m, rcanal)
             await m.react('✔️')
             
-            // Solo reiniciar, no salir del proceso
             setTimeout(() => {
-                if (process.send) {
-                    process.send("restart")
-                } else {
-                    // En panel, usar reinicio del proceso
-                    console.log("Reiniciando bot...")
-                    process.exit(0)
-                }
+                // Método más confiable para reiniciar en panel
+                process.kill(process.pid, 'SIGINT')
             }, 3000)
         }
         
         else if (command === 'stop') {
             await m.react('🛑')
-            await conn.reply(m.chat, `🛑 *DETENIENDO BOT* 🛑\n\n⚠️ El bot se detendrá inmediatamente.\n📌 Para iniciarlo nuevamente, presiona *Iniciar* en el panel.`, m, rcanal)
+            await conn.reply(m.chat, `🛑 *DETENIENDO BOT* 🛑\n\n⚠️ El bot se detendrá inmediatamente.\n📌 Presiona *Iniciar* en el panel para volver a encenderlo.`, m, rcanal)
             await m.react('✔️')
             setTimeout(() => {
                 process.exit(0)
