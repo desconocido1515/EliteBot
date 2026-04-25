@@ -86,7 +86,7 @@ ${m.messageStubParameters[0]}
 
     if (chat.detect && m.messageStubType == 2) {
         const uniqid = (m.isGroup ? m.chat : m.sender).split('@')[0];
-        const sessionPath = `./${sessions}/`; // ✅ ruta corregida
+        const sessionPath = `./${sessions}/`;
 
         for (const file of await fs.readdir(sessionPath)) {
             if (file.includes(uniqid)) {
@@ -98,21 +98,21 @@ ${m.messageStubParameters[0]}
     }
 
     if (chat.detect && m.messageStubType == 21) {
-        await conn.reply(m.chat, nombre, m, rcanal);   
+        await conn.sendMessage(m.chat, { text: nombre, mentions: [m.sender, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });   
     } else if (chat.detect && m.messageStubType == 22) {
-        await conn.reply(m.chat, foto, m, rcanal);  
+        await conn.sendMessage(m.chat, { text: foto, mentions: [m.sender] }, { quoted: fkontak });  
     } else if (chat.detect && m.messageStubType == 23) {
-        await conn.reply(m.chat, newlink, m, rcanal); 
+        await conn.sendMessage(m.chat, { text: newlink, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 24) {
-        await conn.reply(m.chat, desc, m, rcanal); 
+        await conn.sendMessage(m.chat, { text: desc, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 25) {
-        await conn.reply(m.chat, edit, m, rcanal); 
+        await conn.sendMessage(m.chat, { text: edit, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 26) {
-        await conn.reply(m.chat, status, m, rcanal);
+        await conn.sendMessage(m.chat, { text: status, mentions: [m.sender] }, { quoted: fkontak });
     } else if (chat.detect && m.messageStubType == 29) {
-        await conn.reply(m.chat, admingp, m, rcanal); 
+        await conn.sendMessage(m.chat, { text: admingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 30) {
-        await conn.reply(m.chat, noadmingp, m, rcanal);
+        await conn.sendMessage(m.chat, { text: noadmingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });
     } else {
         if (m.messageStubType == 2) return;
         console.log({
