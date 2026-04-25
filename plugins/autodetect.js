@@ -76,56 +76,75 @@ contextInfo: {
 
 const pp = await conn.profilePictureUrl(m.chat, 'image').catch(_ => null) || 'https://files.catbox.moe/5biv5v.jpg'
 
-/* ================== TEXTOS CORREGIDOS ================== */
+/* ================== TEXTOS CON NUEVO ESTILO ================== */
 
-const nombre = `*\`INFORMACION\`✅*
+const nombre = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *SE CAMBIÓ EL NOMBRE DEL GRUPO A :*
-*${m.messageStubParameters[0]}*
+\`\`\`@${usuario.split('@')[0]}
+CAMBIÓ EL NOMBRE DEL GRUPO A:
+${m.messageStubParameters[0]}
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const foto = `*\`INFORMACION\`✅*
+const foto = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *SE CAMBIÓ LA IMAGEN DEL GRUPO*
+\`\`\`@${usuario.split('@')[0]}
+CAMBIÓ LA IMAGEN DEL GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const edit = `*\`INFORMACION\`✅*
+const edit = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *SE ACTUALIZARON LOS PERMISOS DEL GRUPO*
+\`\`\`@${usuario.split('@')[0]}
+ACTUALIZÓ LOS PERMISOS DEL GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const newlink = `*\`INFORMACION\`✅*
+const newlink = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *SE RESTABLECIÓ EL ENLACE DEL GRUPO*
+\`\`\`@${usuario.split('@')[0]}
+RESTABLECIÓ EL ENLACE DEL GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const status = `*\`INFORMACION\`✅*
+const status = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *EL GRUPO HA SIDO* *${m.messageStubParameters[0] == 'on' ? 'CERRADO' : 'ABIERTO'}*
+\`\`\`@${usuario.split('@')[0]}
+HA ${m.messageStubParameters[0] == 'on' ? 'CERRADO 🔒' : 'ABIERTO 🔓'} EL GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const admingp = `*\`NUEVO ADMINISTRADOR\`✅*
+const admingp = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *AHORA ES ADMINISTRADOR :* @${users.split('@')[0]}
+\`\`\`@${users.split('@')[0]}
+AHORA TIENE PODERES EN
+ESTE GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const noadmingp = `*\`INFORMACION\`✅*
+const noadmingp = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *YA NO ES ADMINISTRADOR :* @${users.split('@')[0]}
+\`\`\`@${users.split('@')[0]}
+YA NO TIENE PODERES EN
+ESTE GRUPO
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
-const desc = `*\`INFORMACION\`✅*
+const desc = `💥 \`AVISO INFORMATIVO\` 💥
 
-✦ *SE CAMBIO LA DESCRIPCIÓN DEL GRUPO A :* ${m.messageStubParameters[0]}
+\`\`\`@${usuario.split('@')[0]}
+CAMBIÓ LA DESCRIPCIÓN DEL GRUPO A:
+${m.messageStubParameters[0]}
 
-» *ACCIÓN HECHA POR :* @${usuario.split('@')[0]}`
+» OPERACIÓN REALIZADA POR:
+» @${usuario.split('@')[0]}\`\`\``
 
 /* ======================================================= */
 
@@ -234,4 +253,4 @@ await new Promise(resolve => setTimeout(resolve, retryDelay))
 }
 
 return inputJid
-}
+  }
