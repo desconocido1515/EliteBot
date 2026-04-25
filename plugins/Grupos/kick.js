@@ -1,43 +1,61 @@
-let handler = async (m, { conn, participants, usedPrefix, command }) => {
-  if (!global.db.data.settings[conn.user.jid].restrict) 
-    throw '*[ ⚠️ ] MI CREADOR TIENE DESACTIVADO ESTA FUNCIÓN.*\n💻 593993370003';
-
-  let kicktext = `⚠️ *ETIQUETA A LA PERSONA O RESPONDE SU MENSAJE PARA ELIMINARLO DE ESTE GRUPO.*`;
-  if (!m.mentionedJid[0] && !m.quoted) 
-    return m.reply(kicktext, m.chat, { mentions: conn.parseMention(kicktext) });
-
-  let user = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted.sender;
-  let owr = m.chat.split`-`[0];
-
-  // Mensaje de cuenta regresiva
-  await conn.sendMessage(
-    m.chat,
-    { 
-      text: `*ADIOS BASURA🤮*\n@${user.split('@')[0]}\n\n *¡Tienes 15 segundos para decir tus últimas palabras!* ⏳`,
-      mentions: [user]
+let handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmin }) => {
+    // Usar la misma lógica de mención que promote
+    let mentionedJid = await m.mentionedJid
+    let user = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
+    
+    if (!user) {
+        return conn.reply(m.chat, `☑️ *USO CORRECTO*\n\n📌 *Ejemplo:*\n.${command} @usuario\n\nO responde al mensaje del usuario.`, m, rcanal)
     }
-  );
-
-  // Espera 15 segundos antes de kickear
-  setTimeout(async () => {
+    
+    // No permitir kickear al creador del grupo
     try {
-      await conn.groupParticipantsUpdate(m.chat, [user], 'remove');
-      await conn.sendMessage(
-        m.chat,
-        { 
-          text: `Le mandamos botando a esta basura\n@${user.split('@')[0]}\n\nOjalá no vuelva.`,
-          mentions: [user]
+        const groupInfo = await conn.groupMetadata(m.chat)
+        const ownerGroup = groupInfo.owner || m.chat.split('-')[0] + '@s.whatsapp.net'
+        
+        if (user === ownerGroup) {
+            return conn.reply(m.chat, `☑️ No puedes expulsar al creador del grupo.`, m, rcanal)
         }
-      );
-    } catch (error) {
-      console.error("Error al kickear:", error);
+        
+        // No permitir kickear al bot
+        if (user === conn.user.jid) {
+            return conn.reply(m.chat, `☑️ No puedes expulsarme a mí mismo.`, m, rcanal)
+        }
+        
+        // Verificar si el usuario es admin (no se puede kickear a un admin)
+        if (groupInfo.participants.some(p => p.id === user && p.admin)) {
+            return conn.reply(m.chat, `☑️ No puedes expulsar a un administrador.`, m, rcanal)
+        }
+        
+    } catch (e) {
+        console.error(e)
     }
-  }, 15000); // 15 segundos
-};
+    
+    // Mensaje de advertencia
+    await conn.sendMessage(m.chat, { 
+        text: `⚠️ *AVISO IMPORTANTE* ⚠️\n\n@${user.split('@')[0]}, *TIENES 15 SEGUNDOS PARA DECIR TUS ÚLTIMAS PALABRAS* ⏳\n\n*¡Adiós, basura!* 🤮`,
+        mentions: [user]
+    })
+    
+    // Espera 15 segundos antes de kickear
+    setTimeout(async () => {
+        try {
+            await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
+            await conn.sendMessage(m.chat, { 
+                text: `🗑️ *USUARIO ELIMINADO* 🗑️\n\n@${user.split('@')[0]} ha sido expulsado del grupo.\n\n*Ojalá no vuelva...* 👋`,
+                mentions: [user]
+            })
+            await conn.sendMessage(m.chat, { react: { text: '🗑️', key: m.key } })
+        } catch (error) {
+            console.error("Error al kickear:", error)
+            await conn.reply(m.chat, `☑️ *ERROR*\n\nNo se pudo expulsar al usuario. Asegúrate de que el bot sea administrador.`, m, rcanal)
+        }
+    }, 15000)
+}
 
-handler.command = /^(kick|echar|hechar|ban|rip|basura)$/i;
-handler.admin = true;
-handler.group = true;
-handler.botAdmin = true;
-handler.register = false;
-export default handler;
+handler.command = /^(kick|echar|hechar|ban|rip|basura|sacar|expulsar)$/i
+handler.admin = true
+handler.group = true
+handler.botAdmin = true
+handler.register = false
+
+export default handler
