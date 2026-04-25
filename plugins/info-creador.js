@@ -2,10 +2,10 @@
 import PhoneNumber from 'awesome-phonenumber';
 
 const handler = async (m, { conn }) => {
-  const name = 'GojoBot - MD | ᥆𝖿𝖿іᥴіᥲᥣ';
-  const numCreador = '51900922660';
+  const name = 'Kevv. 🏖️';
+  const numCreador = '593993370003';
   const empresa = 'ɢᴏᴊᴏ ʙᴏᴛ ɪɴɪᴄ.';
-  const about = '💫 𝑫𝒆𝒔𝒂𝒓𝒓𝒐𝒍𝒍𝒂𝒅𝒐𝒓 𝒐𝒇𝒇𝒊𝒄𝒊𝒂𝒍 𝒅𝒆 𝑮𝒐𝒋𝒐𝑩𝒐𝒕 - 𝑴𝑫';
+  const about = 'Creador de Elite Bot';
   const correo = 'carlosramirezvillanueva30@gmail.com';
   const web = 'https://CarlosRv.vercel.app/';
   const direccion = 'Tokyo, Japón 🇯🇵';
