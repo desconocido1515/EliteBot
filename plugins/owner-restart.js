@@ -1,23 +1,52 @@
 let handler = async (m, { conn, usedPrefix, command, isROwner }) => {
-if (!isROwner) return
-try {
-await m.react('🕒')
-m.reply(`❀ Reiniciando a ${botname} જ⁀➴\n> ► Espera hasta que el *Socket* se reinicie.`)
-await m.react('✔️')
-setTimeout(() => {
-if (process.send) {
-process.send("restart")
-} else {
-process.exit(0)
-}}, 3000)
-} catch (error) {
-await m.react('✖️')
-console.log(error)
-conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${error.message}`, m)
-}}
+    if (!isROwner) return
+    
+    try {
+        if (command === 'restart' || command === 'reiniciar') {
+            await m.react('🕒')
+            await conn.reply(m.chat, `☑️ *REINICIANDO BOT* ☑️\n\n⏳ Espera hasta que el bot se reinicie completamente.\n\n📌 *El proceso puede tomar unos segundos.*`, m, rcanal)
+            await m.react('✔️')
+            setTimeout(() => {
+                if (process.send) {
+                    process.send("restart")
+                } else {
+                    process.exit(0)
+                }
+            }, 3000)
+        }
+        
+        else if (command === 'stop') {
+            await m.react('🛑')
+            await conn.reply(m.chat, `🛑 *DETENIENDO BOT* 🛑\n\n⚠️ El bot se detendrá inmediatamente.\n📌 Para iniciarlo nuevamente, usa el comando *iniciar* en la consola o reinicia el panel.`, m, rcanal)
+            await m.react('✔️')
+            setTimeout(() => {
+                process.exit(0)
+            }, 2000)
+        }
+        
+        else if (command === 'iniciar') {
+            await m.react('🔄')
+            await conn.reply(m.chat, `🔄 *INICIANDO BOT* 🔄\n\n☑️ El bot se está reiniciando para aplicar cambios.\n\n📌 *Espera unos segundos...*`, m, rcanal)
+            await m.react('✔️')
+            setTimeout(() => {
+                if (process.send) {
+                    process.send("restart")
+                } else {
+                    process.exit(0)
+                }
+            }, 2000)
+        }
+        
+    } catch (error) {
+        await m.react('✖️')
+        console.log(error)
+        await conn.reply(m.chat, `⚠️ *ERROR*\n\n☑️ Ocurrió un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${error.message}`, m, rcanal)
+    }
+}
 
-handler.help = ['restart']
+handler.help = ['restart', 'reiniciar', 'stop', 'iniciar']
 handler.tags = ['owner']
-handler.command = ['restart', 'reiniciar'] 
+handler.command = ['restart', 'reiniciar', 'stop', 'iniciar']
+handler.rowner = true
 
 export default handler
