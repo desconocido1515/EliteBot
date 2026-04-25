@@ -97,22 +97,23 @@ ${m.messageStubParameters[0]}
         }
     }
 
+    // Solo agregué rcanal como cuarto parámetro en cada sendMessage
     if (chat.detect && m.messageStubType == 21) {
-        await conn.sendMessage(m.chat, { text: nombre, mentions: [m.sender, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });   
+        await conn.sendMessage(m.chat, { text: nombre, mentions: [m.sender, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal });   
     } else if (chat.detect && m.messageStubType == 22) {
-        await conn.sendMessage(m.chat, { text: foto, mentions: [m.sender] }, { quoted: fkontak });  
+        await conn.sendMessage(m.chat, { text: foto, mentions: [m.sender] }, { quoted: fkontak, rcanal });  
     } else if (chat.detect && m.messageStubType == 23) {
-        await conn.sendMessage(m.chat, { text: newlink, mentions: [m.sender] }, { quoted: fkontak }); 
+        await conn.sendMessage(m.chat, { text: newlink, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
     } else if (chat.detect && m.messageStubType == 24) {
-        await conn.sendMessage(m.chat, { text: desc, mentions: [m.sender] }, { quoted: fkontak }); 
+        await conn.sendMessage(m.chat, { text: desc, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
     } else if (chat.detect && m.messageStubType == 25) {
-        await conn.sendMessage(m.chat, { text: edit, mentions: [m.sender] }, { quoted: fkontak }); 
+        await conn.sendMessage(m.chat, { text: edit, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
     } else if (chat.detect && m.messageStubType == 26) {
-        await conn.sendMessage(m.chat, { text: status, mentions: [m.sender] }, { quoted: fkontak });
+        await conn.sendMessage(m.chat, { text: status, mentions: [m.sender] }, { quoted: fkontak, rcanal });
     } else if (chat.detect && m.messageStubType == 29) {
-        await conn.sendMessage(m.chat, { text: admingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak }); 
+        await conn.sendMessage(m.chat, { text: admingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal }); 
     } else if (chat.detect && m.messageStubType == 30) {
-        await conn.sendMessage(m.chat, { text: noadmingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });
+        await conn.sendMessage(m.chat, { text: noadmingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal });
     } else {
         if (m.messageStubType == 2) return;
         console.log({
