@@ -1,5 +1,3 @@
-// plugins/antiprivado.js
-
 export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }) {
   if (m.isBaileys && m.fromMe) return true;
   if (m.isGroup) return false;
@@ -17,6 +15,7 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
   if (m.sender.includes(creador.replace('+', ''))) return true;
 
   if (bot.antiPrivate && !isOwner && !isROwner) {
+    // ✅ ELIMINÉ la condición del prefijo - ahora bloquea CUALQUIER mensaje
     const grupoURL = 'https://chat.whatsapp.com/ETHW7aP7kOICrR2RBrfE6N'; 
     const nombreUsuario = await conn.getName(m.sender);
     const mensajeBloqueo = `⚠️ *Hola ${nombreUsuario}*, mi creador ha desactivado los comandos en chats privados.\n\n🌌 *Únete al grupo oficial para usar el bot:*\n${grupoURL}`;
@@ -24,7 +23,12 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
 
     await conn.sendFile(m.chat, imagenURL, 'antiprivado.jpg', mensajeBloqueo, m, false, { mentions: [m.sender]});
     
-    // Esto es lo importante: bloquear TODOS los mensajes, no solo comandos
+    // Opcional: bloquear al usuario
+    try {
+      await conn.updateBlockStatus(m.sender, 'block');
+    } catch (e) {}
+    
+    // Retornar true para que NO se ejecute ningún comando
     return true;
   }
 
