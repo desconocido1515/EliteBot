@@ -1,3 +1,6 @@
+
+
+
 import chalk from 'chalk';
 let WAMessageStubType = (await import("@whiskeysockets/baileys")).default;
 import { readdirSync, unlinkSync, existsSync, promises as fs, rmSync } from 'fs';
@@ -32,50 +35,50 @@ handler.before = async function (m, { conn, participants, groupMetadata, isBotAd
 
     /* ================== TEXTOS ================== */
 
-    const nombre = `☑️ *INFORMACION* ✅
+    const nombre = `*\`INFORMACION\`✅*
 
 ✦ *SE CAMBIÓ EL NOMBRE DEL GRUPO A :*
 *${m.messageStubParameters[0]}*
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const foto = `☑️ *INFORMACION* ✅
+    const foto = `*\`INFORMACION\`✅*
 
 ✦ *SE CAMBIÓ LA IMAGEN DEL GRUPO*
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const edit = `☑️ *INFORMACION* ✅
+    const edit = `*\`INFORMACION\`✅*
 
 ✦ *SE ACTUALIZARON LOS PERMISOS DEL GRUPO*
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const newlink = `☑️ *INFORMACION* ✅
+    const newlink = `*\`INFORMACION\`✅*
 
 ✦ *SE RESTABLECIÓ EL ENLACE DEL GRUPO*
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const status = `☑️ *INFORMACION* ✅
+    const status = `*\`INFORMACION\`✅*
 
 ✦ *EL GRUPO HA SIDO* *${m.messageStubParameters[0] == 'on' ? 'CERRADO' : 'ABIERTO'}*
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const admingp = `☑️ *NUEVO ADMINISTRADOR* ✅
+    const admingp = `*\`NUEVO ADMINISTRADOR\`✅*
 
 ✦ *AHORA ES ADMINISTRADOR :* @${users.split('@')[0]}
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const noadmingp = `☑️ *INFORMACION* ✅
+    const noadmingp = `*\`INFORMACION\`✅*
 
 ✦ *YA NO ES ADMINISTRADOR :* @${users.split('@')[0]}
 
 » *ACCIÓN HECHA POR :* ${usuario}`;
 
-    const desc = `☑️ *INFORMACION* ✅
+    const desc = `*\`INFORMACION\`✅*
 
 ✦ *SE CAMBIÓ LA DESCRIPCIÓN DEL GRUPO A :*
 ${m.messageStubParameters[0]}
@@ -86,7 +89,7 @@ ${m.messageStubParameters[0]}
 
     if (chat.detect && m.messageStubType == 2) {
         const uniqid = (m.isGroup ? m.chat : m.sender).split('@')[0];
-        const sessionPath = `./${sessions}/`;
+        const sessionPath = `./${sessions}/`; // ✅ ruta corregida
 
         for (const file of await fs.readdir(sessionPath)) {
             if (file.includes(uniqid)) {
@@ -97,23 +100,22 @@ ${m.messageStubParameters[0]}
         }
     }
 
-    // Solo agregué rcanal como cuarto parámetro en cada sendMessage
     if (chat.detect && m.messageStubType == 21) {
-        await conn.sendMessage(m.chat, { text: nombre, mentions: [m.sender, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal });   
+        await this.sendMessage(m.chat, { text: nombre, mentions: [m.sender, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });   
     } else if (chat.detect && m.messageStubType == 22) {
-        await conn.sendMessage(m.chat, { text: foto, mentions: [m.sender] }, { quoted: fkontak, rcanal });  
+        await this.sendMessage(m.chat, { text: foto, mentions: [m.sender] }, { quoted: fkontak });  
     } else if (chat.detect && m.messageStubType == 23) {
-        await conn.sendMessage(m.chat, { text: newlink, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
+        await this.sendMessage(m.chat, { text: newlink, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 24) {
-        await conn.sendMessage(m.chat, { text: desc, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
+        await this.sendMessage(m.chat, { text: desc, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 25) {
-        await conn.sendMessage(m.chat, { text: edit, mentions: [m.sender] }, { quoted: fkontak, rcanal }); 
+        await this.sendMessage(m.chat, { text: edit, mentions: [m.sender] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 26) {
-        await conn.sendMessage(m.chat, { text: status, mentions: [m.sender] }, { quoted: fkontak, rcanal });
+        await this.sendMessage(m.chat, { text: status, mentions: [m.sender] }, { quoted: fkontak });
     } else if (chat.detect && m.messageStubType == 29) {
-        await conn.sendMessage(m.chat, { text: admingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal }); 
+        await this.sendMessage(m.chat, { text: admingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak }); 
     } else if (chat.detect && m.messageStubType == 30) {
-        await conn.sendMessage(m.chat, { text: noadmingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak, rcanal });
+        await this.sendMessage(m.chat, { text: noadmingp, mentions: [m.sender, users, ...groupAdmins.map(v => v.id)] }, { quoted: fkontak });
     } else {
         if (m.messageStubType == 2) return;
         console.log({
