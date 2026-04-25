@@ -30,20 +30,38 @@ let handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmi
         console.error(e)
     }
     
-    // Mensaje de advertencia
-    await conn.sendMessage(m.chat, { 
-        text: `⚠️ *AVISO IMPORTANTE* ⚠️\n\n@${user.split('@')[0]}, *TIENES 15 SEGUNDOS PARA DECIR TUS ÚLTIMAS PALABRAS* ⏳\n\n*¡Adiós, basura!* 🤮`,
-        mentions: [user]
-    })
+    // Textos agresivos aleatorios
+    const textosAgresivos = [
+        `⚠️ *FUERA DE AQUÍ, BASURA* ⚠️\n\n@${user.split('@')[0]}, *TIENES 15 SEGUNDOS PARA DESAPARECER VOLUNTARIAMENTE* ⏳\n\n*Si no te vas, yo te voy a echar a patadas!* 👢💀`,
+        
+        `👊 *CHAU CHAU, RATA* 👊\n\n@${user.split('@')[0]}, *TE DAMOS 15 SEGUNDOS PARA QUE HUYAS* 🏃💨\n\n*Porque cuando pase el tiempo, vuelas de aquí!* 🦵💥`,
+        
+        `🤮 *VETE A LA MIERDA* 🤮\n\n@${user.split('@')[0]}, *15 SEGUNDOS TENÉS PARA DECIR ADIÓS* ⏰\n\n*Después de eso, nunca más vuelvas, parásito!* 🪳❌`,
+        
+        `💀 *ÚLTIMA OPORTUNIDAD, ESCORIA* 💀\n\n@${user.split('@')[0]}, *15 SEGUNDOS PARA ARREPENTIRTE* ⏳\n\n*¡CORRE, INSERVIBLE, ANTES DE QUE TE SAQUE!* 🦶🔥`,
+        
+        `🗑️ *BASURA DETECTADA* 🗑️\n\n@${user.split('@')[0]}, *TE QUEDAN 15 SEGUNDOS PARA SALIR POR TU PROPIO PIE* 🚪\n\n*O TE SACO A PATADAS COMO LA RATA QUE SOS!* 🐀💥`,
+        
+        `😈 *ADVERTENCIA FINAL* 😈\n\n@${user.split('@')[0]}, *15 SEGUNDOS PARA QUE DESAPAREZCAS DE MI VISTA* 👁️\n\n*¡ZÁFATE, MOGÓLICO, QUE YA VAS!* 🦵🚪`,
+        
+        `🔥 *TE QUEMAMOS, NOCIVO* 🔥\n\n@${user.split('@')[0]}, *TE REGALO 15 SEGUNDOS PARA QUE TE VAYAS* ⏱️\n\n*DESPUÉS, NI LA POLICÍA TE ENCUENTRA!* 👮❌`,
+        
+        `🪦 *PREPARATE PARA VOLAR* 🪦\n\n@${user.split('@')[0]}, *15 SEGUNDOS TENÉS PARA REZAR* ⛪\n\n*PORQUE VAS A DESAPARECER COMO CACA POR EL INODORO!* 🚽💩`,
+        
+        `🤜 *NO MEREZCO PERDÓN* 🤛\n\n@${user.split('@')[0]}, *15 SEGUNDOS PARA QUE LLAMES A TU MAMITA* 📞\n\n*¡FUISTE, PAPÁ! A CHUPAR LIMONES A OTRO LADO!* 🍋🦵`,
+        
+        `⚡ *VAS A SALIR VOLANDO* ⚡\n\n@${user.split('@')[0]}, *15 SEGUNDOS PARA QUE ENTIERRES TUS SENTIMIENTOS* 🪦\n\n*¡CHAUS, PAJERAZO, NO TE VAMOS A EXTRAÑAR!* 🥾💨`
+    ]
+    
+    const textoAleatorio = textosAgresivos[Math.floor(Math.random() * textosAgresivos.length)]
+    
+    // Mensaje de advertencia con texto aleatorio
+    await conn.reply(m.chat, textoAleatorio, m, rcanal)
     
     // Espera 15 segundos antes de kickear
     setTimeout(async () => {
         try {
             await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
-            await conn.sendMessage(m.chat, { 
-                text: `🗑️ *USUARIO ELIMINADO* 🗑️\n\n@${user.split('@')[0]} ha sido expulsado del grupo.\n\n*Ojalá no vuelva...* 👋`,
-                mentions: [user]
-            })
             await conn.sendMessage(m.chat, { react: { text: '🗑️', key: m.key } })
         } catch (error) {
             console.error("Error al kickear:", error)
