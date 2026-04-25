@@ -22,8 +22,8 @@ if (!comandoReal) {
 ❌ `\𝖮𝖥𝖥\` 𝖲𝗂𝗀𝗇𝗂𝖿𝗂𝖼𝖺 𝖣𝖾𝗌𝖺𝖼𝗍𝗂𝗏𝖺𝖽𝗈
 
 
-> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
-> 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
+ 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.on welcome\`
+ 𝖯𝗈𝗋 𝖾𝗃𝖾𝗆𝗉𝗅𝗈: \`.off welcome\`
 
 
 🔏 \`ESTADO DEL GRUPO\`
