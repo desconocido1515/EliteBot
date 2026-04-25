@@ -7,7 +7,7 @@ const handler = async (m, { conn }) => {
   const empresa = 'ɢᴏᴊᴏ ʙᴏᴛ ɪɴɪᴄ.';
   const about = 'Creador de Elite Bot';
   const correo = 'carlosramirezvillanueva30@gmail.com';
-  const web = 'https://CarlosRv.vercel.app/';
+  const web = 'https://Kevin.vercel.app/';
   const direccion = 'Tokyo, Japón 🇯🇵';
   const fotoPerfil = 'https://files.catbox.moe/2vwn2d.jpg';
 
