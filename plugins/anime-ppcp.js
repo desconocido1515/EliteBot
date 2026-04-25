@@ -17,7 +17,7 @@ await conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPref
 
 handler.help = ['ppcouple']
 handler.tags = ['anime']
-handler.command = ['ppcp', 'ppcouple']
+handler.command = ['par', 'ppcouple']
 handler.group = true
 
 export default handler
