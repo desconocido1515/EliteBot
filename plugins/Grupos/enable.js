@@ -4,23 +4,21 @@ if (primaryBot && conn.user.jid !== primaryBot) throw !1
 const chat = global.db.data.chats[m.chat]
 const settings = global.db.data.settings[conn.user.jid] || {}
 
-// El comando puede ser 'on' o 'off'
 const accion = command.toLowerCase()
 const comandoReal = args[0]?.toLowerCase()
 
-// Si no hay comandoReal, mostrar panel con estados
+// Si no hay comandoReal, mostrar panel
 if (!comandoReal) {
-    // Obtener estados de los comandos
-    const estadoWelcome = chat.welcome ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoNsfw = chat.nsfw ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoEconomy = chat.economy ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoRpg = chat.gacha ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoDetect = chat.detect ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoAntiLink = chat.antiLink ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoModoAdmin = chat.modoadmin ? '✅ ACTIVADO' : '❌ DESACTIVADO'
-    const estadoJadibot = settings.jadibotmd ? '✅ ACTIVADO' : '❌ DESACTIVADO'
+    const estadoJadibot = settings.jadibotmd ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoWelcome = chat.welcome ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoNsfw = chat.nsfw ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoEconomy = chat.economy ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoRpg = chat.gacha ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoDetect = chat.detect ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoAntiLink = chat.antiLink ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
+    const estadoModoAdmin = chat.modoadmin ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     
-    return conn.reply(m.chat, `╭━━━〔 ⚙️ PANEL DE CONTROL 〕━━⬣
+    return conn.reply(m.chat, `╭━━━〔 ⚙️ ᴘᴀɴᴇʟ ᴅᴇ ᴄᴏɴᴛʀᴏʟ 〕━━⬣
 ┃
 ┃ ✨ *COMANDOS DISPONIBLES* ✨
 ┃
@@ -63,19 +61,29 @@ if (comandoReal === 'jadibot' || comandoReal === 'serbot') {
     }
     
     let isEnable = settings.jadibotmd !== undefined ? settings.jadibotmd : true
+    let estadoTexto = isEnable ? 'ACTIVADO' : 'DESACTIVADO'
     
     if (accion === 'on') {
-        if (isEnable) return conn.reply(m.chat, `☑️ *${comandoReal.toUpperCase()}* ya estaba *ACTIVADO* globalmente.`, m, rcanal)
+        if (isEnable) return conn.reply(m.chat, `☑️ *JADIBOT* ya estaba *ACTIVADO* globalmente.`, m, rcanal)
         isEnable = true
+        estadoTexto = 'ACTIVADO'
     } else if (accion === 'off') {
-        if (!isEnable) return conn.reply(m.chat, `☑️ *${comandoReal.toUpperCase()}* ya estaba *DESACTIVADO* globalmente.`, m, rcanal)
+        if (!isEnable) return conn.reply(m.chat, `☑️ *JADIBOT* ya estaba *DESACTIVADO* globalmente.`, m, rcanal)
         isEnable = false
+        estadoTexto = 'DESACTIVADO'
     } else {
         return conn.reply(m.chat, `☑️ Acción no válida. Usa *${usedPrefix}on* o *${usedPrefix}off*.`, m, rcanal)
     }
     
     settings.jadibotmd = isEnable
-    return conn.reply(m.chat, `🌍 *CONFIGURACIÓN GLOBAL* 🌍\n\n✅ *${comandoReal.toUpperCase()}* ha sido *${isEnable ? 'ACTIVADO' : 'DESACTIVADO'}* para TODO el bot.`, m, rcanal)
+    
+    return conn.reply(m.chat, `
+❱❱ 𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇 ❰❰
+
+⚙️ 𝙁𝙐𝙉𝘾𝙄𝙊́𝙉 *|* jadibot
+⚙️ 𝙀𝙎𝙏𝘼𝘿𝙊 *|* ${estadoTexto}
+⚙️ 𝙀𝙉 𝙀𝙎𝙏𝙀 *|* 𝘽𝙊𝙏
+`, m, rcanal)
 }
 
 // ==================== CONFIGURACIÓN POR GRUPO ====================
@@ -89,82 +97,97 @@ if (!isAdmin && !isOwner) {
 
 let isEnable = chat[comandoReal] !== undefined ? chat[comandoReal] : false
 let nombreComando = ''
+let estadoTexto = isEnable ? 'ACTIVADO' : 'DESACTIVADO'
 
 switch (comandoReal) {
     case 'welcome': case 'bienvenida':
-        nombreComando = 'WELCOME'
+        nombreComando = 'welcome'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *WELCOME* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *WELCOME* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.welcome = isEnable
         break
     case 'modoadmin': case 'onlyadmin':
-        nombreComando = 'MODO ADMIN'
+        nombreComando = 'modoadmin'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *MODO ADMIN* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *MODO ADMIN* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.modoadmin = isEnable
         break
     case 'detect': case 'alertas':
-        nombreComando = 'DETECT'
+        nombreComando = 'detect'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *DETECT* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *DETECT* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.detect = isEnable
         break
     case 'antilink': case 'antienlace':
-        nombreComando = 'ANTI LINK'
+        nombreComando = 'antilink'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *ANTI LINK* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *ANTI LINK* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.antiLink = isEnable
         break
     case 'nsfw': case 'modohorny':
-        nombreComando = 'NSFW'
+        nombreComando = 'nsfw'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *NSFW* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *NSFW* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.nsfw = isEnable
         break
     case 'economy': case 'economia':
-        nombreComando = 'ECONOMY'
+        nombreComando = 'economy'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *ECONOMY* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *ECONOMY* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.economy = isEnable
         break
     case 'rpg': case 'gacha':
-        nombreComando = 'RPG'
+        nombreComando = 'rpg'
         if (accion === 'on') {
             if (isEnable) return conn.reply(m.chat, `☑️ *RPG* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
             isEnable = true
+            estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
             if (!isEnable) return conn.reply(m.chat, `☑️ *RPG* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
             isEnable = false
+            estadoTexto = 'DESACTIVADO'
         }
         chat.gacha = isEnable
         break
@@ -173,7 +196,14 @@ switch (comandoReal) {
 }
 
 chat[comandoReal] = isEnable
-conn.reply(m.chat, `✅ *${nombreComando}* ha sido *${isEnable ? 'ACTIVADO' : 'DESACTIVADO'}* para ESTE grupo.`, m, rcanal)
+
+return conn.reply(m.chat, `
+❱❱ 𝙀𝙇𝙄𝙏𝙀 𝘽𝙊𝙏 𝙂𝙇𝙊𝘽𝘼𝙇 ❰❰
+
+⚙️ 𝙁𝙐𝙉𝘾𝙄𝙊́𝙉 *|* ${nombreComando}
+⚙️ 𝙀𝙎𝙏𝘼𝘿𝙊 *|* ${estadoTexto}
+⚙️ 𝙀𝙉 𝙀𝙎𝙏𝙀 *|* 𝙂𝙍𝙐𝙋𝙊
+`, m, rcanal)
 }
 
 handler.help = ['on', 'off']
