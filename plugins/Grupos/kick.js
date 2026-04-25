@@ -1,4 +1,17 @@
-let handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmin }) => {
+let handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmin, isOwner }) => {
+    
+    // VERIFICACIÓN MANUAL DE ADMIN (por si no funciona handler.admin)
+    let isUserAdmin = false
+    if (m.isGroup) {
+        const groupMetadata = await conn.groupMetadata(m.chat)
+        const participant = groupMetadata.participants.find(p => p.id === m.sender)
+        isUserAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+    }
+    
+    if (!isUserAdmin && !isOwner) {
+        return conn.reply(m.chat, `☑️ *PERMISO DENEGADO*\n\nEste comando solo puede ser usado por administradores del grupo.`, m, rcanal)
+    }
+    
     // Usar la misma lógica de mención que promote
     let mentionedJid = await m.mentionedJid
     let user = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
@@ -71,9 +84,7 @@ let handler = async (m, { conn, usedPrefix, command, text, groupMetadata, isAdmi
 }
 
 handler.command = /^(kick|echar|hechar|ban|rip|basura|sacar|expulsar)$/i
-handler.admin = true
 handler.group = true
 handler.botAdmin = true
-handler.register = false
 
 export default handler
