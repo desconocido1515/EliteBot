@@ -18,7 +18,7 @@ if (!comandoReal) {
     const estadoAntiLink = chat.antiLink ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     const estadoModoAdmin = chat.modoadmin ? '𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊' : '𝘿𝙀𝙎𝘼𝘾𝙏𝙄𝙑𝘼𝘿𝙊'
     
-    return conn.reply(m.chat, `╭━━━〔 ⚙️ ᴘᴀɴᴇʟ ᴅᴇ ᴄᴏɴᴛʀᴏʟ 〕━━⬣
+    return conn.reply(m.chat, `╭━━━ 𝙎𝙄𝙎𝙏𝙀𝙈𝘼 𝙀𝙇𝙄𝙏𝙀 ━━⬣
 ┃
 ┃ ✨ *COMANDOS DISPONIBLES* ✨
 ┃
@@ -57,18 +57,21 @@ if (!comandoReal) {
 // ==================== CONFIGURACIÓN GLOBAL JADIBOT ====================
 if (comandoReal === 'jadibot' || comandoReal === 'serbot') {
     if (!isOwner) {
-        return conn.reply(m.chat, `☑️ *ACCESO DENEGADO*\n\nEl comando *${comandoReal}* solo puede ser usado por el *OWNER* del bot.`, m, rcanal)
+        return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘛𝘦 𝘪𝘯𝘧𝘰𝘳𝘮𝘰 𝘲𝘶𝘦 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰 𝘴𝘰𝘭𝘰 𝘱𝘶𝘦𝘥𝘦 𝘶𝘵𝘪𝘭𝘪𝘻𝘢𝘳 𝘮𝘪 𝘤𝘳𝘦𝘢𝘥𝘰𝘳 𝘒𝘦𝘷𝘪𝘯.`, m, rcanal)
     }
     
     let isEnable = settings.jadibotmd !== undefined ? settings.jadibotmd : true
     let estadoTexto = isEnable ? 'ACTIVADO' : 'DESACTIVADO'
     
     if (accion === 'on') {
-        if (isEnable) return conn.reply(m.chat, `☑️ *JADIBOT* ya estaba *ACTIVADO* globalmente.`, m, rcanal)
+        if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘑𝘈𝘋𝘐𝘉𝘖𝘛 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘨𝘭𝘰𝘣𝘢𝘭𝘮𝘦𝘯𝘵𝘦.`, m, rcanal)
         isEnable = true
         estadoTexto = 'ACTIVADO'
     } else if (accion === 'off') {
-        if (!isEnable) return conn.reply(m.chat, `☑️ *JADIBOT* ya estaba *DESACTIVADO* globalmente.`, m, rcanal)
+        if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘑𝘈𝘋𝘐𝘉𝘖𝘛 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘨𝘭𝘰𝘣𝘢𝘭𝘮𝘦𝘯𝘵𝘦.`, m, rcanal)
         isEnable = false
         estadoTexto = 'DESACTIVADO'
     } else {
@@ -88,11 +91,13 @@ if (comandoReal === 'jadibot' || comandoReal === 'serbot') {
 
 // ==================== CONFIGURACIÓN POR GRUPO ====================
 if (!m.isGroup) {
-    return conn.reply(m.chat, `☑️ Este comando solo funciona en grupos.`, m, rcanal)
+    return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘛𝘦 𝘪𝘯𝘧𝘰𝘳𝘮𝘰 𝘲𝘶𝘦 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰 𝘴𝘰𝘭𝘰 𝘱𝘶𝘦𝘥𝘦 𝘶𝘴𝘢𝘳𝘴𝘦 𝘦𝘯 𝘨𝘳𝘶𝘱𝘰𝘴.`, m, rcanal)
 }
 
 if (!isAdmin && !isOwner) {
-    return conn.reply(m.chat, `☑️ Solo administradores pueden usar este comando.`, m, rcanal)
+    return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘛𝘦 𝘪𝘯𝘧𝘰𝘳𝘮𝘰 𝘲𝘶𝘦 𝘦𝘴𝘵𝘦 𝘤𝘰𝘮𝘢𝘯𝘥𝘰 𝘴𝘰𝘭𝘰 𝘱𝘶𝘦𝘥𝘦𝘯 𝘶𝘴𝘢𝘳 𝘭𝘰𝘴 𝘢𝘥𝘮𝘪𝘯𝘪𝘴𝘵𝘳𝘢𝘥𝘰𝘳𝘦𝘴 𝘥𝘦 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
 }
 
 let isEnable = chat[comandoReal] !== undefined ? chat[comandoReal] : false
@@ -103,11 +108,13 @@ switch (comandoReal) {
     case 'welcome': case 'bienvenida':
         nombreComando = 'welcome'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *WELCOME* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘞𝘌𝘓𝘊𝘖𝘔𝘌 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *WELCOME* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘞𝘌𝘓𝘊𝘖𝘔𝘌 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -116,11 +123,13 @@ switch (comandoReal) {
     case 'modoadmin': case 'onlyadmin':
         nombreComando = 'modoadmin'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *MODO ADMIN* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘔𝘖𝘋𝘖 𝘈𝘋𝘔𝘐𝘕 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *MODO ADMIN* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘔𝘖𝘋𝘖 𝘈𝘋𝘔𝘐𝘕 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -129,11 +138,13 @@ switch (comandoReal) {
     case 'detect': case 'alertas':
         nombreComando = 'detect'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *DETECT* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘋𝘌𝘛𝘌𝘊𝘛 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *DETECT* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘋𝘌𝘛𝘌𝘊𝘛 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -142,11 +153,13 @@ switch (comandoReal) {
     case 'antilink': case 'antienlace':
         nombreComando = 'antilink'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *ANTI LINK* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘈𝘕𝘛𝘐 𝘓𝘐𝘕𝘒 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *ANTI LINK* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘈𝘕𝘛𝘐 𝘓𝘐𝘕𝘒 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -155,11 +168,13 @@ switch (comandoReal) {
     case 'nsfw': case 'modohorny':
         nombreComando = 'nsfw'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *NSFW* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘕𝘚𝘍𝘞 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *NSFW* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘕𝘚𝘍𝘞 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -168,11 +183,13 @@ switch (comandoReal) {
     case 'economy': case 'economia':
         nombreComando = 'economy'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *ECONOMY* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘌𝘊𝘖𝘕𝘖𝘔𝘠 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *ECONOMY* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘌𝘊𝘖𝘕𝘖𝘔𝘠 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
@@ -181,11 +198,13 @@ switch (comandoReal) {
     case 'rpg': case 'gacha':
         nombreComando = 'rpg'
         if (accion === 'on') {
-            if (isEnable) return conn.reply(m.chat, `☑️ *RPG* ya estaba *ACTIVADO* en este grupo.`, m, rcanal)
+            if (isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘙𝘗𝘎 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = true
             estadoTexto = 'ACTIVADO'
         } else if (accion === 'off') {
-            if (!isEnable) return conn.reply(m.chat, `☑️ *RPG* ya estaba *DESACTIVADO* en este grupo.`, m, rcanal)
+            if (!isEnable) return conn.reply(m.chat, `¡𝘏𝘰𝘭𝘢 𝘏𝘶𝘮𝘢𝘯𝘰! ✨
+» 𝘙𝘗𝘎 𝘺𝘢 𝘦𝘴𝘵𝘢𝘣𝘢 *𝘋𝘌𝘚𝘈𝘊𝘛𝘐𝘝𝘈𝘋𝘖* 𝘦𝘯 𝘦𝘴𝘵𝘦 𝘨𝘳𝘶𝘱𝘰.`, m, rcanal)
             isEnable = false
             estadoTexto = 'DESACTIVADO'
         }
