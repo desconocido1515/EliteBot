@@ -3,7 +3,7 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
   if (m.isGroup) return false;
   if (!m.message) return true;
 
-  const chat = global.db.data.chats[m.chat];
+  const chat = global.db.data.chats[m.chat] = global.db.data.chats[m.chat] || {}; // asegurar existencia
   const bot = global.db.data.settings[conn.user.jid] || {};
 
   const palabrasClave = ['PIEDRA', 'PAPEL', 'TIJERA', 'serbot', 'jadibot'];
@@ -13,6 +13,9 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
 
   const creador = '+5804242773183';
   if (m.sender.includes(creador.replace('+', ''))) return true;
+
+  // 🚫 Si ya se le envió antes, no hacer nada
+  if (chat.antiPrivateSent) return true;
 
   if (bot.antiPrivate && !isOwner && !isROwner) {
     const prefixRegex = /^[!/#$.]/; 
@@ -44,6 +47,9 @@ https://sites.google.com/view/elitebotglobal?usp=sharing
         false,
         { mentions: [m.sender], gifPlayback: true }
       );
+
+      // ✅ Marcar como ya enviado
+      chat.antiPrivateSent = true;
 
       await conn.updateBlockStatus(m.chat, 'block');
     }
