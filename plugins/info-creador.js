@@ -41,7 +41,7 @@ END:VCARD`.trim();
     contextInfo: {
     mentionedJid: [m.sender],
       externalAdReply: {
-        title: '📌 ƈσɳƚαƈƚσ ԃҽ ɱι ƈɾҽαԃσɾ •💫',
+        title: 'Desarrollador profesional',
         body: '',
         mediaType: 1,
         thumbnailUrl: fotoPerfil,
