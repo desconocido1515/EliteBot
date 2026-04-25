@@ -8,28 +8,45 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }
 
   const palabrasClave = ['PIEDRA', 'PAPEL', 'TIJERA', 'serbot', 'jadibot'];
 
-  if (palabrasClave.some((palabra) => m.text && m.text.includes(palabra))) return true;
+  if (palabrasClave.some((palabra) => m.text.includes(palabra))) return true;
   if (m.chat === '120363416409380841@newsletter') return true;
 
   const creador = '+5804242773183';
   if (m.sender.includes(creador.replace('+', ''))) return true;
 
   if (bot.antiPrivate && !isOwner && !isROwner) {
-    // ✅ ELIMINÉ la condición del prefijo - ahora bloquea CUALQUIER mensaje
-    const grupoURL = 'https://chat.whatsapp.com/ETHW7aP7kOICrR2RBrfE6N'; 
-    const nombreUsuario = await conn.getName(m.sender);
-    const mensajeBloqueo = `⚠️ *Hola ${nombreUsuario}*, mi creador ha desactivado los comandos en chats privados.\n\n🌌 *Únete al grupo oficial para usar el bot:*\n${grupoURL}`;
-    const imagenURL = 'https://files.catbox.moe/y6hfiv.jpg';
+    const prefixRegex = /^[!/#$.]/; 
+    if (prefixRegex.test(m.text)) {
+      const grupoURL = 'https://chat.whatsapp.com/ETHW7aP7kOICrR2RBrfE6N'; 
+      const nombreUsuario = await conn.getName(m.sender);
 
-    await conn.sendFile(m.chat, imagenURL, 'antiprivado.jpg', mensajeBloqueo, m, false, { mentions: [m.sender]});
-    
-    // Opcional: bloquear al usuario
-    try {
-      await conn.updateBlockStatus(m.sender, 'block');
-    } catch (e) {}
-    
-    // Retornar true para que NO se ejecute ningún comando
-    return true;
+      const now = new Date();
+      const week = now.toLocaleDateString('es-EC', { weekday: 'long' });
+      const date = now.toLocaleDateString('es-EC');
+
+      const mensajeBloqueo = `¡Hola! 👋🏻 @${m.sender.split("@")[0]}
+\`\`\`${week}, ${date}\`\`\`
+
+INGRESA AL LINK PARA VER EL CATÁLOGO:
+https://sites.google.com/view/elitebotglobal?usp=sharing
+
+ © 2023 EliteBotGlobal // ProyectoX`;
+      
+      // 📁 Ruta local
+      let videoPath = './media/tienda.mp4';
+
+      await conn.sendFile(
+        m.chat,
+        videoPath,
+        'antiprivado.mp4',
+        mensajeBloqueo,
+        m,
+        false,
+        { mentions: [m.sender], gifPlayback: true }
+      );
+
+      await conn.updateBlockStatus(m.chat, 'block');
+    }
   }
 
   return false;
