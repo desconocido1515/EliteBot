@@ -9,7 +9,9 @@ const handler = async (m, { conn }) => {
   const correo = 'carlosramirezvillanueva30@gmail.com';
   const web = 'https://Kevin.vercel.app/';
   const direccion = 'Tokyo, Japón 🇯🇵';
-  const fotoPerfil = 'https://files.catbox.moe/2vwn2d.jpg';
+
+  // 🔥 AQUÍ TU NUEVA IMAGEN
+  const fotoPerfil = 'https://raw.githubusercontent.com/desconocido1515/desco/main/media/creador.jpg';
 
   const vcard = `
 BEGIN:VCARD
@@ -32,14 +34,16 @@ END:VCARD`.trim();
     displayName: name,
     vcard
   };
+
   m.react('☁️');
+
   await conn.sendMessage(m.chat, {
     contacts: {
       displayName: name,
       contacts: [contactMessage]
     },
     contextInfo: {
-    mentionedJid: [m.sender],
+      mentionedJid: [m.sender],
       externalAdReply: {
         title: 'Desarrollador profesional',
         body: '',
@@ -55,4 +59,5 @@ END:VCARD`.trim();
 handler.help = ['creador'];
 handler.tags = ['info'];
 handler.command = ['creador', 'creator', 'owner'];
+
 export default handler;
